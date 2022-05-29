@@ -16,19 +16,3 @@ class Config(Dependencies):
         _open = self.__bevy__.get(open, provider_type=FunctionProvider)
         with _open(self._path, "rb") as f:
             self._data |= safe_load(f.read())
-
-
-from bevy import Context
-from io import BytesIO
-
-
-c = Context()
-c.use_for(
-    lambda path, mode: BytesIO(
-        b"Hello: World\npath: " + bytes(path) + b"\nmode: " + mode.encode()
-    ),
-    open,
-    provider_type=FunctionProvider,
-)
-config = c.get(Config, args=("Test/Path",))
-print(config._data)
