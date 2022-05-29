@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, Unicode
-from soc.models.base import BaseModel
+from soc.database.models.base import BaseModel
 
 
 class SessionField(BaseModel):

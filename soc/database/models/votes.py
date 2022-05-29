@@ -1,6 +1,6 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode
 from sqlalchemy.sql import func
-from soc.models.base import BaseModel
+from soc.database.models.base import BaseModel
 
 
 class Vote(BaseModel):
