@@ -1,8 +1,9 @@
 from pathlib import Path
-from yaml import safe_load
 
 from bevy import Dependencies
 from bevy.function_provider import FunctionProvider
+from pydantic import BaseSettings, Extra
+from yaml import safe_load
 
 
 class Config(Dependencies):
