@@ -8,6 +8,7 @@ from yaml import safe_load
 
 class Config(Dependencies):
     def __init__(self, *file_paths: str | Path):
+        super().__init__()
         self._paths = tuple(Path(file_path) for file_path in file_paths)
         self._data = {}
 
