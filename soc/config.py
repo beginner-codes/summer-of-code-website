@@ -33,5 +33,10 @@ class Config(Dependencies):
     def _load(self):
         _open = self.__bevy__.get(open, provider_type=FunctionProvider)
         for path in self._paths:
-            with _open(path, "rb") as f:
-                self._data |= safe_load(f.read())
+            try:
+                f = _open(path, "rb")
+            except FileNotFoundError:
+                pass
+            else:
+                with f:
+                    self._data |= safe_load(f.read())
