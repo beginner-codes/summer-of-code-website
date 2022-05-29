@@ -3,11 +3,11 @@ from typing import Type, TypeVar
 
 from bevy import Dependencies
 from bevy.function_provider import FunctionProvider
-from pydantic import BaseSettings, Extra
+from pydantic import BaseSettings as _BaseSettings, Extra
 from yaml import safe_load
 
 
-class BaseSettingsModel(BaseSettings):
+class BaseSettingsModel(_BaseSettings):
     class Config:
         extra = Extra.allow
         env_prefix = "SOC_"
