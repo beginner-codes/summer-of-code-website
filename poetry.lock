@@ -56,7 +56,7 @@ test = ["pycodestyle (>=2.7.0,<2.8.0)", "flake8 (>=3.9.2,<3.10.0)", "uvloop (>=0
 
 [[package]]
 name = "bevy"
-version = "1.2.2"
+version = "1.2.3"
 description = "Python Dependency Inversion made simple so you can focus on creating amazing code."
 category = "main"
 optional = false
@@ -427,8 +427,8 @@ asyncpg = [
     {file = "asyncpg-0.25.0.tar.gz", hash = "sha256:63f8e6a69733b285497c2855464a34de657f2cccd25aeaeeb5071872e9382540"},
 ]
 bevy = [
-    {file = "Bevy-1.2.2-py3-none-any.whl", hash = "sha256:6667a761792e0ebd49808524efd0f9504d8156d11665337faa116a2504819397"},
-    {file = "Bevy-1.2.2.tar.gz", hash = "sha256:b6dc86363bb53fee4ba05b0aff1ca4c714b353d5d7239513b24f8f0ed1a04ba3"},
+    {file = "Bevy-1.2.3-py3-none-any.whl", hash = "sha256:5a48cf8dd4fdd93e3e141e723e4cae3a81b07bb777532177d4bf31e9e92a6138"},
+    {file = "Bevy-1.2.3.tar.gz", hash = "sha256:bde81936e9cf6347257a1cbb447826b67b25e568cf258cd412d9e7a1cba3ddba"},
 ]
 black = [
     {file = "black-22.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:2497f9c2386572e28921fa8bec7be3e51de6801f7459dffd6e62492531c47e09"},
