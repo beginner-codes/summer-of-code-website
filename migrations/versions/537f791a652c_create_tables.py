@@ -1,8 +1,8 @@
 """Create tables
 
-Revision ID: 564536bb6ac9
+Revision ID: 537f791a652c
 Revises: 
-Create Date: 2022-05-29 10:51:01.814789
+Create Date: 2022-05-29 14:37:55.651052
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "564536bb6ac9"
+revision = "537f791a652c"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,12 +22,12 @@ def upgrade():
         "Users",
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.Unicode(length=64), nullable=False),
-        sa.Column("avatar", sa.Text(length=256), nullable=True),
-        sa.Column("email", sa.Text(length=256), nullable=False),
+        sa.Column("avatar", sa.Unicode(length=256), nullable=True),
+        sa.Column("email", sa.Unicode(length=256), nullable=False),
         sa.Column(
             "joined",
             sa.DateTime(),
-            server_default=sa.text("(CURRENT_TIMESTAMP)"),
+            server_default=sa.text("now()"),
             nullable=True,
         ),
         sa.Column("banned", sa.Boolean(), nullable=True),
@@ -41,7 +41,7 @@ def upgrade():
         sa.Column(
             "created",
             sa.DateTime(),
-            server_default=sa.text("(CURRENT_TIMESTAMP)"),
+            server_default=sa.text("now()"),
             nullable=True,
         ),
         sa.Column("start", sa.DateTime(), nullable=False),
@@ -56,7 +56,7 @@ def upgrade():
     op.create_table(
         "Roles",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("type", sa.Text(length=32), nullable=False),
+        sa.Column("type", sa.Unicode(length=32), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(["user_id"], ["Users.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
@@ -68,7 +68,7 @@ def upgrade():
         sa.Column(
             "created",
             sa.DateTime(),
-            server_default=sa.text("(CURRENT_TIMESTAMP)"),
+            server_default=sa.text("now()"),
             nullable=True,
         ),
         sa.Column("user_id", sa.Integer(), nullable=True),
@@ -88,7 +88,7 @@ def upgrade():
     op.create_table(
         "Submissions",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("type", sa.Text(length=32), nullable=False),
+        sa.Column("type", sa.Unicode(length=32), nullable=False),
         sa.Column("link", sa.Unicode(length=512), nullable=False),
         sa.Column("description", sa.Unicode(length=4096), nullable=False),
         sa.Column("user_id", sa.Integer(), nullable=True),
@@ -105,11 +105,11 @@ def upgrade():
     op.create_table(
         "SubmissionStatus",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("status", sa.Text(length=32), nullable=False),
+        sa.Column("status", sa.Unicode(length=32), nullable=False),
         sa.Column(
             "updated",
             sa.DateTime(),
-            server_default=sa.text("(CURRENT_TIMESTAMP)"),
+            server_default=sa.text("now()"),
             nullable=True,
         ),
         sa.Column("user_id", sa.Integer(), nullable=True),
@@ -130,7 +130,7 @@ def upgrade():
         sa.Column(
             "created",
             sa.DateTime(),
-            server_default=sa.text("(CURRENT_TIMESTAMP)"),
+            server_default=sa.text("now()"),
             nullable=True,
         ),
         sa.Column("user_id", sa.Integer(), nullable=True),
