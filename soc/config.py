@@ -17,9 +17,11 @@ T = TypeVar("T", bound=BaseSettingsModel)
 
 
 class Config(Dependencies):
+    default_paths = ("production.config.yaml", "development.config.yaml")
+
     def __init__(self, *file_paths: str | Path):
         super().__init__()
-        self._paths = tuple(Path(file_path) for file_path in file_paths)
+        self._paths = tuple(Path(file_path) for file_path in file_paths or self.default_paths)
         self._data = {}
 
         self._load()
