@@ -1,6 +1,6 @@
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer
 from sqlalchemy.sql import func
-from soc.models import BaseModel
+from soc.models.base import BaseModel
 
 
 class Session(BaseModel):

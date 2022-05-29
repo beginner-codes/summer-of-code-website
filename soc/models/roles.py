@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, Text
-from soc.models import BaseModel
+from soc.models.base import BaseModel
 
 
 class Role(BaseModel):
