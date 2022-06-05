@@ -1,19 +1,16 @@
 from io import BytesIO
 
-from bevy import Context
-from bevy.function_provider import FunctionProvider
+from bevy import Context, Bevy
+from bevy.providers.function_provider import FunctionProvider
 from pydantic import Field
 
 from soc.config import Config, BaseSettingsModel
 
 
-def populated_context(data) -> Context:
+def populated_context(open_override) -> Context:
     c = Context()
-    c.add(
-        data,
-        as_type=open,
-        provider_type=FunctionProvider,
-    )
+    c.add_provider(FunctionProvider)
+    c.add(open_override, use_as=open)
     return c
 
 
@@ -23,7 +20,7 @@ def test_yaml_loaded():
             b"Hello: World\npath: " + bytes(path) + b"\nmode: " + mode.encode()
         )
     )
-    config = c.get(Config, args=("Test/Path",))
+    config = c.create(Config, "Test/Path")
     assert config._data == {"Hello": "World", "path": "Test/Path", "mode": "rb"}
 
 
@@ -33,7 +30,7 @@ def test_model_population():
         b: str
 
     c = populated_context(lambda *_: BytesIO(b"data:\n  a: 1\n  b: Hello"))
-    config = c.get(Config, args=("some/path",))
+    config = c.create(Config, "some/path")
     data = config.get(DataModel, "data")
     assert data.a == 1
     assert data.b == "Hello"
@@ -57,7 +54,7 @@ def test_multiple_files():
         return BytesIO(files[str(path)])
 
     c = populated_context(open_mock)
-    config = c.get(Config, args=("a.yaml", "b.yaml"))
+    config = c.create(Config, "a.yaml", "b.yaml")
     data = config.get(DataModel)
     assert data.a == 1
     assert data.b == "Hello"

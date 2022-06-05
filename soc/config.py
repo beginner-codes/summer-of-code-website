@@ -1,8 +1,8 @@
 from pathlib import Path
 from typing import Type, TypeVar
 
-from bevy import Dependencies
-from bevy.function_provider import FunctionProvider
+from bevy import Bevy
+from bevy.providers.function_provider import FunctionProvider
 from pydantic import BaseSettings as _BaseSettings, Extra
 from yaml import safe_load
 
@@ -16,7 +16,7 @@ class BaseSettingsModel(_BaseSettings):
 T = TypeVar("T", bound=BaseSettingsModel)
 
 
-class Config(Dependencies):
+class Config(Bevy):
     default_paths = ("production.config.yaml", "development.config.yaml")
 
     def __init__(self, *file_paths: str | Path):
@@ -31,7 +31,7 @@ class Config(Dependencies):
         return model(**data)
 
     def _load(self):
-        _open = self.__bevy__.get(open, provider_type=FunctionProvider)
+        _open = self.bevy.get(open)
         for path in self._paths:
             try:
                 f = _open(path, "rb")
