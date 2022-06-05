@@ -2,15 +2,9 @@ from pathlib import Path
 from typing import Type, TypeVar
 
 from bevy import Bevy
-from bevy.providers.function_provider import FunctionProvider
-from pydantic import BaseSettings as _BaseSettings, Extra
 from yaml import safe_load
 
-
-class BaseSettingsModel(_BaseSettings):
-    class Config:
-        extra = Extra.allow
-        env_prefix = "SOC_"
+from soc.config.base_model import BaseSettingsModel
 
 
 T = TypeVar("T", bound=BaseSettingsModel)
