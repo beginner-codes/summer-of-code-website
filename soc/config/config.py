@@ -20,7 +20,7 @@ class Config(Bevy):
 
         self._load()
 
-    def get(self, model: Type[T], key: str = None) -> T:
+    def get(self, model: Type[T], key: str | None = None) -> T:
         data = self._data.get(key, {}) if key else self._data
         return model(**data)
 

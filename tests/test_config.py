@@ -1,10 +1,10 @@
 from io import BytesIO
 
-from bevy import Context, Bevy
+from bevy import Bevy, Context, Detect, Inject
 from bevy.providers.function_provider import FunctionProvider
-from pydantic import Field
 
 from soc.config import Config, BaseSettingsModel
+from soc.config.settings_provider import SettingsProvider
 
 
 def populated_context(open_override) -> Context:
@@ -61,3 +61,26 @@ def test_multiple_files():
     assert data.a == 1
     assert data.e.c == 12.3
     assert data.e.d == [1, 2]
+
+
+def test_populated_settings_injection():
+    class SectionModel(BaseSettingsModel):
+        __config_key__ = "section"
+
+        foo: str
+
+    class Test(Bevy[Detect.ALL]):
+        section: SectionModel
+
+    def open_mock(path, _):
+        files = {
+            "a.yaml": b"section:\n  foo: bar",
+        }
+        return BytesIO(files[str(path)])
+
+    c = populated_context(open_mock)
+    c.add_provider(SettingsProvider)
+    c.create(Config, "a.yaml", add_to_context=True)
+    test: Test = c.create(Test)
+    assert test.section.foo == "bar"
+
