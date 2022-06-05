@@ -78,7 +78,7 @@ tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>
 
 [[package]]
 name = "bevy"
-version = "1.3.2"
+version = "1.3.3"
 description = "Python Dependency Inversion made simple so you can focus on creating amazing code."
 category = "main"
 optional = false
@@ -528,8 +528,8 @@ attrs = [
     {file = "attrs-21.4.0.tar.gz", hash = "sha256:626ba8234211db98e869df76230a137c4c40a12d72445c45d5f5b716f076e2fd"},
 ]
 bevy = [
-    {file = "Bevy-1.3.2-py3-none-any.whl", hash = "sha256:075bd889a1cf6c89080af968464cc9a8717c11049fffd14020c044b78809ab2b"},
-    {file = "Bevy-1.3.2.tar.gz", hash = "sha256:286abc292cede20ae57122a87111722f2f4e75fd0003513024e10493abfdf322"},
+    {file = "Bevy-1.3.3-py3-none-any.whl", hash = "sha256:f797a09e6ffda62248ca8ca7a3ac5a3465461d81bd4f6476f76824727a65b0b4"},
+    {file = "Bevy-1.3.3.tar.gz", hash = "sha256:ba8b9bd9dca6d941d2c6029f0bcee53c8dc3175722027ccc98d2656a84302fc4"},
 ]
 black = [
     {file = "black-22.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:2497f9c2386572e28921fa8bec7be3e51de6801f7459dffd6e62492531c47e09"},
