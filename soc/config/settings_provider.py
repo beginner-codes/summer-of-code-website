@@ -32,6 +32,10 @@ class SettingsProvider(TypeProvider):
         return model
 
     def supports(self, obj: Type[BaseSettingsModel] | Any) -> bool:
-        return isinstance(obj, type) and issubclass(obj, BaseSettingsModel)
+        return (
+            isinstance(obj, BaseSettingsModel)
+            or isinstance(obj, type)
+            and issubclass(obj, BaseSettingsModel)
+        )
 
     create_and_insert = high_priority
