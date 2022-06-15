@@ -15,14 +15,18 @@ async def _setup_tables(context: Context):
         await conn.run_sync(BaseModel.metadata.create_all)
 
 
-@pytest.fixture()
-async def context():
-    context = Context()
+async def _connect_db(context: Context):
     context.add_provider(DatabaseProvider)
     context.add(
         DatabaseSettings(driver="sqlite+aiosqlite"),
         use_as=DatabaseSettings,
     )
+
+
+@pytest.fixture()
+async def context():
+    context = Context()
+    await _connect_db(context)
     await _setup_tables(context)
     return context
 
