@@ -41,7 +41,10 @@ class DatabaseProvider(TypeProvider):
         return super().get(obj, default)
 
     def supports(self, obj: Type[Database] | Type[Session]) -> bool:
-        return obj in self._create_methods
+        try:
+            return obj in self._create_methods
+        except TypeError:
+            return False
 
     @bevy_method
     def create_connection(self, settings: DatabaseSettings = Inject) -> Database:
