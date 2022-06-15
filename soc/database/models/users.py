@@ -1,5 +1,6 @@
 from sqlalchemy import Boolean, Column, DateTime, Integer, Unicode
 from sqlalchemy.sql import func
+
 from soc.database.models.base import BaseModel
 
 
@@ -9,5 +10,6 @@ class User(BaseModel):
     name = Column(Unicode(64), nullable=False)
     avatar = Column(Unicode(256), nullable=True)
     email = Column(Unicode(256), nullable=False)
+    password = Column(Unicode(256), nullable=False)
     joined = Column(DateTime, server_default=func.now())
     banned = Column(Boolean, default=False)
