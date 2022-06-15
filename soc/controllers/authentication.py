@@ -29,7 +29,7 @@ class Authentication(Bevy):
         self, name: str, password: str, session: Session = Inject()
     ) -> User | None:
         async with session.begin():
-            result = await session.execute(User.select().where(User.name == name))
+            result = await session.execute(User.select(name=name))
             user: User | None = result.scalars().first()
 
         if user and bcrypt.checkpw(password.encode(), user.password.encode()):
