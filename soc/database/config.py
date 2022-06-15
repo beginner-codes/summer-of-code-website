@@ -4,12 +4,29 @@ from soc.config import BaseSettingsModel
 
 
 class DatabaseSettings(BaseSettingsModel):
-    port: int = Field(env="SOC_DB_PORT")
-    host: str = Field(env="SOC_DB_HOST")
-    name: str = Field(env="SOC_DB_NAME")
-    username: str = Field(env="SOC_DB_USERNAME")
-    password: str = Field(env="SOC_DB_PASSWORD")
+    port: int = Field(default=0, env="SOC_DB_PORT")
+    host: str = Field(default="", env="SOC_DB_HOST")
+    name: str = Field(default="", env="SOC_DB_NAME")
+    username: str = Field(default="", env="SOC_DB_USERNAME")
+    password: str = Field(default="", env="SOC_DB_PASSWORD")
+    driver: str = Field(default="postgres+asyncpg", env="SOC_DB_PASSWORD")
 
     @property
     def uri(self) -> str:
-        return f"postgresql+asyncpg://{self.username}:{self.password}@{self.host}:{self.port}/{self.name}"
+        uri = [self.driver, "://"]
+        if self.username:
+            uri.append(self.username)
+            if self.password:
+                uri.append(f":{self.password}")
+
+            uri.append("@")
+
+        if self.host:
+            uri.append(self.host)
+            if self.port:
+                uri.append(f":{self.port}")
+
+        if self.name:
+            uri.append(f"/{self.name}")
+
+        return "".join(uri)
