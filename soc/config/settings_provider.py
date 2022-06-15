@@ -6,12 +6,22 @@ from bevy.providers.injection_priority_helpers import high_priority
 
 from soc.config import BaseSettingsModel, Config
 
-
 T = TypeVar("T", bound=BaseSettingsModel)
+NOT_FOUND = object()
 
 
 class SettingsProvider(TypeProvider):
     config: Config = Inject
+
+    def get(self, obj: Type[T], default: T | None = None) -> T | None:
+        value = super().get(obj, NOT_FOUND)
+        if value is not NOT_FOUND:
+            return value
+
+        if default:
+            return default
+
+        return self.create(obj, add=True)
 
     def create(self, obj: Type[T], *args, add: bool = False, **kwargs) -> T:
         bound_type = self.bind_to_context(obj, self.bevy)
