@@ -1,9 +1,7 @@
-from types import SimpleNamespace
-
-from bevy import Context
-from sqlalchemy.ext.asyncio import AsyncEngine
 import httpx
 import pytest
+from bevy import Context
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from soc.api import api_app
 from soc.database.config import DatabaseSettings
@@ -21,7 +19,10 @@ async def _setup_tables(context: Context):
 async def context():
     context = Context()
     context.add_provider(DatabaseProvider)
-    context.add(SimpleNamespace(uri="sqlite+aiosqlite://"), use_as=DatabaseSettings)
+    context.add(
+        DatabaseSettings(driver="sqlite+aiosqlite"),
+        use_as=DatabaseSettings,
+    )
     await _setup_tables(context)
     return context
 
