@@ -2,13 +2,11 @@ from typing import Type, TypeVar
 
 from bevy import Inject
 from bevy.providers.function_provider import bevy_method
-from bevy.providers.injection_priority_helpers import high_priority
 from bevy.providers.type_provider import TypeProvider
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from soc.database.config import DatabaseSettings
-
 
 # Aliases for more understandable annotations
 Database = AsyncEngine
@@ -17,9 +15,7 @@ Session = AsyncSession
 T = TypeVar("T")
 
 
-class DatabaseProvider(TypeProvider):
-    create_and_insert = high_priority
-
+class DatabaseProvider(TypeProvider, priority="high"):
     def __init__(self, *_, **__):
         super().__init__()
         self._create_methods = {
