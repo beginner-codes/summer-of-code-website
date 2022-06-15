@@ -1,4 +1,4 @@
-from typing import Callable, Type, TypeVar, ParamSpec
+from typing import Callable, Type, TypeVar, overload, ParamSpec
 
 from bevy import Context
 from fastapi import Depends
@@ -9,8 +9,6 @@ from soc.database.database import DatabaseProvider
 T = TypeVar("T")
 R = TypeVar("R")
 P = ParamSpec("P")
-InjectType = Callable[P, R] | Type[T]
-InjectValue = Callable[P, R] | T
 
 
 def context() -> Context:
@@ -20,7 +18,17 @@ def context() -> Context:
     return ctx
 
 
-def inject(obj: InjectType, *, add: bool = True) -> InjectValue:
+@overload
+def inject(obj: Callable[P, R], *, add: bool = True) -> Callable[P, R]:
+    ...
+
+
+@overload
+def inject(obj: Type[T], *, add: bool = True) -> T:
+    ...
+
+
+def inject(obj: Callable[P, R] | Type[T], *, add: bool = True) -> Callable[P, R] | T:
     def inject_from_context(ctx: Context = Depends(context)):
         return ctx.get(obj) or ctx.create(obj, add_to_context=add)
 
