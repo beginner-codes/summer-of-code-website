@@ -11,9 +11,8 @@ from soc.database.models.users import User
 class AuthenticationSettings(BaseSettingsModel):
     __config_key__ = "authentication"
 
-    password_salt: str = Field(
-        default="$2b$12$xxINVALIDxSALTxCHANGE.", env="SOC_AUTH_PW_SALT"
-    )
+    salt_rounds: int = Field(default=12, env="SOC_AUTH_SALT_ROUNDS")
+    salt_prefix: str = Field(default="2b", env="SOC_AUTH_SALT_PREFIX")
 
 
 class Authentication(Bevy):
@@ -39,9 +38,8 @@ class Authentication(Bevy):
         session: Session = Inject(),
         settings: AuthenticationSettings = Inject(),
     ):
-        hashed_password = bcrypt.hashpw(
-            password.encode(), settings.password_salt.encode()
-        ).decode()
+        salt = bcrypt.gensalt(settings.salt_rounds, settings.salt_prefix.encode())
+        hashed_password = bcrypt.hashpw(password.encode(), salt).decode()
         async with session.begin():
             session.add(
                 User(
