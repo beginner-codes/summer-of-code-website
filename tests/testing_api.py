@@ -1,4 +1,5 @@
 import httpx
+import jwt
 import pytest
 from bevy import Context
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -6,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from fuzzy import FuzzyValue
 from soc.api import api_app
 from soc.context import context as _context
+from soc.controllers.authentication import AuthenticationSettings, JWTSettings
 from soc.database.config import DatabaseSettings
 from soc.database.models.base import BaseModel
 
@@ -16,10 +18,13 @@ async def context():
 
 
 @pytest.fixture(autouse=True)
-async def _connect_db(context: Context):
+async def _setup_context(context: Context):
     context.add(
         DatabaseSettings(driver="sqlite+aiosqlite"),
         use_as=DatabaseSettings,
+    )
+    context.add(
+        AuthenticationSettings(jwt=JWTSettings(private_key="TOP SECRET TEST KEY"))
     )
 
 
@@ -47,7 +52,7 @@ async def test_authentication_invalid_user(client):
 
 
 @pytest.mark.asyncio
-async def test_registration_authentication(client):
+async def test_registration_authentication(client, context):
     response = await client.post(
         "/register",
         data={"username": "Bob", "password": "PASSWORD", "email": "bob@gmail.com"},
@@ -58,5 +63,10 @@ async def test_registration_authentication(client):
     response = await client.post(
         "/authenticate", data={"username": "Bob", "password": "PASSWORD"}
     )
+    json = response.json()
     assert response.status_code == 200
-    assert response.json() == {"access-token": FuzzyValue(str)}
+    assert json == {"access-token": FuzzyValue(str)}
+
+    settings = context.get(AuthenticationSettings).jwt
+    data = jwt.decode(json["access-token"], settings.private_key, settings.algorithm)
+    assert data["username"] == "Bob"
