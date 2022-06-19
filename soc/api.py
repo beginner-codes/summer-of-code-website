@@ -25,7 +25,7 @@ async def authenticate_user(
 ):
     user = await auth.authenticate_user(data.username, data.password)
     if user:
-        return {"access-token": await auth.create_access_token(user)}
+        return {"access_token": await auth.create_access_token(user)}
     else:
         raise HTTPException(403, "Invalid user")
 

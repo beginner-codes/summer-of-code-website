@@ -65,10 +65,10 @@ async def test_registration_authentication(client, context):
     )
     json = response.json()
     assert response.status_code == 200
-    assert json == {"access-token": FuzzyValue(str)}
+    assert json == {"access_token": FuzzyValue(str)}
 
     settings = context.get(AuthenticationSettings).jwt
-    data = jwt.decode(json["access-token"], settings.private_key, settings.algorithm)
+    data = jwt.decode(json["access_token"], settings.private_key, settings.algorithm)
     assert data["username"] == "Bob"
 
 
@@ -76,7 +76,7 @@ async def test_registration_authentication(client, context):
 async def test_bearer_tokens(client):
     auth = {"username": "Bob", "password": "PASSWORD"}
     await client.post("/register", data=auth | {"email": "bob@gmail.com"})
-    token = (await client.post("/authenticate", data=auth)).json()["access-token"]
+    token = (await client.post("/authenticate", data=auth)).json()["access_token"]
     response = await client.get(
         "/secured",
         headers={"Authorization": f"Bearer {token}"},
