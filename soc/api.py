@@ -1,8 +1,9 @@
 from fastapi import Depends, FastAPI, Form, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
+from soc.auth_scheme import auth_scheme
 from soc.context import inject
-from soc.controllers.authentication import Authentication
+from soc.controllers.authentication import Authentication, AuthTokenDict
 
 api_app = FastAPI()
 
@@ -26,3 +27,8 @@ async def authenticate_user(
         return {"access-token": await auth.create_access_token(user)}
     else:
         raise HTTPException(403, "Invalid user")
+
+
+@api_app.get("/secured")
+async def secured_endpoint(user_data: AuthTokenDict = Depends(auth_scheme)):
+    return {"username": user_data["username"]}
