@@ -5,9 +5,9 @@ import jwt
 from bevy import Bevy, Inject
 from bevy.providers import bevy_method
 from pydantic import Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from soc.config import BaseSettingsModel
-from soc.database import Session
 from soc.database.models.users import User
 
 
@@ -33,7 +33,7 @@ class AuthenticationSettings(BaseSettingsModel):
 class Authentication(Bevy):
     @bevy_method
     async def authenticate_user(
-        self, name: str, password: str, session: Session = Inject()
+        self, name: str, password: str, session: AsyncSession = Inject()
     ) -> User | None:
         async with session.begin():
             result = await session.execute(User.select(name=name))
@@ -58,7 +58,11 @@ class Authentication(Bevy):
 
     @bevy_method
     async def _create_user(
-        self, name: str, email: str, hashed_password: str, session: Session = Inject
+        self,
+        name: str,
+        email: str,
+        hashed_password: str,
+        session: AsyncSession = Inject,
     ):
         async with session.begin():
             session.add(

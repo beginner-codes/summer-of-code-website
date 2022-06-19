@@ -8,10 +8,6 @@ from sqlalchemy.orm import sessionmaker
 
 from soc.database.config import DatabaseSettings
 
-# Aliases for more understandable annotations
-Database = AsyncEngine
-Session = AsyncSession
-
 T = TypeVar("T")
 
 
@@ -19,13 +15,13 @@ class DatabaseProvider(TypeProvider, priority="high"):
     def __init__(self, *_, **__):
         super().__init__()
         self._create_methods = {
-            Database: self.create_connection,
-            Session: self.create_session,
+            AsyncEngine: self.create_connection,
+            AsyncSession: self.create_session,
         }
 
     def create(
-        self, obj: Type[Database], *args, add: bool = False, **kwargs
-    ) -> Database:
+        self, obj: Type[AsyncEngine], *args, add: bool = False, **kwargs
+    ) -> AsyncEngine:
         inst = self._create_methods[obj](*args, **kwargs)
         if add:
             self.add(inst, use_as=obj)
@@ -33,27 +29,27 @@ class DatabaseProvider(TypeProvider, priority="high"):
         return inst
 
     def get(self, obj: Type[T], default: T | None = None) -> T | None:
-        if obj is Session:
+        if obj is AsyncSession:
             return self.create_session()
 
         return super().get(obj, default)
 
-    def supports(self, obj: Type[Database] | Type[Session]) -> bool:
+    def supports(self, obj: Type[AsyncEngine] | Type[AsyncSession]) -> bool:
         try:
             return obj in self._create_methods
         except TypeError:
             return False
 
     @bevy_method
-    def create_connection(self, settings: DatabaseSettings = Inject) -> Database:
+    def create_connection(self, settings: DatabaseSettings = Inject) -> AsyncEngine:
         engine = create_async_engine(settings.uri)
-        self.bevy.add(engine, use_as=Database)
+        self.bevy.add(engine, use_as=AsyncEngine)
         self.bevy.add(
-            sessionmaker(engine, expire_on_commit=False, class_=Session),
+            sessionmaker(engine, expire_on_commit=False, class_=AsyncSession),
             use_as=sessionmaker,
         )
         return engine
 
     @bevy_method
-    def create_session(self, session_factory: sessionmaker = Inject) -> Session:
+    def create_session(self, session_factory: sessionmaker = Inject) -> AsyncSession:
         return session_factory()
