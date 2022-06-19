@@ -10,7 +10,7 @@ from sqlalchemy.orm import declarative_base
 
 from soc.database import Database
 from soc.database.config import DatabaseSettings
-from soc.database.database import DatabaseProvider
+from soc.database.provider import DatabaseProvider
 
 
 @pytest.fixture()

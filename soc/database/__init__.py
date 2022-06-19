@@ -1,4 +1,4 @@
-from soc.database.database import Database, Session
+from soc.database.provider import Database, Session
 
 
 __all__ = ["Database", "Session"]

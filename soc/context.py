@@ -4,7 +4,7 @@ from bevy import Context
 from fastapi import Depends
 
 from soc.config.settings_provider import SettingsProvider
-from soc.database.database import DatabaseProvider
+from soc.database.provider import DatabaseProvider
 
 T = TypeVar("T")
 R = TypeVar("R")
