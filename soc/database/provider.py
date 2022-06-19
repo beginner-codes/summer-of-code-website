@@ -17,6 +17,7 @@ class DatabaseProvider(TypeProvider, priority="high"):
         self._create_methods = {
             AsyncEngine: self.create_connection,
             AsyncSession: self.create_session,
+            sessionmaker: self.create_session_maker,
         }
 
     def create(
@@ -44,12 +45,12 @@ class DatabaseProvider(TypeProvider, priority="high"):
     def create_connection(self, settings: DatabaseSettings = Inject) -> AsyncEngine:
         engine = create_async_engine(settings.uri)
         self.bevy.add(engine, use_as=AsyncEngine)
-        self.bevy.add(
-            sessionmaker(engine, expire_on_commit=False, class_=AsyncSession),
-            use_as=sessionmaker,
-        )
         return engine
 
     @bevy_method
     def create_session(self, session_factory: sessionmaker = Inject) -> AsyncSession:
         return session_factory()
+
+    @bevy_method
+    def create_session_maker(self, engine: AsyncEngine = Inject) -> sessionmaker:
+        return sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
