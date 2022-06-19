@@ -1,3 +1,4 @@
+from datetime import datetime
 from types import SimpleNamespace
 
 import pytest
@@ -9,6 +10,8 @@ from sqlalchemy.orm import declarative_base
 from soc.context import context as make_context
 from soc.database import Database
 from soc.database.config import DatabaseSettings
+from soc.database.models.base import BaseModel
+from tests.fuzzy import FuzzyValue
 
 
 @pytest.fixture()
@@ -32,6 +35,15 @@ def table_a(table_base):
         text = Column(String)
 
     return A
+
+
+@pytest.fixture
+async def database(context):
+    database = context.create(AsyncEngine)
+    async with database.begin() as conn:
+        await conn.run_sync(BaseModel.metadata.create_all)
+
+    return database
 
 
 @pytest.mark.asyncio
@@ -69,9 +81,12 @@ async def test_connection(context, table_base, table_a):
 
 
 @pytest.mark.asyncio
-async def test_database_facade(context):
-    db = context.get(Database)
+async def test_database_facade(context, database):
+    db = context.create(Database)
     user = await db.users.create("Bob", "PASSWORDHASH", "bob@bob.bob")
+    assert user.id == FuzzyValue(int)
     assert user.username == "Bob"
     assert user.password == "PASSWORDHASH"
     assert user.email == "bob@bob.bob"
+    assert user.joined == FuzzyValue(datetime)
+    assert user.banned is False
