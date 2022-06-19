@@ -1,3 +1,5 @@
+from typing import TypedDict
+
 import bcrypt
 import jwt
 from bevy import Bevy, Inject
@@ -7,6 +9,11 @@ from pydantic import Field
 from soc.config import BaseSettingsModel
 from soc.database import Session
 from soc.database.models.users import User
+
+
+class AuthTokenDict(TypedDict):
+    user_id: int
+    username: str
 
 
 class JWTSettings(BaseSettingsModel):
