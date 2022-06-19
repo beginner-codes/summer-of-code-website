@@ -1,13 +1,14 @@
 from types import SimpleNamespace
 
+import pytest
 from bevy import Context
 from bevy.providers.function_provider import FunctionProvider
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base
-import pytest
 
+from soc.database import Database
 from soc.database.config import DatabaseSettings
 from soc.database.database import DatabaseProvider
 
@@ -17,10 +18,7 @@ def context():
     context = Context()
     context.add_provider(DatabaseProvider)
     context.add_provider(FunctionProvider)
-    context.add(
-        SimpleNamespace(uri="sqlite+aiosqlite://"),
-        use_as=DatabaseSettings
-    )
+    context.add(SimpleNamespace(uri="sqlite+aiosqlite://"), use_as=DatabaseSettings)
     return context
 
 
@@ -72,3 +70,12 @@ async def test_connection(context, table_base, table_a):
         result = await session.execute(stmt)
         row = result.scalar()
         assert row.text == "Foo"
+
+
+@pytest.mark.asyncio
+async def test_database_facade(context):
+    db = context.get(Database)
+    user = await db.users.create("Bob", "PASSWORDHASH", "bob@bob.bob")
+    assert user.username == "Bob"
+    assert user.password == "PASSWORDHASH"
+    assert user.email == "bob@bob.bob"
