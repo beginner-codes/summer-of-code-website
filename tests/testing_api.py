@@ -70,3 +70,50 @@ async def test_registration_authentication(client, context):
     settings = context.get(AuthenticationSettings).jwt
     data = jwt.decode(json["access-token"], settings.private_key, settings.algorithm)
     assert data["username"] == "Bob"
+
+
+@pytest.mark.asyncio
+async def test_bearer_tokens(client):
+    auth = {"username": "Bob", "password": "PASSWORD"}
+    await client.post("/register", data=auth | {"email": "bob@gmail.com"})
+    token = (await client.post("/authenticate", data=auth)).json()["access-token"]
+    response = await client.get(
+        "/secured",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 200
+    assert response.json() == {"username": "Bob"}
+
+
+@pytest.mark.asyncio
+async def test_bad_bearer_token(client):
+    auth = {"username": "Bob", "password": "PASSWORD"}
+    await client.post("/register", data=auth | {"email": "bob@gmail.com"})
+    response = await client.get(
+        "/secured",
+        headers={"Authorization": f"Bearer NO_TOKEN"},
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_invalid_bearer_token(client, context):
+    auth = {"username": "Bob", "password": "PASSWORD"}
+    await client.post("/register", data=auth | {"email": "bob@gmail.com"})
+    settings = context.get(AuthenticationSettings)
+    token = jwt.encode(
+        {"user_id": 1, "username": "Bob"}, "INVALID KEY", settings.jwt.algorithm
+    )
+    response = await client.get(
+        "/secured",
+        headers={"Authorization": f"Bearer {token}"},
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_no_authorization_header(client):
+    auth = {"username": "Bob", "password": "PASSWORD"}
+    await client.post("/register", data=auth | {"email": "bob@gmail.com"})
+    response = await client.get("/secured")
+    assert response.status_code == 401
