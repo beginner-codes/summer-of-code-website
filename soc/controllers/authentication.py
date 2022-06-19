@@ -8,6 +8,7 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from soc.config import BaseSettingsModel
+from soc.database import Database
 from soc.database.models.users import UserModel
 
 
@@ -50,28 +51,12 @@ class Authentication(Bevy):
         name: str,
         password: str,
         email: str,
-        settings: AuthenticationSettings = Inject(),
+        settings: AuthenticationSettings = Inject,
+        database: Database = Inject,
     ):
         salt = bcrypt.gensalt(settings.salt_rounds, settings.salt_prefix)
         hashed_password = bcrypt.hashpw(password.encode(), salt).decode()
-        await self._create_user(name, email, hashed_password)
-
-    @bevy_method
-    async def _create_user(
-        self,
-        name: str,
-        email: str,
-        hashed_password: str,
-        session: AsyncSession = Inject,
-    ):
-        async with session.begin():
-            session.add(
-                UserModel(
-                    username=name,
-                    password=hashed_password,
-                    email=email,
-                )
-            )
+        await database.users.create(name, hashed_password, email)
 
     @bevy_method
     async def create_access_token(
