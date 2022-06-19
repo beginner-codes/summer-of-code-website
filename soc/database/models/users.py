@@ -4,10 +4,11 @@ from sqlalchemy.sql import func
 from soc.database.models.base import BaseModel
 
 
-class User(BaseModel):
+class UserModel(BaseModel):
     __tablename__ = "Users"
+
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode(64), nullable=False)
+    username = Column(Unicode(64), nullable=False)
     avatar = Column(Unicode(256), nullable=True)
     email = Column(Unicode(256), nullable=False)
     password = Column(Unicode(256), nullable=False)

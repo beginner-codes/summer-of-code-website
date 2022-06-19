@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, Unicode
 from soc.database.models.base import BaseModel
 
 
-class Submission(BaseModel):
+class SubmissionModel(BaseModel):
     __tablename__ = "Submissions"
     id = Column(Integer, primary_key=True)
     type = Column(Unicode(32), nullable=False)

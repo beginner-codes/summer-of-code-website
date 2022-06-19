@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from soc.database.models.base import BaseModel
 
 
-class Vote(BaseModel):
+class VoteModel(BaseModel):
     __tablename__ = "Votes"
     id = Column(Integer, primary_key=True)
     emoji = Column(Unicode(12), nullable=False)

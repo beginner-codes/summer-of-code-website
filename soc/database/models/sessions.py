@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from soc.database.models.base import BaseModel
 
 
-class Session(BaseModel):
+class SessionModel(BaseModel):
     __tablename__ = "Sessions"
     id = Column(Integer, primary_key=True)
     revoked = Column(Boolean, default=False)

@@ -3,7 +3,7 @@ from sqlalchemy.sql import func
 from soc.database.models.base import BaseModel
 
 
-class Challenge(BaseModel):
+class ChallengeModel(BaseModel):
     __tablename__ = "Challenges"
     id = Column(Integer, primary_key=True)
     title = Column(Unicode(512), nullable=False)

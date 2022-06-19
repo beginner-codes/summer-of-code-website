@@ -1,10 +1,11 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, Unicode
 from sqlalchemy.sql import func
+
 from soc.database.models.base import BaseModel
 
 
-class SubmissionStatus(BaseModel):
-    __tablename__ = "SubmissionStatus"
+class SubmissionStatusModel(BaseModel):
+    __tablename__ = "SubmissionStatusModel"
     id = Column(Integer, primary_key=True)
     status = Column(Unicode(32), nullable=False)
     updated = Column(DateTime, server_default=func.now())

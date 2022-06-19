@@ -8,7 +8,7 @@ from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from soc.config import BaseSettingsModel
-from soc.database.models.users import User
+from soc.database.models.users import UserModel
 
 
 class AuthTokenDict(TypedDict):
@@ -34,10 +34,10 @@ class Authentication(Bevy):
     @bevy_method
     async def authenticate_user(
         self, name: str, password: str, session: AsyncSession = Inject()
-    ) -> User | None:
+    ) -> UserModel | None:
         async with session.begin():
-            result = await session.execute(User.select(name=name))
-            user: User | None = result.scalars().first()
+            result = await session.execute(UserModel.select(username=name))
+            user: UserModel | None = result.scalars().first()
 
         if user and bcrypt.checkpw(password.encode(), user.password.encode()):
             return user
@@ -66,8 +66,8 @@ class Authentication(Bevy):
     ):
         async with session.begin():
             session.add(
-                User(
-                    name=name,
+                UserModel(
+                    username=name,
                     password=hashed_password,
                     email=email,
                 )
@@ -75,8 +75,8 @@ class Authentication(Bevy):
 
     @bevy_method
     async def create_access_token(
-        self, user: User, settings: AuthenticationSettings = Inject
+        self, user: UserModel, settings: AuthenticationSettings = Inject
     ) -> str:
         return jwt.encode(
-            {"user_id": user.id, "username": user.name}, settings.jwt.private_key
+            {"user_id": user.id, "username": user.username}, settings.jwt.private_key
         )

@@ -2,7 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, Unicode
 from soc.database.models.base import BaseModel
 
 
-class SessionField(BaseModel):
+class SessionFieldModel(BaseModel):
     __tablename__ = "SessionFields"
     id = Column(Integer, primary_key=True)
     data = Column(Unicode(8192), default="")
