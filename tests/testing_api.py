@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from fuzzy import FuzzyValue
 from soc.api import api_app
-from soc.context import context as _context
+from soc.context import create_context
 from soc.controllers.authentication import AuthenticationSettings, JWTSettings
 from soc.database.config import DatabaseSettings
 from soc.database.models.base import BaseModel
@@ -14,7 +14,7 @@ from soc.database.models.base import BaseModel
 
 @pytest.fixture()
 async def context():
-    return _context()
+    return create_context()
 
 
 @pytest.fixture(autouse=True)
@@ -37,7 +37,7 @@ async def _setup_tables(context: Context):
 
 @pytest.fixture()
 async def client(context):
-    api_app.dependency_overrides[_context] = lambda: context
+    api_app.dependency_overrides[create_context] = lambda: context
     async with httpx.AsyncClient(app=api_app, base_url="http://localhost") as client:
         yield client
 

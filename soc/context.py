@@ -11,7 +11,7 @@ R = TypeVar("R")
 P = ParamSpec("P")
 
 
-def context() -> Context:
+def create_context() -> Context:
     ctx = Context.factory()
     ctx.add_provider(DatabaseProvider)
     ctx.add_provider(SettingsProvider)
@@ -29,7 +29,7 @@ def inject(obj: Type[T], *, add: bool = True) -> T:
 
 
 def inject(obj: Callable[P, R] | Type[T], *, add: bool = True) -> Callable[P, R] | T:
-    def inject_from_context(ctx: Context = Depends(context)):
+    def inject_from_context(ctx: Context = Depends(create_context)):
         return ctx.get(obj) or ctx.create(obj, add_to_context=add)
 
     return Depends(inject_from_context)
