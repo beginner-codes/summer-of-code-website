@@ -104,7 +104,7 @@ typecheck = ["mypy"]
 
 [[package]]
 name = "bevy"
-version = "1.3.7"
+version = "1.3.8"
 description = "Python Dependency Inversion made simple so you can focus on creating amazing code."
 category = "main"
 optional = false
@@ -648,8 +648,8 @@ bcrypt = [
     {file = "bcrypt-3.2.2.tar.gz", hash = "sha256:433c410c2177057705da2a9f2cd01dd157493b2a7ac14c8593a16b3dab6b6bfb"},
 ]
 bevy = [
-    {file = "Bevy-1.3.7-py3-none-any.whl", hash = "sha256:e196ec1affb007b8b3a365874f4115f7657b50d40135293db8fc812734e3bb3a"},
-    {file = "Bevy-1.3.7.tar.gz", hash = "sha256:fc9e4276d26fd954ca12acd82d38b14699d30240df2822947aac5f5441b48571"},
+    {file = "Bevy-1.3.8-py3-none-any.whl", hash = "sha256:d1e5822c24aef5d6716ba8ba9ca1449882c729a11330dc875d228708c795d9cd"},
+    {file = "Bevy-1.3.8.tar.gz", hash = "sha256:aaf89eb357e93cb84cd9f34e4ea98a30ea3f4a911a839bb7ffed419ec6df7019"},
 ]
 black = [
     {file = "black-22.3.0-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:2497f9c2386572e28921fa8bec7be3e51de6801f7459dffd6e62492531c47e09"},
