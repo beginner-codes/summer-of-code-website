@@ -20,7 +20,8 @@ async def register_user(
 
 @api_app.post("/authenticate")
 async def authenticate_user(
-    data: OAuth2PasswordRequestForm = Depends(), auth=inject(Authentication)
+    data: OAuth2PasswordRequestForm = Depends(),
+    auth: Authentication = inject(Authentication),
 ):
     user = await auth.authenticate_user(data.username, data.password)
     if user:
