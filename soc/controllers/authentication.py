@@ -5,11 +5,11 @@ import jwt
 from bevy import Bevy, Inject
 from bevy.providers import bevy_method
 from pydantic import Field
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from soc.config import BaseSettingsModel
 from soc.database import Database
 from soc.database.models.users import UserModel
+from soc.models.users import User
 
 
 class AuthTokenDict(TypedDict):
@@ -34,12 +34,9 @@ class AuthenticationSettings(BaseSettingsModel):
 class Authentication(Bevy):
     @bevy_method
     async def authenticate_user(
-        self, name: str, password: str, session: AsyncSession = Inject()
-    ) -> UserModel | None:
-        async with session.begin():
-            result = await session.execute(UserModel.select(username=name))
-            user: UserModel | None = result.scalars().first()
-
+        self, name: str, password: str, database: Database = Inject
+    ) -> User | None:
+        user = await database.users.get_by_name(name)
         if user and bcrypt.checkpw(password.encode(), user.password.encode()):
             return user
 
