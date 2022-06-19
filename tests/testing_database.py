@@ -1,23 +1,19 @@
 from types import SimpleNamespace
 
 import pytest
-from bevy import Context
-from bevy.providers.function_provider import FunctionProvider
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base
 
+from soc.context import context as make_context
 from soc.database import Database
 from soc.database.config import DatabaseSettings
-from soc.database.provider import DatabaseProvider
 
 
 @pytest.fixture()
 def context():
-    context = Context()
-    context.add_provider(DatabaseProvider)
-    context.add_provider(FunctionProvider)
+    context = make_context()
     context.add(SimpleNamespace(uri="sqlite+aiosqlite://"), use_as=DatabaseSettings)
     return context
 
