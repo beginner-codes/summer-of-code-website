@@ -9,7 +9,7 @@ metadata:
 spec:
     type: NodePort
     ports:
-      - port: 5000
+      - port: 8000
         name: http
     selector:
         app: beginner.codes-soc
@@ -35,4 +35,4 @@ spec:
             paths:
               - backend:
                     serviceName: summer-of-code
-                    servicePort: 5000
+                    servicePort: 8000
