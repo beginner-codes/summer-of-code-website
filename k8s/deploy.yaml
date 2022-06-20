@@ -1,0 +1,32 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+    name: summer-of-code
+    labels:
+        app: beginner.codes-soc
+spec:
+    strategy:
+        type: RollingUpdate
+        rollingUpdate:
+            maxSurge: 2
+            maxUnavailable: 50%
+    selector:
+        matchLabels:
+            app: beginner.codes-soc
+            tier: frontend
+    replicas: 1
+    template:
+        metadata:
+            labels:
+                app: beginner.codes-soc
+                tier: frontend
+        spec:
+            containers:
+              - name: fastapi-site
+                image: zzmmrmn/summer-of-code:0
+                ports:
+                  - containerPort: 5000
+                resources:
+                    requests:
+                        cpu: 100m
