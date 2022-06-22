@@ -28,6 +28,7 @@ class AuthenticationSettings(BaseSettingsModel):
 
     salt_rounds: int = Field(default=12, env="SOC_AUTH_SALT_ROUNDS")
     salt_prefix: bytes = Field(default=b"2b", env="SOC_AUTH_SALT_PREFIX")
+    admin_email: str = Field(default="", env="SOC_AUTH_ADMIN_EMAIL")
     jwt: JWTSettings = Field(default_factory=JWTSettings)
 
 
