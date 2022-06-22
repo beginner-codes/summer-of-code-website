@@ -1,4 +1,4 @@
-FROM python:3.10 as builder
+FROM python:3.10-buster as builder
 
 WORKDIR /app
 
@@ -18,11 +18,15 @@ RUN poetry export -f requirements.txt --output requirements.txt && \
 
 FROM python:3.10-slim
 
-WORKDIR /app
+RUN addgroup --gid 1001 --system app && \
+    adduser --no-create-home --shell /bin/false --disabled-password --uid 1001 --system --group app
 
+WORKDIR /app
 COPY --from=builder /app/wheels /wheels
-RUN pip install --upgrade pip && \
+RUN pip install --no-cache --upgrade pip && \
     pip install --no-cache /wheels/*
 
 COPY soc soc
-CMD python -m soc
+
+USER app
+ENTRYPOINT ["python", "-m", "soc"]
