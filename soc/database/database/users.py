@@ -5,6 +5,7 @@ from bevy.providers.function_provider import bevy_method
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
+from soc.database.models.roles import RoleModel
 from soc.database.models.users import UserModel
 from soc.models.users import User
 
@@ -43,3 +44,12 @@ class Users(Bevy):
             return
 
         return self._user_type.from_db_model(user_model)
+
+    @bevy_method
+    async def get_users_roles(
+        self, user_id: int, session: AsyncSession = Inject
+    ) -> list[str]:
+        query = select(RoleModel).filter_by(user_id=user_id)
+        async with session:
+            cursor = await session.execute(query)
+            return [row.type for row in cursor.scalars()]
