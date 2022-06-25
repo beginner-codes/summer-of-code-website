@@ -7,6 +7,7 @@ from fastapi.responses import HTMLResponse
 from soc.auth_scheme import AuthenticationSettings
 from soc.context import inject
 from soc.database import Database
+from soc.templates.jinja import Jinja2
 
 admin_app = FastAPI()
 
@@ -41,5 +42,7 @@ async def check_cookie(
 
 
 @admin_app.get("/db", response_class=HTMLResponse)
-async def manage_db(cookie: dict[str, Any] = Depends(check_cookie)):
-    return "Hello World"
+async def manage_db(
+    cookie: dict[str, Any] = Depends(check_cookie), jinja: Jinja2 = inject(Jinja2)
+):
+    return jinja.get_template("test.html").render(user="Zech")
