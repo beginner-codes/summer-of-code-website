@@ -21,6 +21,7 @@ aiosqlite = "^0.17.0"
 python-multipart = "^0.0.5"
 bcrypt = "^3.2.2"
 PyJWT = "^2.4.0"
+Jinja2 = "^3.1.2"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.1.2"
