@@ -14,6 +14,9 @@ class Jinja2(Bevy):
     def __init__(self):
         self.templating = Jinja2Templates(self.directory, **self.settings)
 
+    def __call__(self, name: str, **kwargs) -> str:
+        return self.get_template(name).render(**kwargs)
+
     @property
     def directory(self) -> Path:
         directory = self.config.directory.strip(r"\/")

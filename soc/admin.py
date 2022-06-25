@@ -43,6 +43,6 @@ async def check_cookie(
 
 @admin_app.get("/db", response_class=HTMLResponse)
 async def manage_db(
-    cookie: dict[str, Any] = Depends(check_cookie), jinja: Jinja2 = inject(Jinja2)
+    cookie: dict[str, Any] = Depends(check_cookie), template: Jinja2 = inject(Jinja2)
 ):
-    return jinja.get_template("test.html").render(user="Zech")
+    return template("test.html", user="Zech")
