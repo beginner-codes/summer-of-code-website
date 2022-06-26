@@ -5,7 +5,44 @@
     <title>Title</title>
 </head>
 <body>
-  <h1>Hello!!!</h1>
-  <p>How are you {{user}}</p>
+    <h1>Manage Database</h1>
+    <p>Logged in as: {{email}}</p>
+    <button id="migrate-db-btn" type="button">Run DB Migrations</button>
+    <pre id="migration-output-stdout" style="color: green;"></pre>
+    <pre id="migration-output-stderr" style="color: red;"></pre>
+    <script>
+        function getCookie(cname) {
+            let name = cname + "=";
+            let decodedCookie = decodeURIComponent(document.cookie);
+            let ca = decodedCookie.split(';');
+            for(let i = 0; i <ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') {
+                    c = c.substring(1);
+                }
+                if (c.indexOf(name) == 0) {
+                    return c.substring(name.length, c.length);
+                }
+            }
+            return "";
+        }
+
+        let btn = document.getElementById("migrate-db-btn")
+        btn.addEventListener("click", e => {
+            fetch(
+                "/admin/api/v1/db/migrate",
+                {
+                    headers: new Headers({"Authorization": `Bearer ${getCookie("sessionid")}`})
+                }
+            ).then(res => res.json()).then(data => {
+                if(data.detail)
+                    document.getElementById("migration-output-stderr").innerText = data.detail;
+                else {
+                    document.getElementById("migration-output-stdout").innerText = data.stdout;
+                    document.getElementById("migration-output-stderr").innerText = data.stderr;
+                }
+            })
+        })
+    </script>
 </body>
 </html>
