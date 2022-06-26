@@ -29,6 +29,7 @@ RUN pip install --no-cache --upgrade pip && \
 COPY alembic.ini alembic.ini
 COPY production.config.yaml production.config.yaml
 COPY migrations migrations
+COPY templates templates
 COPY soc soc
 
 USER app
