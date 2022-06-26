@@ -26,6 +26,7 @@ COPY --from=builder /app/wheels /wheels
 RUN pip install --no-cache --upgrade pip && \
     pip install --no-cache /wheels/*
 
+RUN chmod ugo+rw /app
 COPY alembic.ini alembic.ini
 COPY production.config.yaml production.config.yaml
 COPY migrations migrations
