@@ -29,8 +29,6 @@ async def on_start():
         database = context.get(AsyncEngine)
         if not database:
             database = context.create(AsyncEngine)
-            async with database.begin() as conn:
-                await conn.run_sync(BaseModel.metadata.create_all)
 
 
 @site.get("/", response_class=HTMLResponse)
