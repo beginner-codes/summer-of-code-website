@@ -24,9 +24,15 @@ spec:
         spec:
             containers:
               - name: fastapi-site
-                image: zzmmrmn/summer-of-code:1
+                image: zzmmrmn/summer-of-code:13
                 ports:
                   - containerPort: 8000
                 resources:
                     requests:
                         cpu: 100m
+                env:
+                    - name: SOC_DISCORD_CLIENT_SECRET
+                      valueFrom:
+                        secretKeyRef:
+                            name: discord.client.secret
+                            key: client_secret.txt
