@@ -23,6 +23,12 @@ class JWTSettings(BaseSettingsModel):
     algorithm: str = Field(default="HS256", env="SOC_JWT_ALGORITHM")
 
 
+class DiscordSettings(BaseSettingsModel):
+    client_id: str = Field(default="", env="SOC_DISCORD_CLIENT_ID")
+    client_secret: str = Field(default="", env="SOC_DISCORD_CLIENT_SECRET")
+    redirect_uri: str = Field(default="", env="SOC_DISCORD_REDIRECT_URI")
+
+
 class AuthenticationSettings(BaseSettingsModel):
     __config_key__ = "authentication"
 
@@ -30,6 +36,7 @@ class AuthenticationSettings(BaseSettingsModel):
     salt_prefix: bytes = Field(default=b"2b", env="SOC_AUTH_SALT_PREFIX")
     admin_email: str = Field(default="", env="SOC_AUTH_ADMIN_EMAIL")
     jwt: JWTSettings = Field(default_factory=JWTSettings)
+    discord: DiscordSettings = Field(default_factory=DiscordSettings)
 
 
 class Authentication(Bevy):
@@ -62,4 +69,12 @@ class Authentication(Bevy):
     ) -> str:
         return jwt.encode(
             {"user_id": user.id, "username": user.username}, settings.jwt.private_key
+        )
+
+    @bevy_method
+    async def create_email_access_token(
+        self, username: str, email: str, settings: AuthenticationSettings = Inject
+    ) -> str:
+        return jwt.encode(
+            {"username": username, "email": email}, settings.jwt.private_key
         )
