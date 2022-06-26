@@ -1,48 +1,53 @@
+import subprocess
 from typing import Any
 
 import jwt
-from fastapi import FastAPI, HTTPException, Depends, Cookie
+from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
 
-from soc.auth_scheme import AuthenticationSettings
+from soc.auth_scheme import get_session_from_cookie, get_session_from_header
 from soc.context import inject
-from soc.database import Database
+from soc.controllers.authentication import AuthenticationSettings
 from soc.templates.jinja import Jinja2
 
 admin_app = FastAPI()
 
 
-async def check_cookie(
-    session_token: str | None = Cookie(default=None, alias="sessionid"),
-    settings: AuthenticationSettings = inject(AuthenticationSettings),
-    db: Database = inject(Database),
-):
-    if not session_token:
-        raise HTTPException(403, "No session")
-
-    try:
-        session = jwt.decode(
-            session_token, settings.jwt.private_key, settings.jwt.algorithm
-        )
-    except jwt.exceptions.InvalidSignatureError:
-        session = {}
-
-    if not session or ("user_id" not in session and "email" not in session):
-        raise HTTPException(403, "Invalid session")
-
-    if "user_id" in session:
-        roles = await db.users.get_users_roles(session["user_id"])
-        if "admin" not in roles:
-            raise HTTPException(403, "Not an admin")
-
-    elif session.get("email") != settings.admin_email:
-        raise HTTPException(403, "Not an admin")
-
-    return session
+@admin_app.get("/api/v1/db/migrate")
+async def migrate_database(session=Depends(get_session_from_header)):
+    process = subprocess.Popen(
+        ["alembic", "upgrade", "head"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    )
+    stdout, stderr = process.communicate()
+    return {"stdout": stdout, "stderr": stderr}
 
 
 @admin_app.get("/db", response_class=HTMLResponse)
 async def manage_db(
-    cookie: dict[str, Any] = Depends(check_cookie), template: Jinja2 = inject(Jinja2)
+    session: dict[str, Any] = Depends(get_session_from_cookie),
+    template: Jinja2 = inject(Jinja2),
 ):
-    return template("test.html", user="Zech")
+    return template("manage_db.html", email=session["email"])
+
+
+@admin_app.get("/login", response_class=HTMLResponse)
+async def login(
+    template: Jinja2 = inject(Jinja2),
+    settings: AuthenticationSettings = inject(AuthenticationSettings),
+):
+    token = jwt.encode(
+        {"email": settings.admin_email},
+        settings.jwt.private_key,
+        settings.jwt.algorithm,
+    )
+
+    response = HTMLResponse(template("login.html"))
+    response.set_cookie("sessionid", token)
+    return response
+
+
+@admin_app.get("/logout", response_class=HTMLResponse)
+async def logout(template: Jinja2 = inject(Jinja2)):
+    response = HTMLResponse(template("logout.html"))
+    response.delete_cookie("sessionid")
+    return response
