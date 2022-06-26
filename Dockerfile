@@ -26,6 +26,7 @@ COPY --from=builder /app/wheels /wheels
 RUN pip install --no-cache --upgrade pip && \
     pip install --no-cache /wheels/*
 
+COPY production.config.yaml production.config.yaml
 COPY soc soc
 
 USER app
