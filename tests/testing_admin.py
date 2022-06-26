@@ -10,6 +10,7 @@ from soc.database.config import DatabaseSettings
 from soc.database.models.base import BaseModel
 from soc.database.models.roles import RoleModel
 from soc.site import site, admin_app
+from soc.templates.settings import TemplateSettings
 
 
 @pytest.fixture()
@@ -26,6 +27,10 @@ async def _setup_context(context: Context):
     context.add(
         AuthenticationSettings(jwt=JWTSettings(private_key="TOP SECRET TEST KEY")),
         use_as=AuthenticationSettings,
+    )
+    context.add(
+        TemplateSettings(directory="test_templates"),
+        use_as=TemplateSettings,
     )
 
 
