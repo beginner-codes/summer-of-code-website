@@ -1,15 +1,16 @@
 import urllib.parse
 from types import SimpleNamespace
 
-from fastapi import FastAPI, Cookie, Query, HTTPException
-from fastapi.responses import RedirectResponse, JSONResponse
+from fastapi import Cookie, HTTPException, Query
+from fastapi.responses import JSONResponse, RedirectResponse
 from httpx import AsyncClient
 
-from soc.context import inject
+from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication, AuthenticationSettings
 from soc.database import Database
 
-auth_app = FastAPI()
+
+auth_app = create_app()
 
 
 @auth_app.get("/discord")

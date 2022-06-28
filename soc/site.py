@@ -1,5 +1,5 @@
-from fastapi import FastAPI, Depends
 from fastapi.responses import HTMLResponse
+from fastapi import Depends
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncEngine
 
@@ -8,11 +8,11 @@ from soc.api import api_app
 from soc.auth import auth_app
 from soc.auth_scheme import get_session_from_cookie_no_auth
 from soc.config import BaseSettingsModel
-from soc.context import create_context
 from soc.context import inject
 from soc.templates.jinja import Jinja2
+from soc.context import create_app, create_context
+site = create_app()
 
-site = FastAPI()
 
 site.mount("/v1/", api_app)
 site.mount("/admin/", admin_app)

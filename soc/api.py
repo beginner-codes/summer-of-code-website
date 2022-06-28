@@ -1,11 +1,12 @@
-from fastapi import Depends, FastAPI, Form, HTTPException
+from fastapi import Depends, Form, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from soc.auth_scheme import auth_scheme
-from soc.context import inject
+from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication, AuthTokenDict
 
-api_app = FastAPI()
+
+api_app = create_app()
 
 
 @api_app.post("/register")

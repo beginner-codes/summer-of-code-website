@@ -2,15 +2,16 @@ import subprocess
 from typing import Any
 
 import jwt
-from fastapi import FastAPI, Depends
+from fastapi import Depends
 from fastapi.responses import HTMLResponse
 
 from soc.auth_scheme import get_session_from_cookie, get_session_from_header
-from soc.context import inject
+from soc.context import create_app, inject
 from soc.controllers.authentication import AuthenticationSettings
 from soc.templates.jinja import Jinja2
 
-admin_app = FastAPI()
+
+admin_app = create_app()
 
 
 @admin_app.get("/api/v1/db/migrate")
