@@ -9,6 +9,7 @@ from soc.auth_scheme import get_session_from_cookie, get_session_from_header
 from soc.context import create_app, inject
 from soc.controllers.authentication import AuthenticationSettings
 from soc.templates.jinja import Jinja2
+from soc.templates.response import TemplateResponse
 
 
 admin_app = create_app()
@@ -23,12 +24,9 @@ async def migrate_database(session=Depends(get_session_from_header)):
     return {"stdout": stdout, "stderr": stderr}
 
 
-@admin_app.get("/db", response_class=HTMLResponse)
-async def manage_db(
-    session: dict[str, Any] = Depends(get_session_from_cookie),
-    template: Jinja2 = inject(Jinja2),
-):
-    return template("manage_db.html", email=session["email"])
+@admin_app.get("/db", response_class=TemplateResponse)
+async def manage_db(session: dict[str, Any] = Depends(get_session_from_cookie)):
+    return "manage_db.html", {"email": session["email"]}
 
 
 @admin_app.get("/login", response_class=HTMLResponse)
