@@ -1,4 +1,3 @@
-from fastapi.responses import HTMLResponse
 from fastapi import Depends
 from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -8,9 +7,10 @@ from soc.api import api_app
 from soc.auth import auth_app
 from soc.auth_scheme import get_session_from_cookie_no_auth
 from soc.config import BaseSettingsModel
-from soc.context import inject
-from soc.templates.jinja import Jinja2
 from soc.context import create_app, create_context
+from soc.templates.response import TemplateResponse
+
+
 site = create_app()
 
 
@@ -35,11 +35,6 @@ async def on_start():
             database = context.create(AsyncEngine)
 
 
-@site.get("/", response_class=HTMLResponse)
-async def index(
-    session: dict = Depends(get_session_from_cookie_no_auth),
-    template: Jinja2 = inject(Jinja2),
-):
-    return template(
-        "index.html", username=session.get("username", "<i>NOT LOGGED IN</i>")
-    )
+@site.get("/", response_class=TemplateResponse)
+async def index(session: dict = Depends(get_session_from_cookie_no_auth)):
+    return "index.html", {"username": session.get("username", "<i>NOT LOGGED IN</i>")}
