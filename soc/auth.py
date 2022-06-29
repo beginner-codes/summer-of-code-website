@@ -1,5 +1,4 @@
 import urllib.parse
-from types import SimpleNamespace
 
 from fastapi import Cookie, HTTPException, Query
 from fastapi.responses import JSONResponse, RedirectResponse
@@ -76,9 +75,7 @@ async def discord_login(
     settings: AuthenticationSettings = inject(AuthenticationSettings),
 ):
     if session_id is None:
-        session_id = await auth.create_user_access_token(
-            SimpleNamespace(id=-1, username="UNAUTHENTICATED USER")
-        )
+        session_id = auth.create_token(type="login")
 
     redirect_uri = urllib.parse.quote_plus(settings.discord.redirect_uri)
     response = RedirectResponse(
