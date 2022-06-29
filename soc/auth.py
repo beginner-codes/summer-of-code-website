@@ -9,7 +9,6 @@ from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication, AuthenticationSettings
 from soc.database import Database
 
-
 auth_app = create_app()
 
 
@@ -64,7 +63,7 @@ async def discord_code_auth(
         )
     else:
         response = RedirectResponse("/")
-        session_id = await auth.create_access_token(user)
+        session_id = await auth.create_user_access_token(user)
 
     response.set_cookie("sessionid", session_id)
     return response
@@ -77,7 +76,7 @@ async def discord_login(
     settings: AuthenticationSettings = inject(AuthenticationSettings),
 ):
     if session_id is None:
-        session_id = await auth.create_access_token(
+        session_id = await auth.create_user_access_token(
             SimpleNamespace(id=-1, username="UNAUTHENTICATED USER")
         )
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import TypedDict
 
 import bcrypt
@@ -64,17 +65,17 @@ class Authentication(Bevy):
         await database.users.create(name, hashed_password, email)
 
     @bevy_method
-    async def create_access_token(
-        self, user: UserModel, settings: AuthenticationSettings = Inject
-    ) -> str:
-        return jwt.encode(
-            {"user_id": user.id, "username": user.username}, settings.jwt.private_key
-        )
+    async def create_user_access_token(self, user: UserModel) -> str:
+        return self._create_token(user_id=user.id, username=user.username)
 
     @bevy_method
-    async def create_email_access_token(
-        self, username: str, email: str, settings: AuthenticationSettings = Inject
-    ) -> str:
+    async def create_email_access_token(self, username: str, email: str) -> str:
+        return self._create_token(username=username, email=email)
+
+    @bevy_method
+    def _create_token(self, _settings: AuthenticationSettings = Inject, **data) -> str:
         return jwt.encode(
-            {"username": username, "email": email}, settings.jwt.private_key
+            data | {"created": int(datetime.now().timestamp())},
+            _settings.jwt.private_key,
+            _settings.jwt.algorithm,
         )

@@ -5,7 +5,6 @@ from soc.auth_scheme import auth_scheme
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication, AuthTokenDict
 
-
 api_app = create_app()
 
 
@@ -26,7 +25,7 @@ async def authenticate_user(
 ):
     user = await auth.authenticate_user(data.username, data.password)
     if user:
-        return {"access_token": await auth.create_access_token(user)}
+        return {"access_token": await auth.create_user_access_token(user)}
     else:
         raise HTTPException(403, "Invalid user")
 
