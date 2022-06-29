@@ -66,14 +66,14 @@ class Authentication(Bevy):
 
     @bevy_method
     async def create_user_access_token(self, user: UserModel) -> str:
-        return self._create_token(user_id=user.id, username=user.username)
+        return self.create_token(user_id=user.id, username=user.username)
 
     @bevy_method
     async def create_email_access_token(self, username: str, email: str) -> str:
-        return self._create_token(username=username, email=email)
+        return self.create_token(username=username, email=email)
 
     @bevy_method
-    def _create_token(self, _settings: AuthenticationSettings = Inject, **data) -> str:
+    def create_token(self, _settings: AuthenticationSettings = Inject, **data) -> str:
         return jwt.encode(
             data | {"created": int(datetime.now().timestamp())},
             _settings.jwt.private_key,
