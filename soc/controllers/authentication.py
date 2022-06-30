@@ -40,10 +40,6 @@ class Authentication(Bevy):
         return self.create_token(user_id=user.id, username=user.username)
 
     @bevy_method
-    def create_email_access_token(self, username: str, email: str) -> str:
-        return self.create_token(username=username, email=email)
-
-    @bevy_method
     def create_token(self, _settings: AuthenticationSettings = Inject, **data) -> str:
         return jwt.encode(
             data | {"created": int(datetime.now().timestamp())},

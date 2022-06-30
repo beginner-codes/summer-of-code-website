@@ -58,8 +58,10 @@ async def discord_code_auth(
         user = await db.users.create(user_data["username"], "", user_data["email"])
     except sqlalchemy.exc.OperationalError:
         response = RedirectResponse("/admin/db")
-        session_id = auth.create_email_access_token(
-            user_data["username"], user_data["email"]
+        session_id = auth.create_token(
+            username=user_data["username"],
+            email=user_data["email"],
+            access_token=data["access_token"],
         )
     else:
         response = RedirectResponse("/")
