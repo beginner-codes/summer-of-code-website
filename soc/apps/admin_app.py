@@ -75,6 +75,8 @@ async def login(
         await user.set_roles([role, *roles])
 
     token = await auth.create_user_access_token(user)
-    response = HTMLResponse(template("admin/login.html"))
+    response = HTMLResponse(
+        template("admin/login.html", user={"username": user.username, "id": user.id})
+    )
     response.set_cookie("sessionid", token)
     return response
