@@ -32,6 +32,20 @@ class Users(Bevy):
         return self._user_type.from_db_model(user_model)
 
     @bevy_method
+    async def get_by_id(
+        self, user_id: int, session: AsyncSession = Inject
+    ) -> User | None:
+        query = select(UserModel).filter_by(id=user_id)
+        async with session:
+            cursor = await session.execute(query)
+            user_model = cursor.scalars().first()
+
+        if not user_model:
+            return
+
+        return self._user_type.from_db_model(user_model)
+
+    @bevy_method
     async def get_by_name(
         self, username: str, session: AsyncSession = Inject
     ) -> User | None:
