@@ -13,6 +13,7 @@ from soc.auth_helpers import (
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
 from soc.database import Database
+from soc.database.models.base import BaseModel
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
