@@ -3,10 +3,7 @@ from typing import Any
 
 from fastapi import Depends
 
-from soc.auth_helpers import (
-    bearer_token,
-    validate_bearer_token,
-)
+from soc.auth_helpers import bearer_token, validate_bearer_token, require_roles
 from soc.context import create_app, inject
 from soc.database import Database
 from soc.discord import Discord
@@ -14,7 +11,10 @@ from soc.discord import Discord
 admin_api = create_app()
 
 
-@admin_api.get("/db/migrate", dependencies=[Depends(validate_bearer_token)])
+@admin_api.get(
+    "/db/migrate",
+    dependencies=[Depends(validate_bearer_token), Depends(require_roles("ADMIN"))],
+)
 async def migrate_database(
     session: dict[str, Any] = Depends(bearer_token),
     db: Database = inject(Database),
