@@ -37,7 +37,11 @@ async def login(
     template: Jinja2 = inject(Jinja2),
     auth: Authentication = inject(Authentication),
     db: Database = inject(Database),
+    engine: AsyncEngine = inject(AsyncEngine),
 ):
+    async with engine.begin() as conn:
+        await conn.run_sync(BaseModel.metadata.create_all)
+
     user = await db.users.get_by_id(1)
     if not user:
         user = await db.users.create("Test User", "", "testuser@beginner.codes")
@@ -47,7 +51,7 @@ async def login(
     if role not in roles:
         await user.set_roles([role, *roles])
 
-    token = auth.create_user_access_token(user)
+    token = await auth.create_user_access_token(user)
     response = HTMLResponse(template("login.html"))
     response.set_cookie("sessionid", token)
     return response
