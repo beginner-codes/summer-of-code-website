@@ -4,7 +4,7 @@ import pytest
 from bevy import Context
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
-from soc.apps.site import site, admin_app
+from soc.apps.site import site, admin_api
 from soc.config.models.config import DatabaseSettings
 from soc.config.models.templates import TemplateSettings
 from soc.context import create_context
@@ -44,7 +44,7 @@ async def _setup_tables(context: Context):
 @pytest.fixture()
 async def client(context):
     site.dependency_overrides[create_context] = lambda: context
-    admin_app.dependency_overrides[create_context] = lambda: context
+    admin_api.dependency_overrides[create_context] = lambda: context
     async with httpx.AsyncClient(app=site, base_url="http://localhost") as client:
         yield client
 

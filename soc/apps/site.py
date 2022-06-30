@@ -3,7 +3,7 @@ from fastapi import Depends
 from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from soc.apps.admin import admin_app
+from soc.apps.admin_app import admin_app
 from soc.apps.api import api_app
 from soc.apps.auth import auth_app
 from soc.auth_helpers import session_cookie
