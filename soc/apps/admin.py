@@ -28,7 +28,7 @@ async def migrate_database(
     discord: Discord = inject(Discord),
 ):
     output, success = _run_alembic()
-    if success:
+    if success and "access_token" in session:
         await _setup_user(session, db, discord)
 
     return {"output": output, "success": success}
