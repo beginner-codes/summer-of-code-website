@@ -31,6 +31,8 @@ class Users(Bevy):
 
         return self._user_type.from_db_model(user_model)
 
+    async def get_by_email(self, email: str) -> User | None:
+        return await self.get_by(email=email)
 
     async def get_by_id(self, user_id: int) -> User | None:
         return await self.get_by(id=user_id)
