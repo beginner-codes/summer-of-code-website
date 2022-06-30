@@ -60,7 +60,7 @@ class Users(Bevy):
         return self._user_type.from_db_model(user_model)
 
     @bevy_method
-    async def get_users_roles(
+    async def get_roles(
         self, user_id: int, session: AsyncSession = Inject
     ) -> list[str]:
         query = select(RoleModel).filter_by(user_id=user_id)
