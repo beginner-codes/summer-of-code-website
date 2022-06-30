@@ -6,11 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
 from soc.apps.site import site, admin_app
 from soc.config.models.config import DatabaseSettings
+from soc.config.models.templates import TemplateSettings
 from soc.context import create_context
 from soc.controllers.authentication import AuthenticationSettings, JWTSettings
 from soc.database.models.base import BaseModel
 from soc.database.models.roles import RoleModel
-from soc.templates.settings import TemplateSettings
 
 
 @pytest.fixture()

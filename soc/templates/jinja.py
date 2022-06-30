@@ -5,7 +5,7 @@ from bevy import Bevy, Inject
 from jinja2 import Template
 from starlette.templating import Jinja2Templates
 
-from soc.templates.settings import TemplateSettings
+from soc.config.models.templates import TemplateSettings
 
 
 class Jinja2(Bevy):
