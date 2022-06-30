@@ -4,11 +4,11 @@ from typing import Any
 import sqlalchemy.exc
 from fastapi import Cookie, HTTPException, Query, Depends
 from fastapi.responses import RedirectResponse
-from httpx import AsyncClient
 
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication, AuthenticationSettings
 from soc.database import Database
+from soc.discord import Discord
 from soc.entities.users import User
 
 auth_app = create_app()
@@ -30,9 +30,10 @@ async def discord_code_auth(
     settings: AuthenticationSettings = inject(AuthenticationSettings),
     db: Database = inject(Database),
     auth: Authentication = inject(Authentication),
+    discord: Discord = inject(Discord),
 ):
-    access_token = await _get_access_token(code, settings)
-    user_data = await _get_user_data(access_token)
+    access_token = await discord.get_access_token(code, settings)
+    user_data = await discord.get_user_data(access_token)
     user = await _create_user(user_data, db)
     return (
         _home_redirect(user, auth)
@@ -66,39 +67,6 @@ def _manage_db_redirect(
     )
     response.set_cookie("sessionid", token, secure=True)
     return response
-
-
-async def _get_access_token(code: str, settings: AuthenticationSettings) -> str:
-    async with AsyncClient() as client:
-        resp = await client.post(
-            f"{API}/oauth2/token",
-            data={
-                "client_id": settings.discord.client_id,
-                "client_secret": settings.discord.client_secret,
-                "grant_type": "authorization_code",
-                "code": code,
-                "redirect_uri": settings.discord.redirect_uri,
-            },
-            headers={"Content-Type": "application/x-www-form-urlencoded"},
-        )
-        data = resp.json()
-        if resp.status_code != 200:
-            raise HTTPException(resp.status_code, data)
-
-        return data["access_token"]
-
-
-async def _get_user_data(access_token: str) -> dict[str, Any]:
-    async with AsyncClient() as client:
-        resp = await client.get(
-            f"{API}/users/@me",
-            headers={"Authorization": f"Bearer {access_token}"},
-        )
-        data = resp.json()
-        if resp.status_code != 200:
-            raise HTTPException(resp.status_code, data)
-
-        return data
 
 
 @auth_app.get("/discord/login", response_class=RedirectResponse)
