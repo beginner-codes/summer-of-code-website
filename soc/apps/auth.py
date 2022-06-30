@@ -34,19 +34,20 @@ async def discord_code_auth(
 ):
     access_token = await discord.get_access_token(code, settings)
     user_data = await discord.get_user_data(access_token)
-    user = await _create_user(user_data, db)
-    return (
-        _home_redirect(user, auth)
-        if user
-        else _manage_db_redirect(user_data, access_token, auth)
-    )
-
-
-async def _create_user(user_data: dict[str, Any], db: Database) -> User | None:
     try:
-        return await db.users.create(user_data["username"], "", user_data["email"])
+        user = await _log_user_in(user_data, db)
     except sqlalchemy.exc.OperationalError:
-        return None
+        return _manage_db_redirect(user_data, access_token, auth)
+    else:
+        return _home_redirect(user, auth)
+
+
+async def _log_user_in(user_data: dict[str, Any], db: Database) -> User:
+    user = await db.users.get_by_email(user_data["email"])
+    if user:
+        return user
+
+    return await db.users.create(user_data["username"], "", user_data["email"])
 
 
 def _home_redirect(user: User, auth: Authentication) -> RedirectResponse:
