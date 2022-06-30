@@ -14,6 +14,9 @@ class Discord(Bevy):
     async def get_access_token(
         self, code: str, settings: AuthenticationSettings = Inject
     ) -> str:
+        if not settings.discord.client_secret:
+            raise HTTPException(400, "No client secret is set")
+
         async with AsyncClient() as client:
             resp = await client.post(
                 f"{self.API}/oauth2/token",
