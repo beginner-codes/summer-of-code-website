@@ -1,5 +1,6 @@
 import urllib.parse
 
+import sqlalchemy.exc
 from fastapi import Cookie, HTTPException, Query
 from fastapi.responses import JSONResponse, RedirectResponse
 from httpx import AsyncClient
@@ -55,7 +56,7 @@ async def discord_code_auth(
 
     try:
         user = await db.users.create(user_data["username"], "", user_data["email"])
-    except Exception as e:
+    except sqlalchemy.exc.OperationalError:
         response = RedirectResponse("/admin/db")
         session_id = auth.create_email_access_token(
             user_data["username"], user_data["email"]
