@@ -1,15 +1,13 @@
 from fastapi import Depends
-from pydantic import Field
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from soc.admin import admin_app
 from soc.api import api_app
 from soc.auth import auth_app
-from soc.config import BaseSettingsModel
 from soc.authentication_deps import get_session_from_cookie_no_auth
+from soc.config.models.site import SiteSettings
 from soc.context import create_app, create_context
 from soc.templates.response import TemplateResponse
-
 
 site = create_app()
 
@@ -17,12 +15,6 @@ site = create_app()
 site.mount("/v1/", api_app)
 site.mount("/admin/", admin_app)
 site.mount("/auth/", auth_app)
-
-
-class SiteSettings(BaseSettingsModel):
-    __config_key__ = "site"
-
-    dev: bool = Field(default=False, env="SOC_SITE_DEV")
 
 
 @site.on_event("startup")
