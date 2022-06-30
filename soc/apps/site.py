@@ -1,3 +1,4 @@
+from bevy import Context
 from fastapi import Depends
 from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -19,8 +20,10 @@ site.mount("/auth/", auth_app)
 
 @site.on_event("startup")
 async def on_start():
-    context = site.dependency_overrides.get(create_context, create_context)()
-    settings = context.get(SiteSettings)
+    context: Context = site.dependency_overrides.get(create_context, create_context)()
+    settings = context.get(SiteSettings) or context.create(
+        SiteSettings, add_to_context=True
+    )
     if settings.dev:
         database = context.get(AsyncEngine)
         if not database:
