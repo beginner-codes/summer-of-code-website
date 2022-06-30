@@ -2,7 +2,7 @@
 <body>
     <main class="container">
         <h1>Hi!!!</h1>
-        <p>You are: {{user.username}}</p>
+        <p>You are{% if user %}: {{user.username}}{% else %} not logged in.{% endif %}</p>
     </main>
 </body>
 </html>
