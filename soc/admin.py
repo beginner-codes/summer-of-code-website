@@ -5,10 +5,10 @@ from fastapi import Depends, Query
 from fastapi.responses import HTMLResponse
 
 from soc.authentication_deps import (
-    session_cookie,
-    bearer_token,
     dev_only,
+    session_cookie,
     validate_bearer_token,
+    validate_session_cookie,
 )
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
@@ -28,7 +28,11 @@ async def migrate_database():
     return {"stdout": stdout, "stderr": stderr}
 
 
-@admin_app.get("/db", response_class=TemplateResponse)
+@admin_app.get(
+    "/db",
+    response_class=TemplateResponse,
+    dependencies=[Depends(validate_session_cookie)],
+)
 async def manage_db(session: dict[str, Any] = Depends(session_cookie)):
     return "manage_db.html", {"email": session["email"]}
 
