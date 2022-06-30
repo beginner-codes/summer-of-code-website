@@ -6,7 +6,7 @@ from fastapi.responses import HTMLResponse
 
 from soc.authentication_deps import (
     get_session_from_cookie,
-    get_session_from_header,
+    bearer_token,
     dev_only,
 )
 from soc.context import create_app, inject
@@ -19,7 +19,7 @@ admin_app = create_app()
 
 
 @admin_app.get("/api/v1/db/migrate")
-async def migrate_database(session=Depends(get_session_from_header)):
+async def migrate_database(session=Depends(bearer_token)):
     process = subprocess.Popen(
         ["alembic", "upgrade", "head"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )

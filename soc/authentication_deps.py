@@ -63,7 +63,7 @@ async def get_session_from_cookie_no_auth(
         return session
 
 
-async def get_session_from_header(
+async def bearer_token(
     token: str = Depends(OAuth2PasswordBearer(tokenUrl="authenticate")),
     settings: AuthenticationSettings = inject(AuthenticationSettings),
     db: Database = inject(Database),
