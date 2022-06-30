@@ -25,10 +25,16 @@ def require_roles(*roles):
         db: Database = inject(Database),
         settings: AuthenticationSettings = inject(AuthenticationSettings),
     ):
-        await validate_session(session, settings, db)
-        user = await db.users.get_by_id(session["user_id"])
-        user_roles = set(await user.get_roles())
-        if not user_roles & roles:
+        if "email" in session:
+            roles_match = session["email"] == settings.admin_email
+
+        else:
+            await validate_session(session, settings, db)
+            user = await db.users.get_by_id(session["user_id"])
+            user_roles = set(await user.get_roles())
+            roles_match = bool(user_roles & roles)
+
+        if not roles_match:
             raise HTTPException(403, "You must be a mod or admin to access this")
 
     return roles_check
