@@ -4,7 +4,7 @@ from typing import Any
 from fastapi import Depends, Query
 from fastapi.responses import HTMLResponse
 
-from soc.authentication_deps import (
+from soc.auth_helpers import (
     dev_only,
     session_cookie,
     validate_bearer_token,
