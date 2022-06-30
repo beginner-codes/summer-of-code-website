@@ -39,7 +39,7 @@ async def validate_token(token, settings, db):
     return session
 
 
-async def get_session_from_cookie(
+async def session_cookie(
     session_token: str | None = Cookie(default=None, alias="sessionid"),
     settings: AuthenticationSettings = inject(AuthenticationSettings),
     db: Database = inject(Database),

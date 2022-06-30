@@ -5,7 +5,7 @@ from fastapi import Depends, Query
 from fastapi.responses import HTMLResponse
 
 from soc.authentication_deps import (
-    get_session_from_cookie,
+    session_cookie,
     bearer_token,
     dev_only,
 )
@@ -28,7 +28,7 @@ async def migrate_database(session=Depends(bearer_token)):
 
 
 @admin_app.get("/db", response_class=TemplateResponse)
-async def manage_db(session: dict[str, Any] = Depends(get_session_from_cookie)):
+async def manage_db(session: dict[str, Any] = Depends(session_cookie)):
     return "manage_db.html", {"email": session["email"]}
 
 
