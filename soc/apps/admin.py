@@ -59,7 +59,10 @@ async def _setup_user(session: dict[str, Any], db: Database, discord: Discord):
     dependencies=[Depends(validate_session_cookie)],
 )
 async def manage_db(session: dict[str, Any] = Depends(session_cookie)):
-    return "manage_db.html", {"email": session["email"]}
+    return "manage_db.html", {
+        "email": session.get("email"),
+        "username": session.get("username"),
+    }
 
 
 @admin_app.get("/login", response_class=HTMLResponse, dependencies=[Depends(dev_only)])

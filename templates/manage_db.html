@@ -2,7 +2,7 @@
 <body>
     <main class="container">
         <h1>Manage Database</h1>
-        <p>Logged in as: {{email}}</p>
+        <p>Logged in as: {{username}}{% if email %} ({{email}}){% endif %}</p>
         <button id="migrate-db-btn" type="button">Run DB Migrations</button>
         <pre id="migration-output"></pre>
     </main>
