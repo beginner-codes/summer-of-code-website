@@ -40,11 +40,7 @@ async def discord_code_auth(
         data = resp.json()
         if resp.status_code != 200:
             return JSONResponse(
-                {
-                    "a": settings.discord.client_id,
-                    "b": settings.discord.client_secret,
-                    "data": data,
-                },
+                {"data": data},
                 resp.status_code,
             )
 
