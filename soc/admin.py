@@ -1,12 +1,13 @@
 import subprocess
 from typing import Any
 
-from fastapi import Depends
+from fastapi import Depends, Query
 from fastapi.responses import HTMLResponse
 
 from soc.auth_scheme import get_session_from_cookie, get_session_from_header
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
+from soc.database import Database
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
@@ -29,10 +30,21 @@ async def manage_db(session: dict[str, Any] = Depends(get_session_from_cookie)):
 
 @admin_app.get("/login", response_class=HTMLResponse)
 async def login(
+    role: str = Query("ADMIN"),
     template: Jinja2 = inject(Jinja2),
     auth: Authentication = inject(Authentication),
+    db: Database = inject(Database),
 ):
-    token = auth.create_token(user_id=1, username="Test User")
+    user = await db.users.get_by_id(1)
+    if not user:
+        user = await db.users.create("Test User", "", "testuser@beginner.codes")
+
+    role = role.upper()
+    roles = await user.get_roles()
+    if role not in roles:
+        await user.set_roles([role, *roles])
+
+    token = auth.create_user_access_token(user)
     response = HTMLResponse(template("login.html"))
     response.set_cookie("sessionid", token)
     return response
