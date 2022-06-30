@@ -31,25 +31,16 @@ class Users(Bevy):
 
         return self._user_type.from_db_model(user_model)
 
-    @bevy_method
-    async def get_by_id(
-        self, user_id: int, session: AsyncSession = Inject
-    ) -> User | None:
-        query = select(UserModel).filter_by(id=user_id)
-        async with session:
-            cursor = await session.execute(query)
-            user_model = cursor.scalars().first()
 
-        if not user_model:
-            return
+    async def get_by_id(self, user_id: int) -> User | None:
+        return await self.get_by(id=user_id)
 
-        return self._user_type.from_db_model(user_model)
+    async def get_by_name(self, username: str) -> User | None:
+        return await self.get_by(username=username)
 
     @bevy_method
-    async def get_by_name(
-        self, username: str, session: AsyncSession = Inject
-    ) -> User | None:
-        query = select(UserModel).filter_by(username=username)
+    async def get_by(self, session: AsyncSession = Inject, **fields) -> User | None:
+        query = select(UserModel).filter_by(**fields)
         async with session:
             cursor = await session.execute(query)
             user_model = cursor.scalars().first()
