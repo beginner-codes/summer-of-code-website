@@ -39,7 +39,7 @@ async def dashboard(
             for user in await db.users.get_all(start, num)
         ]
     }
-    return "dashboard.html", scope
+    return "admin/dashboard.html", scope
 
 
 @admin_app.get(
@@ -48,7 +48,7 @@ async def dashboard(
     dependencies=[Depends(validate_session_cookie), Depends(require_roles("ADMIN"))],
 )
 async def manage_db(session: dict[str, Any] = Depends(session_cookie)):
-    return "manage_db.html", {
+    return "admin/manage_db.html", {
         "email": session.get("email"),
         "username": session.get("username"),
     }
@@ -75,6 +75,6 @@ async def login(
         await user.set_roles([role, *roles])
 
     token = await auth.create_user_access_token(user)
-    response = HTMLResponse(template("login.html"))
+    response = HTMLResponse(template("admin/login.html"))
     response.set_cookie("sessionid", token)
     return response
