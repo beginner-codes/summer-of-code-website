@@ -3,12 +3,13 @@ from typing import Any
 import jwt
 from fastapi import Depends, HTTPException, Cookie
 from fastapi.security import OAuth2PasswordBearer
-from starlette.status import HTTP_401_UNAUTHORIZED
 
 from soc.config.models.site import SiteSettings
 from soc.context import inject
 from soc.controllers.authentication import AuthenticationSettings
 from soc.database import Database
+
+auth_scheme = OAuth2PasswordBearer(tokenUrl="authenticate")
 
 
 async def dev_only(settings: SiteSettings = inject(SiteSettings)):
@@ -23,12 +24,11 @@ def parse_token(token: str, settings: AuthenticationSettings) -> dict[str, Any]:
         return {}
 
 
-async def validate_token(token, settings, db):
-    if not token:
-        raise HTTPException(403, "No session")
+async def validate_session(session, settings, db):
+    if not session:
+        raise HTTPException(401, "No session")
 
-    session = parse_token(token, settings)
-    if not session or ("user_id" not in session and "email" not in session):
+    if "user_id" not in session and "email" not in session:
         raise HTTPException(403, "Invalid session")
 
     if "user_id" in session:
@@ -39,54 +39,36 @@ async def validate_token(token, settings, db):
     elif session.get("email") != settings.admin_email:
         raise HTTPException(403, "Not an admin")
 
-    return session
-
 
 async def session_cookie(
     session_token: str | None = Cookie(default=None, alias="sessionid"),
     settings: AuthenticationSettings = inject(AuthenticationSettings),
-    db: Database = inject(Database),
 ):
-    return await validate_token(session_token, settings, db)
+    return parse_token(session_token, settings)
 
 
-async def get_session_from_cookie_no_auth(
-    session_token: str | None = Cookie(default=None, alias="sessionid"),
+async def validate_session_cookie(
+    session: dict[str, Any] = Depends(session_cookie),
     settings: AuthenticationSettings = inject(AuthenticationSettings),
     db: Database = inject(Database),
 ):
-    try:
-        session = jwt.decode(
-            session_token, settings.jwt.private_key, settings.jwt.algorithm
-        )
-    except (jwt.exceptions.InvalidSignatureError, jwt.exceptions.DecodeError):
-        return {}
-    else:
-        return session
+    await validate_session(session, settings, db)
 
 
 async def bearer_token(
-    token: str = Depends(OAuth2PasswordBearer(tokenUrl="authenticate")),
+    session_token: str = Depends(auth_scheme),
+    settings: AuthenticationSettings = inject(AuthenticationSettings),
+):
+    return parse_token(session_token, settings)
+
+
+async def validate_bearer_token(
+    session: dict[str, Any] = Depends(bearer_token),
     settings: AuthenticationSettings = inject(AuthenticationSettings),
     db: Database = inject(Database),
 ):
-    return await validate_token(token, settings, db)
-
-
-def auth_scheme(
-    token: str = Depends(OAuth2PasswordBearer(tokenUrl="authenticate")),
-    settings=inject(AuthenticationSettings),
-) -> dict[str, Any]:
     try:
-        data = jwt.decode(token, settings.jwt.private_key, settings.jwt.algorithm)
-    except jwt.exceptions.DecodeError:
-        data = {}
-
-    if data.get("user_id") is None:
-        raise HTTPException(
-            status_code=HTTP_401_UNAUTHORIZED,
-            detail="Not authenticated",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    return data
+        await validate_session(session, settings, db)
+    except HTTPException as http_exc:
+        http_exc.headers.setdefault("WWW-Authenticate", "Bearer")
+        raise http_exc
