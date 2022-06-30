@@ -32,8 +32,8 @@ async def validate_session(session, settings, db):
         raise HTTPException(403, "Invalid session")
 
     if "user_id" in session:
-        roles = await db.users.get_users_roles(session["user_id"])
-        if "admin" not in roles:
+        roles = await db.users.get_roles(session["user_id"])
+        if "ADMIN" not in roles:
             raise HTTPException(403, "Not an admin")
 
     elif session.get("email") != settings.admin_email:
