@@ -1,16 +1,14 @@
 import subprocess
 from typing import Any
 
-import jwt
 from fastapi import Depends
 from fastapi.responses import HTMLResponse
 
 from soc.auth_scheme import get_session_from_cookie, get_session_from_header
 from soc.context import create_app, inject
-from soc.controllers.authentication import AuthenticationSettings
+from soc.controllers.authentication import Authentication
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
-
 
 admin_app = create_app()
 
@@ -32,14 +30,9 @@ async def manage_db(session: dict[str, Any] = Depends(get_session_from_cookie)):
 @admin_app.get("/login", response_class=HTMLResponse)
 async def login(
     template: Jinja2 = inject(Jinja2),
-    settings: AuthenticationSettings = inject(AuthenticationSettings),
+    auth: Authentication = inject(Authentication),
 ):
-    token = jwt.encode(
-        {"email": settings.admin_email},
-        settings.jwt.private_key,
-        settings.jwt.algorithm,
-    )
-
+    token = auth.create_token(user_id=1, username="Test User")
     response = HTMLResponse(template("login.html"))
     response.set_cookie("sessionid", token)
     return response
