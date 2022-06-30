@@ -20,7 +20,7 @@ async def dev_only(settings: SiteSettings = inject(SiteSettings)):
 def parse_token(token: str, settings: AuthenticationSettings) -> dict[str, Any]:
     try:
         return jwt.decode(token, settings.jwt.private_key, settings.jwt.algorithm)
-    except jwt.exceptions.InvalidSignatureError:
+    except (jwt.exceptions.InvalidSignatureError, jwt.exceptions.DecodeError):
         return {}
 
 
