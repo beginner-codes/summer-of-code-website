@@ -54,8 +54,8 @@ class BanRequest(BaseModel):
 @admin_api.post(
     "/users/ban",
     dependencies=[
-        # Depends(validate_bearer_token),
-        # Depends(require_roles("ADMIN", "MOD")),
+        Depends(validate_bearer_token),
+        Depends(require_roles("ADMIN", "MOD")),
     ],
 )
 async def ban_users(bans: BanRequest, db: Database = inject(Database)):
