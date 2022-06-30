@@ -16,15 +16,18 @@ async def dev_only(settings: SiteSettings = inject(SiteSettings)):
         raise HTTPException(404)
 
 
+def parse_token(token: str, settings: AuthenticationSettings) -> dict[str, Any]:
+    try:
+        return jwt.decode(token, settings.jwt.private_key, settings.jwt.algorithm)
+    except jwt.exceptions.InvalidSignatureError:
+        return {}
+
+
 async def validate_token(token, settings, db):
     if not token:
         raise HTTPException(403, "No session")
 
-    try:
-        session = jwt.decode(token, settings.jwt.private_key, settings.jwt.algorithm)
-    except jwt.exceptions.InvalidSignatureError:
-        session = {}
-
+    session = parse_token(token, settings)
     if not session or ("user_id" not in session and "email" not in session):
         raise HTTPException(403, "Invalid session")
 
