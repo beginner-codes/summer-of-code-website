@@ -37,9 +37,9 @@ async def discord_code_auth(
     try:
         user = await _log_user_in(user_data, db)
     except sqlalchemy.exc.OperationalError:
-        return _manage_db_redirect(user_data, access_token, auth)
+        return await _manage_db_redirect(user_data, access_token, auth)
     else:
-        return _home_redirect(user, auth)
+        return await _home_redirect(user, auth)
 
 
 async def _log_user_in(user_data: dict[str, Any], db: Database) -> User:
@@ -50,14 +50,14 @@ async def _log_user_in(user_data: dict[str, Any], db: Database) -> User:
     return await db.users.create(user_data["username"], "", user_data["email"])
 
 
-def _home_redirect(user: User, auth: Authentication) -> RedirectResponse:
+async def _home_redirect(user: User, auth: Authentication) -> RedirectResponse:
     response = RedirectResponse("/")
-    token = auth.create_user_access_token(user)
+    token = await auth.create_user_access_token(user)
     response.set_cookie("sessionid", token, secure=True)
     return response
 
 
-def _manage_db_redirect(
+async def _manage_db_redirect(
     user_data: dict[str, Any], access_token: str, auth: Authentication
 ) -> RedirectResponse:
     response = RedirectResponse("/admin/db")
