@@ -1,4 +1,5 @@
 from fastapi import Depends
+from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from soc.admin import admin_app
@@ -6,12 +7,11 @@ from soc.api import api_app
 from soc.auth import auth_app
 from soc.authentication_deps import session_cookie
 from soc.config.models.site import SiteSettings
-from soc.context import create_app, create_context
+from soc.context import create_app, create_context, inject
+from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
 site = create_app()
-
-
 site.mount("/v1/", api_app)
 site.mount("/admin/", admin_app)
 site.mount("/auth/", auth_app)
@@ -30,3 +30,10 @@ async def on_start():
 @site.get("/", response_class=TemplateResponse)
 async def index(session: dict = Depends(session_cookie)):
     return "index.html", {"username": session.get("username", "<i>NOT LOGGED IN</i>")}
+
+
+@site.get("/logout", response_class=HTMLResponse)
+async def logout(template: Jinja2 = inject(Jinja2)):
+    response = HTMLResponse(template("logout.html"))
+    response.delete_cookie("sessionid")
+    return response

@@ -52,10 +52,3 @@ async def login(
     response = HTMLResponse(template("login.html"))
     response.set_cookie("sessionid", token)
     return response
-
-
-@admin_app.get("/logout", response_class=HTMLResponse)
-async def logout(template: Jinja2 = inject(Jinja2)):
-    response = HTMLResponse(template("logout.html"))
-    response.delete_cookie("sessionid")
-    return response
