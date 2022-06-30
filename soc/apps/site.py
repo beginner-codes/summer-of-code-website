@@ -1,12 +1,10 @@
 from bevy import Context
-from fastapi import Depends
 from fastapi.responses import HTMLResponse
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from soc.apps.admin_app import admin_app
 from soc.apps.api import api_app
 from soc.apps.auth import auth_app
-from soc.auth_helpers import session_cookie
 from soc.config.models.site import SiteSettings
 from soc.context import create_app, create_context, inject
 from soc.templates.jinja import Jinja2
@@ -31,7 +29,7 @@ async def on_start():
 
 
 @site.get("/", response_class=TemplateResponse)
-async def index(session: dict = Depends(session_cookie)):
+async def index():
     return "index.html"
 
 
