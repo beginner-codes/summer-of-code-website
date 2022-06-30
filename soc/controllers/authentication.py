@@ -65,11 +65,11 @@ class Authentication(Bevy):
         await database.users.create(name, hashed_password, email)
 
     @bevy_method
-    async def create_user_access_token(self, user: UserModel) -> str:
+    def create_user_access_token(self, user: User | UserModel) -> str:
         return self.create_token(user_id=user.id, username=user.username)
 
     @bevy_method
-    async def create_email_access_token(self, username: str, email: str) -> str:
+    def create_email_access_token(self, username: str, email: str) -> str:
         return self.create_token(username=username, email=email)
 
     @bevy_method

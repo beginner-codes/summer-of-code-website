@@ -57,12 +57,12 @@ async def discord_code_auth(
         user = await db.users.create(user_data["username"], "", user_data["email"])
     except Exception as e:
         response = RedirectResponse("/admin/db")
-        session_id = await auth.create_email_access_token(
+        session_id = auth.create_email_access_token(
             user_data["username"], user_data["email"]
         )
     else:
         response = RedirectResponse("/")
-        session_id = await auth.create_user_access_token(user)
+        session_id = auth.create_user_access_token(user)
 
     response.set_cookie("sessionid", session_id)
     return response
