@@ -4,8 +4,7 @@
         <h1>Manage Database</h1>
         <p>Logged in as: {{email}}</p>
         <button id="migrate-db-btn" type="button">Run DB Migrations</button>
-        <pre id="migration-output-stdout" style="color: green;"></pre>
-        <pre id="migration-output-stderr" style="color: red;"></pre>
+        <pre id="migration-output"></pre>
     </main>
     <script>
         function getCookie(cname) {
@@ -32,12 +31,10 @@
                     headers: new Headers({"Authorization": `Bearer ${getCookie("sessionid")}`})
                 }
             ).then(res => res.json()).then(data => {
-                if(data.detail)
-                    document.getElementById("migration-output-stderr").innerText = data.detail;
-                else {
-                    document.getElementById("migration-output-stdout").innerText = data.stdout;
-                    document.getElementById("migration-output-stderr").innerText = data.stderr;
-                }
+                let output = document.getElementById("migration-output")
+                let success = data.success || !("detail" in data)
+                output.innerText = data.output || data.detail
+                output.style.color = data.success ? "green" : "red"
             })
         })
     </script>

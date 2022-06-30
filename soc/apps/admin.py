@@ -21,11 +21,16 @@ admin_app = create_app()
 
 @admin_app.get("/api/v1/db/migrate", dependencies=[Depends(validate_bearer_token)])
 async def migrate_database():
+    output, success = _run_alembic()
+    return {"output": output, "success": success}
+
+
+def _run_alembic() -> (str, bool):
     process = subprocess.Popen(
         ["alembic", "upgrade", "head"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
     stdout, stderr = process.communicate()
-    return {"stdout": stdout, "stderr": stderr}
+    return (stderr or stdout), process.returncode == 0
 
 
 @admin_app.get(
