@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import Depends, Query
 from fastapi.responses import HTMLResponse
+from sqlalchemy.ext.asyncio import AsyncEngine
 
 from soc.apps.admin_api import admin_api
 from soc.auth_helpers import (
