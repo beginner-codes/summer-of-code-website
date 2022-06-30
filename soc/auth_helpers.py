@@ -17,6 +17,23 @@ async def dev_only(settings: SiteSettings = inject(SiteSettings)):
         raise HTTPException(404)
 
 
+def require_roles(*roles):
+    roles = set(roles)
+
+    async def roles_check(
+        session: dict[str, Any] = Depends(session_cookie),
+        db: Database = inject(Database),
+        settings: AuthenticationSettings = inject(AuthenticationSettings),
+    ):
+        await validate_session(session, settings, db)
+        user = await db.users.get_by_id(session["user_id"])
+        user_roles = set(await user.get_roles())
+        if not user_roles & roles:
+            raise HTTPException(403, "You must be a mod or admin to access this")
+
+    return roles_check
+
+
 def parse_token(token: str, settings: AuthenticationSettings) -> dict[str, Any]:
     try:
         return jwt.decode(token, settings.jwt.private_key, settings.jwt.algorithm)
@@ -33,8 +50,6 @@ async def validate_session(session, settings, db):
 
     if "user_id" in session:
         roles = await db.users.get_roles(session["user_id"])
-        if "ADMIN" not in roles:
-            raise HTTPException(403, "Not an admin")
 
     elif session.get("email") != settings.admin_email:
         raise HTTPException(403, "Not an admin")
