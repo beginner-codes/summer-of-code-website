@@ -35,7 +35,12 @@ async def dashboard(
     start = (page - 1) * num
     scope = {
         "users": [
-            {"id": user.id, "username": user.username, "roles": await user.get_roles()}
+            {
+                "id": user.id,
+                "username": user.username,
+                "roles": await user.get_roles(),
+                "banned": user.banned,
+            }
             for user in await db.users.get_all(start, num)
         ]
     }
