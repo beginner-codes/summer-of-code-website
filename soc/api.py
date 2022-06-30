@@ -1,7 +1,7 @@
 from fastapi import Depends, Form, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
-from soc.auth_scheme import auth_scheme
+from soc.authentication_deps import auth_scheme
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication, AuthTokenDict
 

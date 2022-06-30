@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from soc.admin import admin_app
 from soc.api import api_app
 from soc.auth import auth_app
-from soc.auth_scheme import get_session_from_cookie_no_auth
 from soc.config import BaseSettingsModel
+from soc.authentication_deps import get_session_from_cookie_no_auth
 from soc.context import create_app, create_context
 from soc.templates.response import TemplateResponse
 
