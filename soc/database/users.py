@@ -2,6 +2,7 @@ from typing import Type
 
 from bevy import Bevy, Inject
 from bevy.providers.function_provider import bevy_method
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -13,6 +14,15 @@ from soc.entities.users import User
 class Users(Bevy):
     def __init__(self):
         self._user_type: Type[User] = self.bevy.bind(User)
+
+    @bevy_method
+    async def ban(self, *ban_ids, session: AsyncSession = Inject):
+        async with session.begin():
+            statement = (
+                update(UserModel).where(UserModel.id.in_(ban_ids)).values(banned=True)
+            )
+            await session.execute(statement)
+            await session.commit()
 
     @bevy_method
     async def create(
