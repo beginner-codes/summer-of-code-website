@@ -6,7 +6,7 @@ from bevy.providers.type_provider import TypeProvider
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
-from soc.database.config import DatabaseSettings
+from soc.config.models.config import DatabaseSettings
 
 T = TypeVar("T")
 

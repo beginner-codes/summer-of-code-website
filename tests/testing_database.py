@@ -7,9 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import declarative_base
 
+from soc.config.models.config import DatabaseSettings
 from soc.context import create_context
 from soc.database import Database
-from soc.database.config import DatabaseSettings
 from soc.database.models.base import BaseModel
 from tests.fuzzy import FuzzyValue
 

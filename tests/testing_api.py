@@ -6,9 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from fuzzy import FuzzyValue
 from soc.apps.api import api_app
+from soc.config.models.config import DatabaseSettings
 from soc.context import create_context
 from soc.controllers.authentication import AuthenticationSettings, JWTSettings
-from soc.database.config import DatabaseSettings
 from soc.database.models.base import BaseModel
 
 
