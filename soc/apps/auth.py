@@ -67,7 +67,7 @@ async def discord_code_auth(
         response = RedirectResponse("/")
         session_id = auth.create_user_access_token(user)
 
-    response.set_cookie("sessionid", session_id)
+    response.set_cookie("sessionid", session_id, secure=True)
     return response
 
 
