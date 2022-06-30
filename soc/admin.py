@@ -8,6 +8,7 @@ from soc.authentication_deps import (
     session_cookie,
     bearer_token,
     dev_only,
+    validate_bearer_token,
 )
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
@@ -18,8 +19,8 @@ from soc.templates.response import TemplateResponse
 admin_app = create_app()
 
 
-@admin_app.get("/api/v1/db/migrate")
-async def migrate_database(session=Depends(bearer_token)):
+@admin_app.get("/api/v1/db/migrate", dependencies=[Depends(validate_bearer_token)])
+async def migrate_database():
     process = subprocess.Popen(
         ["alembic", "upgrade", "head"], stdout=subprocess.PIPE, stderr=subprocess.PIPE
     )
