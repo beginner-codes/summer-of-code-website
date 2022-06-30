@@ -2,7 +2,7 @@ import urllib.parse
 from typing import Any
 
 import sqlalchemy.exc
-from fastapi import Cookie, HTTPException, Query
+from fastapi import Cookie, HTTPException, Query, Depends
 from fastapi.responses import RedirectResponse
 from httpx import AsyncClient
 
@@ -17,32 +17,41 @@ auth_app = create_app()
 API = "https://discord.com/api/v10"
 
 
-@auth_app.get("/discord")
-async def discord_code_auth(
-    cookie: str = Cookie(default="", alias="sessionid"),
-    code: str = Query(),
-    state: str = Query(),
-    settings: AuthenticationSettings = inject(AuthenticationSettings),
-    db: Database = inject(Database),
-    auth: Authentication = inject(Authentication),
+def _verify_state(
+    cookie: str = Cookie(default="", alias="sessionid"), state: str = Query()
 ):
     if cookie != state:
         raise HTTPException(403, "Invalid state")
 
+
+@auth_app.get("/discord", dependencies=[Depends(_verify_state)])
+async def discord_code_auth(
+    code: str = Query(),
+    settings: AuthenticationSettings = inject(AuthenticationSettings),
+    db: Database = inject(Database),
+    auth: Authentication = inject(Authentication),
+):
     access_token = await _get_access_token(code, settings)
     user_data = await _get_user_data(access_token)
+    user = await _create_user(user_data, db)
+    return (
+        _home_redirect(user, auth)
+        if user
+        else _manage_db_redirect(user_data, access_token, auth)
+    )
+
+
+async def _create_user(user_data: dict[str, Any], db: Database) -> User | None:
     try:
-        user = await db.users.create(user_data["username"], "", user_data["email"])
+        return await db.users.create(user_data["username"], "", user_data["email"])
     except sqlalchemy.exc.OperationalError:
-        return _manage_db_redirect(user_data, access_token, auth)
-    else:
-        return _home_redirect(user, auth)
+        return None
 
 
 def _home_redirect(user: User, auth: Authentication) -> RedirectResponse:
     response = RedirectResponse("/")
-    session_id = auth.create_user_access_token(user)
-    response.set_cookie("sessionid", session_id, secure=True)
+    token = auth.create_user_access_token(user)
+    response.set_cookie("sessionid", token, secure=True)
     return response
 
 
