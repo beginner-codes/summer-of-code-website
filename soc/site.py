@@ -24,7 +24,7 @@ async def on_start():
     if settings.dev:
         database = context.get(AsyncEngine)
         if not database:
-            database = context.create(AsyncEngine)
+            context.create(AsyncEngine)
 
 
 @site.get("/", response_class=TemplateResponse)
