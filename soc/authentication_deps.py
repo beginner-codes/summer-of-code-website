@@ -11,7 +11,7 @@ from soc.controllers.authentication import AuthenticationSettings
 from soc.database import Database
 
 
-async def get_session_from_token(token, settings, db):
+async def validate_token(token, settings, db):
     if not token:
         raise HTTPException(403, "No session")
 
