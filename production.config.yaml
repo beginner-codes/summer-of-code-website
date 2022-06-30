@@ -11,8 +11,7 @@ database:
   driver: sqlite+aiosqlite
 
 site:
-
-  dev: true
+  dev: false
 
 templates:
   directory: templates
