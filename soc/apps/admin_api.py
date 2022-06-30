@@ -2,6 +2,7 @@ import subprocess
 from typing import Any
 
 from fastapi import Depends
+from pydantic import BaseModel, Field
 
 from soc.auth_helpers import bearer_token, validate_bearer_token, require_roles
 from soc.context import create_app, inject
@@ -44,3 +45,19 @@ async def _setup_user(session: dict[str, Any], db: Database, discord: Discord):
     roles = await user.get_roles()
     if "ADMIN" not in roles:
         await user.set_roles(["ADMIN", *roles])
+
+
+class BanRequest(BaseModel):
+    ids: list[int] = Field(default_factory=list)
+
+
+@admin_api.post(
+    "/users/ban",
+    dependencies=[
+        # Depends(validate_bearer_token),
+        # Depends(require_roles("ADMIN", "MOD")),
+    ],
+)
+async def ban_users(bans: BanRequest, db: Database = inject(Database)):
+    await db.users.ban(*bans.ids)
+    return {"success": True}
