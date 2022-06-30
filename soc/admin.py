@@ -4,7 +4,11 @@ from typing import Any
 from fastapi import Depends, Query
 from fastapi.responses import HTMLResponse
 
-from soc.auth_scheme import get_session_from_cookie, get_session_from_header
+from soc.authentication_deps import (
+    get_session_from_cookie,
+    get_session_from_header,
+    dev_only,
+)
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
 from soc.database import Database
@@ -28,7 +32,7 @@ async def manage_db(session: dict[str, Any] = Depends(get_session_from_cookie)):
     return "manage_db.html", {"email": session["email"]}
 
 
-@admin_app.get("/login", response_class=HTMLResponse)
+@admin_app.get("/login", response_class=HTMLResponse, dependencies=[Depends(dev_only)])
 async def login(
     role: str = Query("ADMIN"),
     template: Jinja2 = inject(Jinja2),
