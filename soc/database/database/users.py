@@ -67,3 +67,14 @@ class Users(Bevy):
         async with session:
             cursor = await session.execute(query)
             return [row.type for row in cursor.scalars()]
+
+    @bevy_method
+    async def set_roles(
+        self,
+        user_id: int,
+        roles: list[str],
+        session: AsyncSession = Inject,
+    ):
+        async with session.begin():
+            for role in roles:
+                session.add(RoleModel(type=role, user_id=user_id))
