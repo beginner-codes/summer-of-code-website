@@ -1,15 +1,20 @@
 import urllib.parse
+from typing import Any
 
 import sqlalchemy.exc
 from fastapi import Cookie, HTTPException, Query
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from httpx import AsyncClient
 
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication, AuthenticationSettings
 from soc.database import Database
+from soc.entities.users import User
 
 auth_app = create_app()
+
+
+API = "https://discord.com/api/v10"
 
 
 @auth_app.get("/discord")
@@ -24,10 +29,40 @@ async def discord_code_auth(
     if cookie != state:
         raise HTTPException(403, "Invalid state")
 
-    api = "https://discord.com/api/v10"
+    access_token = await _get_access_token(code, settings)
+    user_data = await _get_user_data(access_token)
+    try:
+        user = await db.users.create(user_data["username"], "", user_data["email"])
+    except sqlalchemy.exc.OperationalError:
+        return _manage_db_redirect(user_data, access_token, auth)
+    else:
+        return _home_redirect(user, auth)
+
+
+def _home_redirect(user: User, auth: Authentication) -> RedirectResponse:
+    response = RedirectResponse("/")
+    session_id = auth.create_user_access_token(user)
+    response.set_cookie("sessionid", session_id, secure=True)
+    return response
+
+
+def _manage_db_redirect(
+    user_data: dict[str, Any], access_token: str, auth: Authentication
+) -> RedirectResponse:
+    response = RedirectResponse("/admin/db")
+    token = auth.create_token(
+        username=user_data["username"],
+        email=user_data["email"],
+        access_token=access_token,
+    )
+    response.set_cookie("sessionid", token, secure=True)
+    return response
+
+
+async def _get_access_token(code: str, settings: AuthenticationSettings) -> str:
     async with AsyncClient() as client:
         resp = await client.post(
-            f"{api}/oauth2/token",
+            f"{API}/oauth2/token",
             data={
                 "client_id": settings.discord.client_id,
                 "client_secret": settings.discord.client_secret,
@@ -39,32 +74,22 @@ async def discord_code_auth(
         )
         data = resp.json()
         if resp.status_code != 200:
-            return JSONResponse(
-                {"data": data},
-                resp.status_code,
-            )
+            raise HTTPException(resp.status_code, data)
 
+        return data["access_token"]
+
+
+async def _get_user_data(access_token: str) -> dict[str, Any]:
+    async with AsyncClient() as client:
         resp = await client.get(
-            f"{api}/users/@me",
-            headers={"Authorization": f"Bearer {data['access_token']}"},
+            f"{API}/users/@me",
+            headers={"Authorization": f"Bearer {access_token}"},
         )
-        user_data = resp.json()
+        data = resp.json()
+        if resp.status_code != 200:
+            raise HTTPException(resp.status_code, data)
 
-    try:
-        user = await db.users.create(user_data["username"], "", user_data["email"])
-    except sqlalchemy.exc.OperationalError:
-        response = RedirectResponse("/admin/db")
-        session_id = auth.create_token(
-            username=user_data["username"],
-            email=user_data["email"],
-            access_token=data["access_token"],
-        )
-    else:
-        response = RedirectResponse("/")
-        session_id = auth.create_user_access_token(user)
-
-    response.set_cookie("sessionid", session_id, secure=True)
-    return response
+        return data
 
 
 @auth_app.get("/discord/login", response_class=RedirectResponse)
