@@ -23,6 +23,26 @@ admin_app.mount("/api/v1", admin_api)
 
 
 @admin_app.get(
+    "/dashboard",
+    response_class=TemplateResponse,
+    dependencies=[Depends(require_roles("ADMIN", "MOD"))],
+)
+async def dashboard(
+    page: int = Query(1, gt=0),
+    num: int = Query(25, gt=0),
+    db: Database = inject(Database),
+):
+    start = (page - 1) * num
+    scope = {
+        "users": [
+            {"id": user.id, "username": user.username, "roles": await user.get_roles()}
+            for user in await db.users.get_all(start, num)
+        ]
+    }
+    return "dashboard.html", scope
+
+
+@admin_app.get(
     "/db",
     response_class=TemplateResponse,
     dependencies=[Depends(validate_session_cookie), Depends(require_roles("ADMIN"))],
