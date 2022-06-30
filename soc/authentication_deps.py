@@ -3,6 +3,7 @@ from fastapi import Depends, HTTPException, Cookie
 from fastapi.security import OAuth2PasswordBearer
 from starlette.status import HTTP_401_UNAUTHORIZED
 
+from soc.config.models.site import SiteSettings
 from soc.context import inject
 from soc.controllers.authentication import AuthenticationSettings, AuthTokenDict
 from soc.database import Database
@@ -38,6 +39,11 @@ async def get_session_from_cookie(
     db: Database = inject(Database),
 ):
     return await get_session_from_token(session_token, settings, db)
+
+
+async def dev_only(settings: SiteSettings = inject(SiteSettings)):
+    if not settings.dev:
+        raise HTTPException(404)
 
 
 async def get_session_from_cookie_no_auth(
