@@ -8,7 +8,7 @@ from bevy.providers import bevy_method
 from soc.config.models.authentication import AuthenticationSettings
 from soc.database import Database
 from soc.database.models.users import UserModel
-from soc.models.users import User
+from soc.entities.users import User
 
 
 class Authentication(Bevy):

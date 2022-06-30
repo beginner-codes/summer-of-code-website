@@ -7,7 +7,7 @@ from sqlalchemy.future import select
 
 from soc.database.models.roles import RoleModel
 from soc.database.models.users import UserModel
-from soc.models.users import User
+from soc.entities.users import User
 
 
 class Users(Bevy):
