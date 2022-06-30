@@ -58,6 +58,9 @@ async def _log_user_in(user_data: dict[str, Any], db: Database) -> User:
 
 
 async def _home_redirect(user: User, auth: Authentication) -> RedirectResponse:
+    if user.banned:
+        raise HTTPException(401, "You've been banned")
+
     response = RedirectResponse("/")
     token = await auth.create_user_access_token(user)
     response.set_cookie("sessionid", token, secure=True)
