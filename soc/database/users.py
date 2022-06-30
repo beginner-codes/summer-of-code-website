@@ -31,6 +31,21 @@ class Users(Bevy):
 
         return self._user_type.from_db_model(user_model)
 
+    @bevy_method
+    async def get_all(
+        self, start: int = 0, num: int = 0, session: AsyncSession = Inject
+    ) -> list[User]:
+        query = select(UserModel)
+        if start:
+            query = query.offset(start)
+
+        if num:
+            query = query.limit(num)
+
+        async with session:
+            cursor = await session.execute(query)
+            return [self._user_type.from_db_model(row) for row in cursor.scalars()]
+
     async def get_by_email(self, email: str) -> User | None:
         return await self.get_by(email=email)
 
