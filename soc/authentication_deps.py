@@ -11,6 +11,11 @@ from soc.controllers.authentication import AuthenticationSettings
 from soc.database import Database
 
 
+async def dev_only(settings: SiteSettings = inject(SiteSettings)):
+    if not settings.dev:
+        raise HTTPException(404)
+
+
 async def validate_token(token, settings, db):
     if not token:
         raise HTTPException(403, "No session")
@@ -40,12 +45,7 @@ async def get_session_from_cookie(
     settings: AuthenticationSettings = inject(AuthenticationSettings),
     db: Database = inject(Database),
 ):
-    return await get_session_from_token(session_token, settings, db)
-
-
-async def dev_only(settings: SiteSettings = inject(SiteSettings)):
-    if not settings.dev:
-        raise HTTPException(404)
+    return await validate_token(session_token, settings, db)
 
 
 async def get_session_from_cookie_no_auth(
@@ -68,7 +68,7 @@ async def bearer_token(
     settings: AuthenticationSettings = inject(AuthenticationSettings),
     db: Database = inject(Database),
 ):
-    return await get_session_from_token(token, settings, db)
+    return await validate_token(token, settings, db)
 
 
 def auth_scheme(
