@@ -2,7 +2,7 @@ from collections import ChainMap
 from typing import Callable, Type, TypeVar, overload, ParamSpec
 
 from bevy import Context
-from fastapi import Depends, routing, FastAPI
+from fastapi import Depends, routing, FastAPI, Request
 from fastapi.routing import get_request_handler
 
 from soc.config.settings_provider import SettingsProvider
@@ -25,7 +25,8 @@ class BevyRoute(routing.APIRoute):
             response_class = self.response_class
             overrides_provider = self.dependency_overrides_provider
             overrides = overrides_provider.dependency_overrides
-            context = overrides.get(create_context, create_context)().branch()
+            context: Context = overrides.get(create_context, create_context)().branch()
+            context.add(request, use_as=Request)
             if hasattr(self.response_class, "__bevy_context__"):
                 response_class = context.bind(response_class)
 
