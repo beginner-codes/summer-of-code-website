@@ -5,7 +5,7 @@ from bevy import Context
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from fuzzy import FuzzyValue
-from soc.api import api_app
+from soc.apps.api import api_app
 from soc.context import create_context
 from soc.controllers.authentication import AuthenticationSettings, JWTSettings
 from soc.database.config import DatabaseSettings

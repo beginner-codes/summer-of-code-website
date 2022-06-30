@@ -4,12 +4,12 @@ import pytest
 from bevy import Context
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 
+from soc.apps.site import site, admin_app
 from soc.context import create_context
 from soc.controllers.authentication import AuthenticationSettings, JWTSettings
 from soc.database.config import DatabaseSettings
 from soc.database.models.base import BaseModel
 from soc.database.models.roles import RoleModel
-from soc.site import site, admin_app
 from soc.templates.settings import TemplateSettings
 
 
