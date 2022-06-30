@@ -1,7 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>{% if title %}{{title}}{% else %}Summer of Code{% endif %}</title>
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
-</head>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
+    />
+  </head>
+  <body>
+    <header class="container">
+      <nav>
+        <ul>
+          <li>
+            <strong>Summer Of Code</strong>
+          </li>
+        </ul>
+        <ul>
+          <li>
+            <a href="/">Home</a>
+          </li>
+          <li>
+            {% if user %}
+            <a href="/logout">Log out</a>
+            {% else %}
+            <a href="/auth/discord/login">Log in</a>
+            {% endif %}
+          </li>
+          <li>
+            {% if user and ("ADMIN" in user.roles or "MOD" in user.roles) %}
+            <a href="/admin">Admin</a>
+            {% endif %}
+          </li>
+        </ul>
+      </nav>
+    </header>
+  </body>
+</html>
