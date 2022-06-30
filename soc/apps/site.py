@@ -29,7 +29,7 @@ async def on_start():
 
 @site.get("/", response_class=TemplateResponse)
 async def index(session: dict = Depends(session_cookie)):
-    return "index.html", {"username": session.get("username", "<i>NOT LOGGED IN</i>")}
+    return "index.html"
 
 
 @site.get("/logout", response_class=HTMLResponse)
