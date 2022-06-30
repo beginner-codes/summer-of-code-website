@@ -34,7 +34,6 @@ async def validate_token(token, settings, db):
             raise HTTPException(403, "Not an admin")
 
     elif session.get("email") != settings.admin_email:
-        print(repr(session.get("email")), repr(settings.admin_email))
         raise HTTPException(403, "Not an admin")
 
     return session
