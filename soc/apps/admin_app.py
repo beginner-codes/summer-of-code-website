@@ -10,6 +10,7 @@ from soc.auth_helpers import (
     session_cookie,
     validate_session_cookie,
 )
+from soc.auth_helpers import require_roles
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
 from soc.database import Database
@@ -24,7 +25,7 @@ admin_app.mount("/api/v1", admin_api)
 @admin_app.get(
     "/db",
     response_class=TemplateResponse,
-    dependencies=[Depends(validate_session_cookie)],
+    dependencies=[Depends(validate_session_cookie), Depends(require_roles("ADMIN"))],
 )
 async def manage_db(session: dict[str, Any] = Depends(session_cookie)):
     return "manage_db.html", {
