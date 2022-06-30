@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse
 
 from soc.auth_helpers import parse_token
 from soc.config.models.authentication import AuthenticationSettings
+from soc.config.models.site import SiteSettings
 from soc.templates.jinja import Jinja2
 
 
@@ -25,7 +26,8 @@ class TemplateResponse(HTMLResponse, Bevy):
         super().__init__(content, status_code, headers, media_type, background)
 
     @bevy_method
-    def _populate_scope(self, request: Request = Inject, auth_settings: AuthenticationSettings = Inject) -> dict[str, Any]:
+    def _populate_scope(self, request: Request = Inject, auth_settings: AuthenticationSettings = Inject,
+                        site_settings: SiteSettings = Inject) -> dict[str, Any]:
         scope = {}
         session = parse_token(request.cookies.get("sessionid"), auth_settings)
         if session:
@@ -33,6 +35,9 @@ class TemplateResponse(HTMLResponse, Bevy):
                 "username": session.get("username"),
                 "roles": session.get("roles", [])
             }
+
+        if site_settings.dev:
+            scope["dev"] = True
 
         return scope
 
