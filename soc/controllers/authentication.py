@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import TypedDict
 
 import bcrypt
 import jwt
@@ -10,11 +9,6 @@ from soc.config.models.authentication import AuthenticationSettings
 from soc.database import Database
 from soc.database.models.users import UserModel
 from soc.models.users import User
-
-
-class AuthTokenDict(TypedDict):
-    user_id: int
-    username: str
 
 
 class Authentication(Bevy):

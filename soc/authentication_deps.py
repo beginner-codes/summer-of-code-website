@@ -1,3 +1,5 @@
+from typing import Any
+
 import jwt
 from fastapi import Depends, HTTPException, Cookie
 from fastapi.security import OAuth2PasswordBearer
@@ -5,7 +7,7 @@ from starlette.status import HTTP_401_UNAUTHORIZED
 
 from soc.config.models.site import SiteSettings
 from soc.context import inject
-from soc.controllers.authentication import AuthenticationSettings, AuthTokenDict
+from soc.controllers.authentication import AuthenticationSettings
 from soc.database import Database
 
 
@@ -72,7 +74,7 @@ async def get_session_from_header(
 def auth_scheme(
     token: str = Depends(OAuth2PasswordBearer(tokenUrl="authenticate")),
     settings=inject(AuthenticationSettings),
-) -> AuthTokenDict:
+) -> dict[str, Any]:
     try:
         data = jwt.decode(token, settings.jwt.private_key, settings.jwt.algorithm)
     except jwt.exceptions.DecodeError:
