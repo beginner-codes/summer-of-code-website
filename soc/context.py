@@ -19,7 +19,7 @@ P = ParamSpec("P")
 
 
 class DependencyOverridesProvider:
-    def __init__(self, app, **overrides):
+    def __init__(self, app, overrides):
         self.overrides = overrides
         self.dependency_overrides = ChainMap(self.overrides, app.dependency_overrides)
 
@@ -49,7 +49,7 @@ class BevyRoute(routing.APIRoute):
                 response_model_exclude_defaults=self.response_model_exclude_defaults,
                 response_model_exclude_none=self.response_model_exclude_none,
                 dependency_overrides_provider=DependencyOverridesProvider(
-                    overrides_provider, create_context=lambda: context
+                    overrides_provider, {create_context: lambda: context}
                 ),
             )
             return await handler(request, *args, **kwargs)
