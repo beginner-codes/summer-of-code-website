@@ -79,7 +79,7 @@ async def login(
     if role not in roles:
         await user.set_roles([role, *roles])
 
-    token = await auth.create_user_access_token(user)
+    token, _ = await auth.create_user_session(user)
     response = HTMLResponse(
         template("admin/login.html", user={"username": user.username, "id": user.id})
     )
