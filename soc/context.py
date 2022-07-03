@@ -12,6 +12,7 @@ from soc.config.settings_provider import SettingsProvider
 from soc.database import Database
 from soc.database.provider import DatabaseProvider
 from soc.entities.sessions import Session
+from soc.templates.scope import Scope
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -33,6 +34,10 @@ class BevyRoute(routing.APIRoute):
             context: Context = overrides.get(create_context, create_context)().branch()
             context.add(await self._load_session(request, context), use_as=Session)
             context.add(request, use_as=Request)
+            if "sessionid" in request.cookies:
+                scope = context.get(Scope)
+                scope["session_token"] = request.cookies["sessionid"]
+
             if hasattr(self.response_class, "__bevy_context__"):
                 response_class = context.bind(response_class)
 
