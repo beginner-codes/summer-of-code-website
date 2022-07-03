@@ -83,5 +83,7 @@ async def login(
     response = HTMLResponse(
         template("admin/login.html", user={"username": user.username, "id": user.id})
     )
-    response.set_cookie("sessionid", token)
+    response.set_cookie(
+        "sessionid", token, secure=True, httponly=True, expires=7 * 24 * 60 * 60
+    )
     return response

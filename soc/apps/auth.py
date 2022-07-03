@@ -81,7 +81,9 @@ async def _manage_db_redirect(
         email=user_data["email"],
         access_token=access_token,
     )
-    response.set_cookie("sessionid", token, secure=True)
+    response.set_cookie(
+        "sessionid", token, secure=True, expires=7 * 24 * 60 * 60, httponly=True
+    )
     return response
 
 
@@ -102,7 +104,9 @@ async def discord_login(
         f"redirect_uri={redirect_uri}&"
         f"prompt=consent"
     )
-    response.set_cookie("sessionid", session_id)
+    response.set_cookie(
+        "sessionid", session_id, secure=True, expires=7 * 24 * 60 * 60, httponly=True
+    )
     return response
 
 
