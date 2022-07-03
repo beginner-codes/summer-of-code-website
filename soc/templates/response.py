@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse
 from soc.config.models.site import SiteSettings
 from soc.entities.sessions import Session
 from soc.templates.jinja import Jinja2
+from soc.templates.scope import Scope
 
 
 class TemplateResponse(HTMLResponse, Bevy):
@@ -27,7 +28,8 @@ class TemplateResponse(HTMLResponse, Bevy):
     def _populate_scope(
         self,
         site_settings: SiteSettings = Inject,
-        session: Session = Inject
+        session: Session = Inject,
+        response_scope: Scope = Inject
     ) -> dict[str, Any]:
         scope = {}
         if session:
@@ -40,7 +42,7 @@ class TemplateResponse(HTMLResponse, Bevy):
         if site_settings.dev:
             scope["dev"] = True
 
-        return scope
+        return scope | response_scope
 
     def _process_data(self, data):
         match data:
