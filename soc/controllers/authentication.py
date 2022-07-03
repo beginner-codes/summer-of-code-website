@@ -56,6 +56,21 @@ class Authentication(Bevy):
         return token, session
 
     @bevy_method
+    async def create_guest_session(
+        self, db: Database = Inject, **values
+    ) -> tuple[str, Session]:
+        session_id = self._create_session_id()
+        try:
+            session = await db.sessions.create(session_id, -1, **values)
+        except sqlalchemy.exc.OperationalError:
+            token = self.create_token(type="dbless", **values)
+            session = None
+        else:
+            token = self.create_token(session_id=session_id)
+
+        return token, session
+
+    @bevy_method
     def create_token(self, _settings: AuthenticationSettings = Inject, **data) -> str:
         return jwt.encode(
             data | {"created": int(datetime.now().timestamp())},
