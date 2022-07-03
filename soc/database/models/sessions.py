@@ -5,6 +5,7 @@ from sqlalchemy import (
     ForeignKey,
     BigInteger,
     Integer,
+    Unicode,
 )
 from sqlalchemy.sql import func
 
@@ -17,3 +18,4 @@ class SessionModel(BaseModel):
     revoked = Column(Boolean, default=False)
     created = Column(DateTime, server_default=func.now())
     user_id = Column(Integer, ForeignKey("Users.id", ondelete="CASCADE"))
+    values = Column(Unicode(2**12), default="")
