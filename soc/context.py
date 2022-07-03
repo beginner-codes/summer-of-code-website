@@ -91,6 +91,6 @@ def inject(obj: Type[T], *, add: bool = True) -> T:
 
 def inject(obj: Callable[P, R] | Type[T], *, add: bool = True) -> Callable[P, R] | T:
     def inject_from_context(ctx: Context = Depends(create_context)):
-        return ctx.get(obj) or ctx.create(obj, add_to_context=add)
+        return ctx.get(obj)
 
     return Depends(inject_from_context)
