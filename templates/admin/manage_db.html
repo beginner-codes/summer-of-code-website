@@ -7,36 +7,29 @@
         <pre id="migration-output"></pre>
     </main>
     <script>
-        function getCookie(cname) {
-            let name = cname + "=";
-            let decodedCookie = decodeURIComponent(document.cookie);
-            let ca = decodedCookie.split(';');
-            for(let i = 0; i <ca.length; i++) {
-                let c = ca[i];
-                while (c.charAt(0) == ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) == 0) {
-                    return c.substring(name.length, c.length);
-                }
-            }
-            return "";
-        }
 
-        let btn = document.getElementById("migrate-db-btn")
-        btn.addEventListener("click", e => {
-            fetch(
-                "/admin/api/v1/db/migrate",
-                {
-                    headers: new Headers({"Authorization": `Bearer ${getCookie("sessionid")}`})
-                }
-            ).then(res => res.json()).then(data => {
-                let output = document.getElementById("migration-output")
-                let success = data.success || !("detail" in data)
-                output.innerText = data.output || data.detail
-                output.style.color = data.success ? "green" : "red"
+        async function apiRequest(method, endpoint, payload){
+            const fetched = await fetch(
+                endpoint,{
+                headers: new Headers({
+                "Authorization": `Bearer ${sessionToken}`, 
+                'content-type': 'application/json'}),
+                method: method,
+                body: JSON.stringify(payload)
             })
-        })
+            return await fetched.json()
+        }
+        let btn = document.getElementById("migrate-db-btn")
+
+        btn.addEventListener("click", e => {
+            apiRequest("POST", "/admin/api/v1/users/ban", {"ids": [1, 2, 3]}).then(
+                data => {
+                    let output = document.getElementById("migration-output")
+                    let success = data.success || !("detail" in result)
+                    output.innerText = data.output || data.detail
+                    output.style.color = data.success ? "green" : "red"
+                }
+            )})
     </script>
 </body>
 </html>
