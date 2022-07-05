@@ -59,6 +59,18 @@ async def manage_db(session: dict[str, Any] = Depends(session_cookie)):
     }
 
 
+@admin_app.get(
+    "/challenges",
+    response_class=TemplateResponse,
+    dependencies=[
+        Depends(validate_session_cookie),
+        Depends(require_roles("ADMIN", "MOD")),
+    ],
+)
+async def challenges(db: Database = inject(Database)):
+    return "admin/challenges.html", {"challenges": await db.challenges.get_all()}
+
+
 @admin_app.get("/login", response_class=HTMLResponse, dependencies=[Depends(dev_only)])
 async def login(
     role: str = Query("ADMIN"),
