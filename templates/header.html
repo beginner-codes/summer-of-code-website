@@ -2,15 +2,18 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{% if title %}{{title}}{% else %}Summer of Code{% endif %}</title>
     <link
       rel="stylesheet"
       href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
     />
     {% if session_token %}
-    <script>const sessionToken = "{{session_token}}";</script>
+    <script>
+      const sessionToken = "{{session_token}}";
+    </script>
     {% endif %}
+    <script src="../static/scripts.js"></script>
   </head>
   <body>
     <header class="container">
