@@ -57,6 +57,15 @@ class Challenges(Bevy):
         return self._challenge_type.from_db_model(model)
 
     @bevy_method
+    async def get_all(self, session: AsyncSession = Inject) -> list[Challenge]:
+        query = select(ChallengeModel).order_by(
+            ChallengeModel.start, ChallengeModel.end
+        )
+        async with session:
+            cursor = await session.execute(query)
+            return [self._challenge_type.from_db_model(row) for row in cursor.scalars()]
+
+    @bevy_method
     async def update(
         self, challenge_id: int, db_session: AsyncSession = Inject, **fields
     ):
