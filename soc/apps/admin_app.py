@@ -71,6 +71,15 @@ async def challenges(db: Database = inject(Database)):
     return "admin/challenges.html", {"challenges": await db.challenges.get_all()}
 
 
+@admin_app.get(
+    "/challenges/create",
+    response_class=TemplateResponse,
+    dependencies=[Depends(validate_session_cookie), Depends(require_roles("ADMIN"))],
+)
+async def challenges(db: Database = inject(Database)):
+    return "admin/create_challenge.html", {"challenges": await db.challenges.get_all()}
+
+
 @admin_app.get("/login", response_class=HTMLResponse, dependencies=[Depends(dev_only)])
 async def login(
     role: str = Query("ADMIN"),
