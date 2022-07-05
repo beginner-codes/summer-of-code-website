@@ -53,7 +53,7 @@ class Session(MutableMapping, Bevy):
 
     def __repr__(self):
         return (
-            f"{type(self).__name__}({self._id}, {self._user_id}, {self._revoked}, {None if not self._created else self._created.isoformat()!r}, "
+            f"{type(self).__name__}({self._id}, {self._user_id}, {self._revoked}, {self._created.isoformat() if self._created else None!r}, "
             f"**{self._values})"
         )
 
