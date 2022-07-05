@@ -1,5 +1,6 @@
 from bevy import Context
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncEngine
 
 from soc.apps.admin_app import admin_app
@@ -14,6 +15,7 @@ site = create_app()
 site.mount("/v1/", api_app)
 site.mount("/admin/", admin_app)
 site.mount("/auth/", auth_app)
+site.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @site.on_event("startup")
