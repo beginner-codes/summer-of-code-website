@@ -29,8 +29,8 @@ class Challenges(Bevy):
         model = ChallengeModel(
             title=title,
             description=description,
-            start=start.isoformat(),
-            end=end.isoformat(),
+            start=start,
+            end=end,
             user_id=user.id if isinstance(user, User) else user,
         )
         async with db_session.begin():
