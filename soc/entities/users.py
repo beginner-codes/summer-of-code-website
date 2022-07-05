@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+from typing import Any
 
 import pydantic
 from bevy import Bevy, bevy_method, Inject
@@ -31,6 +32,17 @@ class User(pydantic.BaseModel, Bevy):
     @bevy_method
     async def set_roles(self, roles: list[str], db: soc.database.Database = Inject):
         await db.users.set_roles(self.id, roles)
+
+    @bevy_method
+    async def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "username": self.username,
+            "avatar": self.avatar,
+            "joined": self.joined.isoformat(),
+            "banned": self.banned,
+            "roles": await self.get_roles(),
+        }
 
     @classmethod
     def from_db_model(cls, model: UserModel) -> User:
