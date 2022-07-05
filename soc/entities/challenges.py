@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import datetime
 from datetime import datetime
-from typing import Awaitable
+from typing import Any, Awaitable
 
 from bevy import Bevy, bevy_method, Inject
 
@@ -100,6 +100,17 @@ class Challenge(Bevy):
             self._end_state.changed = False
 
         await db.challenges.update(**changes)
+
+    async def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "title": self.title,
+            "description": self.description,
+            "created": self.created,
+            "start": self.start,
+            "end": self.end,
+            "user": await (await self.created_by).to_dict(),
+        }
 
     @classmethod
     def from_db_model(cls, model: ChallengeModel) -> Challenge:
