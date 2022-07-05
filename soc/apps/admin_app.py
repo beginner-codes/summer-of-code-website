@@ -7,16 +7,17 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from soc.apps.admin_api import admin_api
 from soc.auth_helpers import (
     dev_only,
+    require_roles,
     session_cookie,
     validate_session_cookie,
 )
-from soc.auth_helpers import require_roles
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
 from soc.database import Database
 from soc.database.models.base import BaseModel
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
+
 
 admin_app = create_app()
 admin_app.mount("/api/v1", admin_api)
@@ -68,7 +69,11 @@ async def manage_db(session: dict[str, Any] = Depends(session_cookie)):
     ],
 )
 async def challenges(db: Database = inject(Database)):
-    return "admin/challenges.html", {"challenges": await db.challenges.get_all()}
+    return "admin/challenges.html", {
+        "challenges": [
+            await challenge.to_dict() for challenge in await db.challenges.get_all()
+        ]
+    }
 
 
 @admin_app.get(
