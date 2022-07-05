@@ -1,13 +1,16 @@
 import subprocess
+from datetime import datetime
 from typing import Any
 
 from fastapi import Depends
 from pydantic import BaseModel, Field
 
-from soc.auth_helpers import bearer_token, validate_bearer_token, require_roles
+from soc.auth_helpers import bearer_token, require_roles, validate_bearer_token
 from soc.context import create_app, inject
 from soc.database import Database
 from soc.discord import Discord
+from soc.entities.sessions import Session
+
 
 admin_api = create_app()
 
@@ -26,6 +29,29 @@ async def migrate_database(
         await _setup_user(session, db, discord)
 
     return {"output": output, "success": success}
+
+
+class CreateChallengePayload(BaseModel):
+    title: str
+    description: str
+    start: datetime
+    end: datetime
+
+
+@admin_api.post(
+    "/challenges/create",
+    deprecated=[Depends(validate_bearer_token), Depends(require_roles("ADMIN"))],
+)
+async def create_challenge(
+    challenge_data: CreateChallengePayload,
+    session: Session = Depends(bearer_token),
+    db: Database = inject(Database),
+):
+    data = {"user": session.user_id} | challenge_data.dict()
+    data["start"] = data["start"]
+    data["end"] = data["end"]
+    challenge = await db.challenges.create(**data)
+    return await challenge.to_dict()
 
 
 def _run_alembic() -> (str, bool):
