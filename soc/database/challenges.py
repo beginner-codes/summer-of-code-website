@@ -8,13 +8,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from soc.database.models.challenges import ChallengeModel
+from soc.database.models.submissions import SubmissionModel
 from soc.entities.challenges import Challenge
+from soc.entities.submissions import Submission
 from soc.entities.users import User
 
 
 class Challenges(Bevy):
     def __init__(self):
         self._challenge_type: Type[Challenge] = self.bevy.bind(Challenge)
+        self._submission_type: Type[Submission] = self.bevy.bind(Submission)
 
     @bevy_method
     async def create(
@@ -83,6 +86,17 @@ class Challenges(Bevy):
         async with session:
             cursor = await session.execute(query)
             return [self._challenge_type.from_db_model(row) for row in cursor.scalars()]
+
+    @bevy_method
+    async def get_submissions(
+        self, challenge_id: int, session: AsyncSession = Inject
+    ) -> list[Submission]:
+        query = select(SubmissionModel).filter_by(challenge_id=challenge_id)
+        async with session:
+            cursor = await session.execute(query)
+            return [
+                self._submission_type.from_db_model(row) for row in cursor.scalars()
+            ]
 
     @bevy_method
     async def update(

@@ -8,6 +8,7 @@ from bevy import Bevy, bevy_method, Inject
 
 import soc.database
 from soc.database.models.challenges import ChallengeModel
+from soc.entities.submissions import Submission
 from soc.entities.users import User
 from soc.state_property import state_property
 
@@ -81,6 +82,13 @@ class Challenge(Bevy):
     def user_id(self) -> int:
         return self._user_id
 
+    @property
+    @bevy_method
+    def submissions(
+        self, db: soc.database.Database = Inject
+    ) -> Awaitable[list[Submission]]:
+        return db.challenges.get_submissions(self.id)
+
     @bevy_method
     async def sync(self, db: soc.database.Database = Inject):
         if not self.changed:
@@ -115,6 +123,9 @@ class Challenge(Bevy):
             "end": self.end,
             "user": await (await self.created_by).to_dict(),
             "active": self.active,
+            "submissions": [
+                await submission.to_dict() for submission in await self.submissions
+            ],
         }
 
     @classmethod
