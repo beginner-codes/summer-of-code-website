@@ -52,6 +52,10 @@ class Challenge(Bevy):
         )
 
     @property
+    def active(self) -> bool:
+        return self.start <= datetime.utcnow() <= self.end
+
+    @property
     def changed(self) -> bool:
         return (
             self._title_state.changed
@@ -110,6 +114,7 @@ class Challenge(Bevy):
             "start": self.start,
             "end": self.end,
             "user": await (await self.created_by).to_dict(),
+            "active": self.active,
         }
 
     @classmethod
