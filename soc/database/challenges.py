@@ -57,6 +57,25 @@ class Challenges(Bevy):
         return self._challenge_type.from_db_model(model)
 
     @bevy_method
+    async def get_active(self, db_session: AsyncSession = Inject) -> Challenge | None:
+        now = datetime.utcnow()
+        query = select(ChallengeModel).filter(
+            ChallengeModel.start <= now, ChallengeModel.end >= now
+        )
+        async with db_session:
+            try:
+                cursor = await db_session.execute(query)
+            except sqlalchemy.exc.OperationalError:
+                return
+            else:
+                model = cursor.scalars().first()
+
+        if not model:
+            return
+
+        return self._challenge_type.from_db_model(model)
+
+    @bevy_method
     async def get_all(self, session: AsyncSession = Inject) -> list[Challenge]:
         query = select(ChallengeModel).order_by(
             ChallengeModel.start, ChallengeModel.end

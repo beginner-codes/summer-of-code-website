@@ -12,6 +12,7 @@ from soc.database import Database
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
+
 site = create_app()
 site.mount("/v1/", api_app)
 site.mount("/admin/", admin_app)
@@ -32,8 +33,9 @@ async def on_start():
 
 
 @site.get("/", response_class=TemplateResponse)
-async def index():
-    return "index.html"
+async def index(db: Database = inject(Database)):
+    challenge = await db.challenges.get_active()
+    return "index.html", {"challenge": await challenge.to_dict() if challenge else None}
 
 
 @site.get("/challenges", response_class=TemplateResponse)
