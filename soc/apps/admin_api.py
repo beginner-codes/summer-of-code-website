@@ -87,3 +87,15 @@ class BanRequest(BaseModel):
 async def ban_users(bans: BanRequest, db: Database = inject(Database)):
     await db.users.ban(*bans.ids)
     return {"success": True}
+
+
+@admin_api.post(
+    "/users/unban",
+    dependencies=[
+        Depends(validate_bearer_token),
+        Depends(require_roles("ADMIN", "MOD")),
+    ],
+)
+async def unban_users(ban: BanRequest, db: Database = inject(Database)):
+    await db.users.unban(*ban.ids)
+    return {"success": True}
