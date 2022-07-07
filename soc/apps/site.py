@@ -37,7 +37,6 @@ async def index(db: Database = inject(Database)):
     challenge = await db.challenges.get_active()
     return "index.html", {"challenge": await challenge.to_dict() if challenge else None}
 
-
 @site.get("/challenges", response_class=TemplateResponse)
 async def challenges(db: Database = inject(Database)):
     return "challenges.html", {"challenges": await db.challenges.get_all()}

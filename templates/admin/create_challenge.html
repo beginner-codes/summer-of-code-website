@@ -2,7 +2,23 @@
 <body>
     <main class="container">
         <h1>Create Challenge</h1>
-        <p>{{challenges}}</p>
+        <form id = "create-challenge-form">
+            <input type = "text" name = "title" placeholder="Title">
+            <textarea type = "text" name = "description" placeholder="Description"></textarea>
+            <input type = "datetime-local" name = "start" placeholder="Start Time">
+            <input type = "datetime-local" name = "end" placeholder="End Time">
+        </form>
     </main>
+    <script>
+        const create_challenge_form = document.getElementById("create-challenge-form");
+        create_challenge_form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            const data = new FormData(e.target);
+            const json_data = Object.fromEntries(data.entries());
+            apiRequest("POST", "/admin/api/v1/challenges/create", json_data).then(
+                data => {console.log(data)}
+            )
+        })
+    </script>
 </body>
 </html>
