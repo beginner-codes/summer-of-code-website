@@ -25,6 +25,15 @@ class Users(Bevy):
             await session.commit()
 
     @bevy_method
+    async def unban(self, *ban_ids, session: AsyncSession = Inject):
+        async with session.begin():
+            statement = (
+                update(UserModel).where(UserModel.id.in_(ban_ids)).values(banned=False)
+            )
+            await session.execute(statement)
+            await session.commit()
+
+    @bevy_method
     async def create(
         self,
         username: str,
