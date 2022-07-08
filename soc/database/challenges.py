@@ -88,6 +88,28 @@ class Challenges(Bevy):
             return [self._challenge_type.from_db_model(row) for row in cursor.scalars()]
 
     @bevy_method
+    async def create_submission(
+        self,
+        type: str,
+        link: str,
+        description: str,
+        challenge: int | Challenge,
+        user: int | User,
+        db_session: AsyncSession = Inject,
+    ) -> Submission:
+        model = SubmissionModel(
+            type=type,
+            link=link,
+            description=description,
+            user_id=user if isinstance(user, int) else user.id,
+            challenge_id=challenge if isinstance(challenge, int) else challenge.id,
+        )
+        async with db_session.begin():
+            db_session.add(model)
+
+        return self._submission_type.from_db_model(model)
+
+    @bevy_method
     async def get_submissions(
         self, challenge_id: int, session: AsyncSession = Inject
     ) -> list[Submission]:
@@ -97,6 +119,19 @@ class Challenges(Bevy):
             return [
                 self._submission_type.from_db_model(row) for row in cursor.scalars()
             ]
+
+    @bevy_method
+    async def update_submission(
+        self, submission_id: int, description: str, db_session: AsyncSession = Inject
+    ):
+        async with db_session.begin():
+            statement = (
+                update(SubmissionModel)
+                .where(SubmissionModel.id == submission_id)
+                .values(description=description)
+            )
+            await db_session.execute(statement)
+            await db_session.commit()
 
     @bevy_method
     async def update(
