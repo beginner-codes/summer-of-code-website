@@ -151,6 +151,7 @@ class Submission(Bevy):
             "link": self._link,
             "user_id": self._user_id,
             "challenge_id": self._challenge_id,
+            "status": await self.status.to_dict()
         }
 
     @classmethod
