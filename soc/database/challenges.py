@@ -101,11 +101,12 @@ class Challenges(Bevy):
         user: int | User,
         db_session: AsyncSession = Inject,
     ) -> Submission:
+        user_id = user if isinstance(user, int) else user.id
         model = SubmissionModel(
             type=type,
             link=link,
             description=description,
-            user_id=user if isinstance(user, int) else user.id,
+            user_id=user_id,
             challenge_id=challenge if isinstance(challenge, int) else challenge.id,
         )
         async with db_session.begin():
