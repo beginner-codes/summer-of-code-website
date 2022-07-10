@@ -113,7 +113,9 @@ class Challenges(Bevy):
             db_session.add(model)
 
         submission = self._submission_type.from_db_model(model)
-        submission.status = Status.CREATED
+        submission.status = SubmissionStatus(
+            status=Status.CREATED, user_id=user_id, submission_id=submission.id
+        )
         await submission.sync()
         return submission
 
