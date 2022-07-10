@@ -117,7 +117,9 @@ class Submission(Bevy):
         if not self.changed:
             return
 
-        await db.challenges.update_submission(self._description)
+        if self._description_state.changed:
+            await db.challenges.update_submission(self._description)
+            self._description_state.changed = False
 
     async def to_dict(self) -> dict[str, Any]:
         return {
