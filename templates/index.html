@@ -1,0 +1,59 @@
+{% include 'header.html' %}
+<body>
+    <div id="challenge-info" class = "container">
+        <div>
+            <p>Active Challenge</p>
+            <h2>{{ challenge.title }}</h2>
+            <p>{{ challenge.description }}</p>
+            <button id = "post-submission-btn">Post Your Submission</button>
+        </div>
+        <div id = "time-info">
+            <h1 id = "days-left"></h1>
+            <h3>Days Left</h3>
+            <div id = "progress-bar-info">
+                <progress id = "progress-bar" data-start = {{ challenge.start }} data-end = {{ challenge.end }}></progress>
+                <div>
+                    <p id = "start-date"></p>
+                    <p id = "end-date"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+            const days_left_heading = document.getElementById("days-left");
+            const progress_bar = document.getElementById("progress-bar");
+            const start_date_tag = document.getElementById("start-date");
+            const end_date_tag = document.getElementById("end-date");
+
+            const start_date = new Date(progress_bar.getAttribute("data-start"));
+            const end_date = new Date(progress_bar.getAttribute("data-end"));
+            const total_days = Math.round((end_date - start_date)/86400000);
+            const days_left = Math.round((end_date - Date.now())/86400000);
+
+            const now = new Date()  
+            const utcMillliseconds = now.getTime() + (now.getTimezoneOffset() * 60 * 1000)  
+            const timeleft = Math.abs(utcMillliseconds - end_date)
+            
+            if(timeleft < 60000 ){
+                console.log("countdown seconds")
+            }
+            else if(timeleft < 3600000){
+                console.log("countdown minutes")
+            }
+            else if(timeleft < 86400000){
+                console.log("countdown hours")
+            }
+            else{
+                console.log("countdown days")
+            }
+
+            progress_bar.value = (total_days - days_left).toString();
+            progress_bar.max = total_days.toString();
+            days_left_heading.textContent = days_left;
+            start_date_tag.textContent = start_date.toDateString();
+            end_date_tag.textContent = end_date.toDateString();
+
+    </script>
+</body>
+</html>

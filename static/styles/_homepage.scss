@@ -1,0 +1,29 @@
+#challenge-info{
+    display: flex;
+    justify-content: space-between;
+    gap:50px;
+}
+#time-info{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width:300px;
+    > h1{
+        font-size: 4em;
+    }
+}
+#progress-bar-info{
+    width:inherit;
+
+    > div{
+        display: flex;
+        justify-content: space-between;
+
+        >p{
+            font-size: 0.6em;
+        }
+    }
+}
+#post-submission-btn{
+    width:250px;
+}

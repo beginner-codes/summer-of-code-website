@@ -1,0 +1,17 @@
+authentication:
+  admin_email: zechzimm90@gmail.com
+  jwt:
+    private_key: PRIVATEKEY
+  discord:
+    redirect_uri: https://soc.beginner.codes/auth/discord
+    client_id: 651551300378689536
+
+database:
+  name: dev.db
+  driver: sqlite+aiosqlite
+
+site:
+  dev: true
+
+templates:
+  directory: templates
