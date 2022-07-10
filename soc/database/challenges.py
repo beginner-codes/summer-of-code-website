@@ -8,9 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
 from soc.database.models.challenges import ChallengeModel
+from soc.database.models.submission_status import SubmissionStatusModel
 from soc.database.models.submissions import SubmissionModel
 from soc.entities.challenges import Challenge
-from soc.entities.submissions import Submission
+from soc.entities.submissions import Submission, Status, SubmissionStatus
 from soc.entities.users import User
 
 
@@ -18,6 +19,9 @@ class Challenges(Bevy):
     def __init__(self):
         self._challenge_type: Type[Challenge] = self.bevy.bind(Challenge)
         self._submission_type: Type[Submission] = self.bevy.bind(Submission)
+        self._submission_status_type: Type[SubmissionStatus] = self.bevy.bind(
+            SubmissionStatus
+        )
 
     @bevy_method
     async def create(
@@ -107,7 +111,26 @@ class Challenges(Bevy):
         async with db_session.begin():
             db_session.add(model)
 
-        return self._submission_type.from_db_model(model)
+        submission = self._submission_type.from_db_model(model)
+        submission.status = Status.CREATED
+        await submission.sync()
+        return submission
+
+    @bevy_method
+    async def set_submission_status(
+        self,
+        submission: Submission | SubmissionModel,
+        status: Status,
+        user: User | int,
+        db_session: AsyncSession = Inject,
+    ):
+        model = SubmissionStatusModel(
+            status=status,
+            submission_id=submission.id,
+            user_id=user if isinstance(user, int) else user.id,
+        )
+        async with db_session.begin():
+            db_session.add(model)
 
     @bevy_method
     async def get_submissions(
@@ -117,8 +140,28 @@ class Challenges(Bevy):
         async with session:
             cursor = await session.execute(query)
             return [
-                self._submission_type.from_db_model(row) for row in cursor.scalars()
+                self._submission_type.from_db_model(
+                    row, await self.get_submission_status(row.id)
+                )
+                for row in cursor.scalars()
             ]
+
+    @bevy_method
+    async def get_submission_status(
+        self, submission_id: int, db_session: AsyncSession = Inject
+    ) -> SubmissionStatus | None:
+        query = select(SubmissionStatusModel).order_by(
+            SubmissionStatusModel.updated.desc()
+        )
+        async with db_session:
+            try:
+                cursor = await db_session.execute(query)
+            except sqlalchemy.exc.OperationalError:
+                return
+            else:
+                model = cursor.scalars().first()
+
+        return self._submission_status_type.from_db_model(model)
 
     @bevy_method
     async def update_submission(
