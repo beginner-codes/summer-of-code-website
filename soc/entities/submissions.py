@@ -14,7 +14,6 @@ from soc.state_property import state_property
 from soc.strenum import StrEnum, auto
 
 
-class Submission:
 class Status(StrEnum):
     CREATED = auto()
     APPROVED = auto()
@@ -57,6 +56,7 @@ class SubmissionStatus:
 
 class Submission(Bevy):
     description, _description, _description_state = state_property(str)
+    status, _status, _status_state = state_property(SubmissionStatus)
 
     def __init__(
         self,
@@ -66,6 +66,7 @@ class Submission(Bevy):
         description: str,
         user_id: int,
         challenge_id: int,
+        status: SubmissionStatus | None = None,
     ):
         self._id = id
         self._type = type
@@ -73,6 +74,7 @@ class Submission(Bevy):
         self._link = link
         self._user_id = user_id
         self._challenge_id = challenge_id
+        self._status = status
 
     def __hash__(self):
         return self.id
@@ -85,12 +87,13 @@ class Submission(Bevy):
             f"{self._description!r}, "
             f"{self._link!r}, "
             f"{self._user_id},"
-            f"{self._challenge_id})"
+            f"{self._challenge_id}, "
+            f"{self._status})"
         )
 
     @property
     def changed(self) -> bool:
-        return self._description_state.changed
+        return self._description_state.changed or self._status_state.changed
 
     @property
     @bevy_method
@@ -121,6 +124,12 @@ class Submission(Bevy):
             await db.challenges.update_submission(self._description)
             self._description_state.changed = False
 
+        if self._status_state.changed:
+            await db.challenges.set_submission_status(
+                self, self._status.status, self._status.user_id
+            )
+            self._status_state.changed = False
+
     async def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
@@ -132,7 +141,9 @@ class Submission(Bevy):
         }
 
     @classmethod
-    def from_db_model(cls, model: SubmissionModel) -> Submission:
+    def from_db_model(
+        cls, model: SubmissionModel, status: SubmissionStatus | None
+    ) -> Submission:
         return cls(
             id=model.id,
             type=model.type,
@@ -140,4 +151,5 @@ class Submission(Bevy):
             link=model.link,
             user_id=model.user_id,
             challenge_id=model.challenge_id,
+            status=SubmissionStatus.from_db_model(status),
         )
