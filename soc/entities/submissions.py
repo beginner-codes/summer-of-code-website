@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Awaitable
 
-from bevy import bevy_method, Inject
+from bevy import Bevy, bevy_method, Inject
 
 import soc.database
 from soc.database.models.submission_status import SubmissionStatusModel
@@ -55,6 +55,7 @@ class SubmissionStatus:
                 )
 
 
+class Submission(Bevy):
     description, _description, _description_state = state_property(str)
 
     def __init__(
