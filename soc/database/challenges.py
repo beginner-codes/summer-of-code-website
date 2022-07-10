@@ -126,7 +126,7 @@ class Challenges(Bevy):
         status: Status,
         user: User | int,
         db_session: AsyncSession = Inject,
-    ):
+    ) -> SubmissionStatus:
         model = SubmissionStatusModel(
             status=status,
             submission_id=submission.id,
@@ -134,6 +134,8 @@ class Challenges(Bevy):
         )
         async with db_session.begin():
             db_session.add(model)
+
+        return SubmissionStatus.from_db_model(model)
 
     @bevy_method
     async def get_submissions(
