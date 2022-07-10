@@ -156,7 +156,7 @@ class Submission(Bevy):
 
     @classmethod
     def from_db_model(
-        cls, model: SubmissionModel, status: SubmissionStatus | None
+        cls, model: SubmissionModel, status: SubmissionStatus | None = None
     ) -> Submission:
         return cls(
             id=model.id,
