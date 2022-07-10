@@ -23,11 +23,11 @@ class Status(StrEnum):
 
 @dataclass(frozen=True)
 class SubmissionStatus:
-    id: int
     status: Status
-    updated: datetime
     user_id: int
     submission_id: int
+    id: int = -1
+    updated: datetime = datetime.fromtimestamp(0)
 
     @property
     def valid(self) -> bool:
@@ -47,11 +47,11 @@ class SubmissionStatus:
         match model:
             case SubmissionStatusModel():
                 return SubmissionStatus(
-                    model.id,
                     Status(model.status),
-                    model.updated,
                     model.user_id,
                     model.submission_id,
+                    model.id,
+                    model.updated,
                 )
 
             case SubmissionStatus():
@@ -59,7 +59,7 @@ class SubmissionStatus:
 
             case _:
                 return SubmissionStatus(
-                    -1, Status.NONE, datetime.fromtimestamp(0), -1, submission_id=-1
+                    Status.NONE, -1, -1, -1, datetime.fromtimestamp(0)
                 )
 
 
