@@ -8,9 +8,17 @@ import soc.database
 from soc.database.models.submissions import SubmissionModel
 from soc.entities.users import User
 from soc.state_property import state_property
+from soc.strenum import StrEnum, auto
 
 
 class Submission:
+class Status(StrEnum):
+    CREATED = auto()
+    APPROVED = auto()
+    DISAPPROVED = auto()
+    NONE = auto()
+
+
     description, _description, _description_state = state_property(str)
 
     def __init__(
