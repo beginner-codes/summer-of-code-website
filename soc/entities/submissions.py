@@ -105,6 +105,10 @@ class Submission(Bevy):
         return self._id
 
     @property
+    def type(self) -> str:
+        return self._type
+
+    @property
     def user_id(self) -> int:
         return self._user_id
 
