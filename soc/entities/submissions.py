@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import datetime
 from typing import Any, Awaitable
 
 from bevy import bevy_method, Inject
 
 import soc.database
+from soc.database.models.submission_status import SubmissionStatusModel
 from soc.database.models.submissions import SubmissionModel
 from soc.entities.users import User
 from soc.state_property import state_property
@@ -17,6 +20,39 @@ class Status(StrEnum):
     APPROVED = auto()
     DISAPPROVED = auto()
     NONE = auto()
+
+
+@dataclass(frozen=True)
+class SubmissionStatus:
+    id: int
+    status: Status
+    updated: datetime
+    user_id: int
+    submission_id: int
+
+    @property
+    def valid(self) -> bool:
+        return self.id != -1
+
+    @classmethod
+    def from_db_model(cls, model: SubmissionStatusModel | SubmissionStatus | None) -> SubmissionStatus:
+        match model:
+            case SubmissionStatusModel():
+                return SubmissionStatus(
+                    model.id,
+                    Status(model.status),
+                    model.updated,
+                    model.user_id,
+                    model.submission_id,
+                )
+
+            case SubmissionStatus():
+                return model
+
+            case _:
+                return SubmissionStatus(
+                    -1, Status.NONE, datetime.fromtimestamp(0), -1, submission_id=-1
+                )
 
 
     description, _description, _description_state = state_property(str)
