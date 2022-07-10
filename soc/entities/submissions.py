@@ -75,7 +75,7 @@ class Submission(Bevy):
         self._challenge_id = challenge_id
 
     def __hash__(self):
-        return id(self.id)
+        return self.id
 
     def __repr__(self):
         return (
