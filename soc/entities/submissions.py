@@ -33,6 +33,15 @@ class SubmissionStatus:
     def valid(self) -> bool:
         return self.id != -1
 
+    async def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "updated": self.updated,
+            "status": self.status,
+            "user_id": self.user_id,
+            "submission_id": self.submission_id,
+        }
+
     @classmethod
     def from_db_model(cls, model: SubmissionStatusModel | SubmissionStatus | None) -> SubmissionStatus:
         match model:
