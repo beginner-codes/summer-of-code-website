@@ -138,7 +138,7 @@ class Submission(Bevy):
             self._description_state.changed = False
 
         if self._status_state.changed:
-            await db.challenges.set_submission_status(
+            self._status = await db.challenges.set_submission_status(
                 self, self._status.status, self._status.user_id
             )
             self._status_state.changed = False
