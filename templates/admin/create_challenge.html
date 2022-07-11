@@ -3,22 +3,28 @@
     <main class="container">
         <h1>Create Challenge</h1>
         <form id = "create-challenge-form">
-            <input type = "text" name = "title" placeholder="Title">
-            <textarea type = "text" name = "description" placeholder="Description"></textarea>
-            <input type = "datetime-local" name = "start" placeholder="Start Time">
-            <input type = "datetime-local" name = "end" placeholder="End Time">
+            <label for = "title">Title</label>
+            <input id = "title" type = "text" name = "title" placeholder="Title">
+            <label for = "description">Description</label>
+            <textarea id = "description" type = "text" name = "description" placeholder="Description"></textarea>
+            <label for = "start">Start Time</label>
+            <input id = "start" type = "datetime-local" name = "start" placeholder="Start Time">
+            <label for = "end">End Time</label>
+            <input id = "end" type = "datetime-local" name = "end" placeholder="End Time">
             <button>Create</button>
         </form>
     </main>
     <script>
         const create_challenge_form = document.getElementById("create-challenge-form");
+        const start_date = document.getElementById("start-date");
+        const end_date = document.getElementById("end-date");
         create_challenge_form.addEventListener("submit", (e) => {
             e.preventDefault();
             const data = new FormData(e.target);
             const json_data = Object.fromEntries(data.entries());
-            apiRequest("POST", "/admin/api/v1/challenges/create", json_data).then(
-                data => {console.log(data)}
-            )
+            json_data.start = new Date(start_date.value).toISOString().slice(0, -5);
+            json_data.end = new Date(end_date.value).toISOString().slice(0, -5);
+            apiRequest("POST", "/admin/api/v1/challenges/create", json_data);
         })
     </script>
 </body>
