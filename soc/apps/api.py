@@ -42,6 +42,12 @@ async def create_submission(
     session: Session = Depends(bearer_token),
     db: Database = inject(Database),
 ):
+    challenge = await db.challenges.get(challenge_id)
+    if not challenge.active:
+        raise HTTPException(
+            400, f"{challenge.title} is no longer open for new submissions."
+        )
+
     submission = await db.challenges.create_submission(
         submission.type,
         submission.link,

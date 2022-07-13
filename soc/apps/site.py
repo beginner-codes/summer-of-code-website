@@ -46,9 +46,14 @@ async def challenges(db: Database = inject(Database)):
     "/challenges/{challenge_id}/create-submission", response_class=TemplateResponse
 )
 async def challenges(challenge_id: int, db: Database = inject(Database)):
-    return "create_submission.html", {
-        "challenge": await (await db.challenges.get(challenge_id)).to_dict()
-    }
+    challenge = await db.challenges.get(challenge_id)
+    if not challenge.active:
+        return "error.html", {
+            "reason": f"{challenge.title} is no longer open for new submissions.",
+            "title": "Submissions Are Closed",
+        }
+
+    return "create_submission.html", {"challenge": await challenge.to_dict()}
 
 
 @site.get("/logout", response_class=HTMLResponse)
