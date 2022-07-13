@@ -123,6 +123,20 @@ class Challenges(Bevy):
 
         return SubmissionStatus.from_db_model(model)
 
+    @bevy_method
+    async def add_vote_to_submission(
+        self,
+        submission: int | Submission,
+        user: int | User,
+        emoji: str,
+        db_session: AsyncSession = Inject,
+    ) -> VoteModel:
+        model = VoteModel(emoji=emoji, user_id=self.get_id(user), submission=self.get_id(submission))
+        async with db_session.begin():
+            db_session.add(model)
+
+        return model
+
     async def get_submission_votes(self, submission: int | Submission) -> list[VoteModel]:
         query = select(VoteModel).filter_by(submission=self.get_id(submission))
         result = await self._get_query_result(query, [])
