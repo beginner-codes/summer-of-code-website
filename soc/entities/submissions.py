@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Awaitable
@@ -121,7 +122,26 @@ class Submission(Bevy):
     def user_id(self) -> int:
         return self._user_id
 
+    @property
+    def votes(self) -> Awaitable[dict[str, set[int]]]:
+        return self._build_votes_dict()
+
     @bevy_method
+    async def _build_votes_dict(self, db: soc.database.Database = Inject) -> dict[str, set[int]]:
+        user_votes = await db.challenges.get_submission_votes(self)
+        votes = defaultdict(set)
+        for vote in user_votes:
+            votes[vote.emoji].add(vote.user_id)
+
+        return votes
+
+    @bevy_method
+    async def add_vote(self, user: int | User, emoji: str, db: soc.database.Database = Inject):
+        await db.challenges.add_vote_to_submission(self.id, user, emoji)
+
+    @bevy_method
+    async def remove_vote(self, user: int | User, emoji: str, db: soc.database.Database = Inject):
+        await db.challenges.remove_vote_from_submission(self.id, user, emoji)
 
     @bevy_method
     async def sync(self, db: soc.database.Database = Inject):
@@ -146,7 +166,8 @@ class Submission(Bevy):
             "link": self._link,
             "user_id": self._user_id,
             "challenge_id": self._challenge_id,
-            "status": await self.status.to_dict()
+            "status": await self.status.to_dict(),
+            "votes": await self.votes
         }
 
     @classmethod
