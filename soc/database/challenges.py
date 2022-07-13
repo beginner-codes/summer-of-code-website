@@ -4,8 +4,8 @@ from typing import Type
 import sqlalchemy.exc
 import sqlalchemy.orm
 from bevy import Bevy, bevy_method, Inject
-from sqlalchemy import update
 from fast_protocol import protocol
+from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -136,6 +136,25 @@ class Challenges(Bevy):
             db_session.add(model)
 
         return model
+
+    @bevy_method
+    async def remove_vote_from_submission(
+        self,
+        submission: int | Submission,
+        user: int | User,
+        emoji: str,
+        db_session: AsyncSession = Inject,
+    ):
+        query = (
+            delete(VoteModel)
+            .filter_by(
+                submission=self.get_id(submission),
+                user_id=self.get_id(user),
+                emoji=emoji
+            )
+        )
+        async with db_session.begin():
+            await db_session.execute(query)
 
     async def get_submission_votes(self, submission: int | Submission) -> list[VoteModel]:
         query = select(VoteModel).filter_by(submission=self.get_id(submission))
