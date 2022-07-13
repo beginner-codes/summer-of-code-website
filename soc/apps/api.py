@@ -23,7 +23,11 @@ async def register_user(
 
 @api_app.get("/challenges", dependencies=[Depends(validate_bearer_token)])
 async def get_challenges(db: Database = inject(Database)):
-    return {"challenges": await db.challenges.get_all()}
+    return {
+        "challenges": [
+            await challenge.to_dict() for challenge in await db.challenges.get_all()
+        ]
+    }
 
 
 class CreateSubmissionPayload(BaseModel):
