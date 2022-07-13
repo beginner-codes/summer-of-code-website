@@ -28,9 +28,11 @@
 
 <script>
     const userVotes = [];
-    {% for submission_id, emoji in user_votes.items() %}
-    userVotes[{{submission_id}}] = {{emoji|safe}};
-    {% endfor %}
+    {% if user_votes %}
+        {% for submission_id, emoji in user_votes.items() %}
+        userVotes[{{submission_id}}] = {{emoji|safe}};
+        {% endfor %}
+    {% endif %}
 
     function vote(e){
         e.preventDefault()
