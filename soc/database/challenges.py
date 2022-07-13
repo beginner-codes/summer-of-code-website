@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Type
 
 import sqlalchemy.exc
@@ -62,7 +62,7 @@ class Challenges(Bevy):
     async def get_active(self) -> Challenge | None:
         now = datetime.utcnow()
         query = select(ChallengeModel).filter(
-            ChallengeModel.start <= now, ChallengeModel.end >= now
+            ChallengeModel.start <= now, ChallengeModel.end >= now - timedelta(days=1)
         )
         model = await self._get_first_query_result(query)
         if not model:

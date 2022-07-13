@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any, Awaitable
 
 from bevy import Bevy, bevy_method, Inject
@@ -54,7 +54,7 @@ class Challenge(Bevy):
 
     @property
     def active(self) -> bool:
-        return self.start <= datetime.utcnow() <= self.end
+        return self.start <= datetime.utcnow() < self.end + timedelta(days=1)
 
     @property
     def changed(self) -> bool:
