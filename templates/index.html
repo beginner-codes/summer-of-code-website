@@ -27,8 +27,8 @@
 
     const start_date = new Date(progress_bar.getAttribute("data-start"));
     const end_date = new Date(progress_bar.getAttribute("data-end"));
-    const total_days = Math.round((end_date - start_date)/86400000);
-    const days_left = Math.round((end_date - Date.now())/86400000);
+    const total_days = Math.ceil((end_date - start_date)/86400000) + 1;
+    const days_left = Math.ceil((end_date - Date.now())/86400000) + 1;
 
     progress_bar.value = (total_days - days_left).toString();
     progress_bar.max = total_days.toString();
