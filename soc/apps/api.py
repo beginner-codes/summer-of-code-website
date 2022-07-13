@@ -21,7 +21,7 @@ async def register_user(
     return {"detail": "User successfully registered"}
 
 
-@api_app.get("/challenges")
+@api_app.get("/challenges", dependencies=[Depends(validate_bearer_token)])
 async def get_challenges(db: Database = inject(Database)):
     return {"challenges": await db.challenges.get_all()}
 
@@ -58,7 +58,7 @@ async def create_submission(
     return await submission.to_dict()
 
 
-@api_app.get("/challenges/active")
+@api_app.get("/challenges/active", dependencies=[Depends(validate_bearer_token)])
 async def get_active_challenge(db: Database = inject(Database)):
     active_challenge = await db.challenges.get_active()
     return {"challenge": await active_challenge.to_dict() if active_challenge else None}
