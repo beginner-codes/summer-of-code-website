@@ -62,6 +62,44 @@ async def create_submission(
     return await submission.to_dict()
 
 
+class VotePayload(BaseModel):
+    emoji: str
+
+
+@api_app.post(
+    "/challenges/{challenge_id}/submissions/{submission_id}/vote",
+    dependencies=[Depends(validate_bearer_token)],
+)
+async def add_vote(
+    submission_id: int,
+    vote: VotePayload,
+    session: Session = Depends(bearer_token),
+    db: Database = inject(Database),
+):
+    submission = await db.challenges.get_submission(submission_id)
+    if not submission:
+        raise HTTPException(400, f"No such submission")
+
+    await submission.add_vote(session.user_id, vote.emoji)
+
+
+@api_app.delete(
+    "/challenges/{challenge_id}/submissions/{submission_id}/vote",
+    dependencies=[Depends(validate_bearer_token)],
+)
+async def delete_vote(
+    submission_id: int,
+    vote: VotePayload,
+    session: Session = Depends(bearer_token),
+    db: Database = inject(Database),
+):
+    submission = await db.challenges.get_submission(submission_id)
+    if not submission:
+        raise HTTPException(400, f"No such submission")
+
+    await submission.remove_vote(session.user_id, vote.emoji)
+
+
 @api_app.get("/challenges/active", dependencies=[Depends(validate_bearer_token)])
 async def get_active_challenge(db: Database = inject(Database)):
     active_challenge = await db.challenges.get_active()
