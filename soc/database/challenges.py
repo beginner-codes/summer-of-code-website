@@ -12,6 +12,7 @@ from sqlalchemy.future import select
 from soc.database.models.challenges import ChallengeModel
 from soc.database.models.submission_status import SubmissionStatusModel
 from soc.database.models.submissions import SubmissionModel
+from soc.database.models.votes import VoteModel
 from soc.entities.challenges import Challenge
 from soc.entities.submissions import Submission, Status, SubmissionStatus
 from soc.entities.users import User
@@ -121,6 +122,11 @@ class Challenges(Bevy):
             db_session.add(model)
 
         return SubmissionStatus.from_db_model(model)
+
+    async def get_submission_votes(self, submission: int | Submission) -> list[VoteModel]:
+        query = select(VoteModel).filter_by(submission=self.get_id(submission))
+        result = await self._get_query_result(query, [])
+        return list(result)
 
     async def get_submission(self, submission_id: int) -> Submission | None:
         query = select(SubmissionModel).filter_by(id=submission_id)
