@@ -5,6 +5,7 @@ import sqlalchemy.exc
 import sqlalchemy.orm
 from bevy import Bevy, bevy_method, Inject
 from sqlalchemy import update
+from fast_protocol import protocol
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -14,6 +15,8 @@ from soc.database.models.submissions import SubmissionModel
 from soc.entities.challenges import Challenge
 from soc.entities.submissions import Submission, Status, SubmissionStatus
 from soc.entities.users import User
+
+IDable = protocol("id")
 
 
 class Challenges(Bevy):
@@ -203,3 +206,15 @@ class Challenges(Bevy):
             return default
 
         return result.first()
+
+    def get_id(self, obj: int | IDable) -> int:
+        match obj:
+            case IDable():
+                return obj.id
+
+            case int():
+                return obj
+
+            case _:
+                raise ValueError(f"Expected an int or an IDable, got {obj!r}")
+
