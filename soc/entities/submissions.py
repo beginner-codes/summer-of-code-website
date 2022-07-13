@@ -121,12 +121,7 @@ class Submission(Bevy):
     def user_id(self) -> int:
         return self._user_id
 
-    @property
     @bevy_method
-    def submissions(
-        self, db: soc.database.Database = Inject
-    ) -> Awaitable[list[Submission]]:
-        return db.challenges.get_submissions(self.id)
 
     @bevy_method
     async def sync(self, db: soc.database.Database = Inject):
