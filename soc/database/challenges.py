@@ -122,10 +122,7 @@ class Challenges(Bevy):
     async def get_submission(self, submission_id: int) -> Submission | None:
         query = select(SubmissionModel).filter_by(id=submission_id)
         model = await self._get_first_query_result(query)
-        if not model:
-            return
-
-        return self._submission_type.from_db_model(model)
+        return self._submission_type.from_db_model(model) if model else None
 
     async def get_submissions(self, challenge_id: int) -> list[Submission]:
         query = select(SubmissionModel).filter_by(challenge_id=challenge_id)
