@@ -24,7 +24,7 @@ spec:
         spec:
             containers:
               - name: fastapi-site
-                image: zzmmrmn/summer-of-code:35
+                image: zzmmrmn/summer-of-code:36
                 ports:
                   - containerPort: 8000
                 resources:

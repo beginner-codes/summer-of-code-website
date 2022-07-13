@@ -45,10 +45,11 @@ async def index(
     if challenge:
         scope["challenge"] = await challenge.to_dict()
         scope["user_votes"] = defaultdict(set)
-        for submission in scope["challenge"]["submissions"]:
-            for emoji, voters in submission["votes"].items():
-                if session.user_id in voters:
-                    scope["user_votes"][submission["id"]].add(emoji)
+        if session:
+            for submission in scope["challenge"]["submissions"]:
+                for emoji, voters in submission["votes"].items():
+                    if session.user_id in voters:
+                        scope["user_votes"][submission["id"]].add(emoji)
 
     return "index.html", scope
 
