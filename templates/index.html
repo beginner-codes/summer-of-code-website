@@ -22,9 +22,39 @@
 <section id="submissions">
     <h4>Submissions</h4>
     {{challenge.submissions}}
+    <a class="vote-button" href="#" role="button" data-emoji="😍" data-submission-id="9" data-challenge-id="4">😍</a>
+    <a class="vote-button" href="#" role="button" data-emoji="👑" data-submission-id="9" data-challenge-id="4">👑</a>
 </section>
 
 <script>
+    const userVotes = [];
+    {% for submission_id, emoji in user_votes.items() %}
+    userVotes[{{submission_id}}] = {{emoji|safe}};
+    {% endfor %}
+
+    function vote(e){
+        e.preventDefault()
+
+        const submissionID = parseInt(this.getAttribute("data-submission-id"))
+        const challengeID = parseInt(this.getAttribute("data-challenge-id"))
+        const emoji = this.getAttribute("data-emoji")
+
+        let method = "POST"
+        if(userVotes[submissionID] === undefined)
+            userVotes[submissionID] = []
+
+        if(userVotes[submissionID].includes(emoji)) {
+            method = "DELETE"
+            userVotes[submissionID].splice(userVotes[submissionID].indexOf(emoji))
+        } else
+            userVotes[submissionID].push(emoji)
+
+        apiRequest(method, `/v1/challenges/${challengeID}/submissions/${submissionID}/vote`, {emoji: emoji})
+    }
+    document.querySelectorAll(".vote-button").forEach((btn) => {
+        btn.addEventListener("click", vote.bind(btn))
+    });
+
     const days_left_heading = document.getElementById("days-left");
     const progress_bar = document.getElementById("progress-bar");
     const start_date_tag = document.getElementById("start-date");
