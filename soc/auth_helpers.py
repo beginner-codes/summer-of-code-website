@@ -76,8 +76,7 @@ async def session_cookie(
     if session_info.get("type") == "dbless":
         return Session(-1, -1, False, None, session_info)
 
-    data = await get_session_data(session_info, db)
-    return data
+    return await get_session_data(session_info, db)
 
 
 async def validate_session_cookie(
