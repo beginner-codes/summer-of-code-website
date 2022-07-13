@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Type
 
 import sqlalchemy.exc
+import sqlalchemy.orm
 from bevy import Bevy, bevy_method, Inject
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -46,50 +47,31 @@ class Challenges(Bevy):
         return self._challenge_type.from_db_model(model)
 
     @bevy_method
-    async def get(
-        self, challenge_id: int, db_session: AsyncSession = Inject
-    ) -> Challenge | None:
+    async def get(self, challenge_id: int) -> Challenge | None:
         query = select(ChallengeModel).filter_by(id=challenge_id)
-        async with db_session:
-            try:
-                cursor = await db_session.execute(query)
-            except sqlalchemy.exc.OperationalError:
-                return
-            else:
-                model = cursor.scalars().first()
-
+        model = await self._get_first_query_result(query)
         if not model:
             return
 
         return self._challenge_type.from_db_model(model)
 
-    @bevy_method
-    async def get_active(self, db_session: AsyncSession = Inject) -> Challenge | None:
+    async def get_active(self) -> Challenge | None:
         now = datetime.utcnow()
         query = select(ChallengeModel).filter(
             ChallengeModel.start <= now, ChallengeModel.end >= now
         )
-        async with db_session:
-            try:
-                cursor = await db_session.execute(query)
-            except sqlalchemy.exc.OperationalError:
-                return
-            else:
-                model = cursor.scalars().first()
-
+        model = await self._get_first_query_result(query)
         if not model:
-            return
+            return None
 
         return self._challenge_type.from_db_model(model)
 
-    @bevy_method
-    async def get_all(self, session: AsyncSession = Inject) -> list[Challenge]:
+    async def get_all(self) -> list[Challenge]:
         query = select(ChallengeModel).order_by(
             ChallengeModel.start, ChallengeModel.end
         )
-        async with session:
-            cursor = await session.execute(query)
-            return [self._challenge_type.from_db_model(row) for row in cursor.scalars()]
+        result = await self._get_query_result(query, [])
+        return [self._challenge_type.from_db_model(row) for row in result]
 
     @bevy_method
     async def create_submission(
@@ -137,19 +119,23 @@ class Challenges(Bevy):
 
         return SubmissionStatus.from_db_model(model)
 
-    @bevy_method
-    async def get_submissions(
-        self, challenge_id: int, session: AsyncSession = Inject
-    ) -> list[Submission]:
+    async def get_submission(self, submission_id: int) -> Submission | None:
+        query = select(SubmissionModel).filter_by(id=submission_id)
+        model = await self._get_first_query_result(query)
+        if not model:
+            return
+
+        return self._submission_type.from_db_model(model)
+
+    async def get_submissions(self, challenge_id: int) -> list[Submission]:
         query = select(SubmissionModel).filter_by(challenge_id=challenge_id)
-        async with session:
-            cursor = await session.execute(query)
-            return [
-                self._submission_type.from_db_model(
-                    row, await self.get_submission_status(row.id)
-                )
-                for row in cursor.scalars()
-            ]
+        result = await self._get_query_result(query, [])
+        return [
+            self._submission_type.from_db_model(
+                row, await self.get_submission_status(row.id)
+            )
+            for row in result
+        ]
 
     @bevy_method
     async def get_submission_status(
@@ -158,14 +144,7 @@ class Challenges(Bevy):
         query = select(SubmissionStatusModel).order_by(
             SubmissionStatusModel.updated.desc()
         )
-        async with db_session:
-            try:
-                cursor = await db_session.execute(query)
-            except sqlalchemy.exc.OperationalError:
-                return
-            else:
-                model = cursor.scalars().first()
-
+        model = await self._get_first_query_result(query)
         return self._submission_status_type.from_db_model(model)
 
     @bevy_method
@@ -200,3 +179,30 @@ class Challenges(Bevy):
             )
             await db_session.execute(statement)
             await db_session.commit()
+
+    @bevy_method
+    async def _get_query_result(
+        self,
+        query: sqlalchemy.orm.Query,
+        default=None,
+        db_session: AsyncSession = Inject,
+    ):
+        async with db_session:
+            try:
+                cursor = await db_session.execute(query)
+            except sqlalchemy.exc.OperationalError:
+                return default
+
+            result = cursor.scalars()
+            if result is None:
+                return default
+
+            return result
+
+    async def _get_first_query_result(self, query: sqlalchemy.orm.Query, default=None):
+        NOTSET = object()
+        result = await self._get_query_result(query, default=NOTSET)
+        if result is NOTSET:
+            return default
+
+        return result.first()
