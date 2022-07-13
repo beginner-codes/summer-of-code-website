@@ -6,6 +6,9 @@
                 <ul>
                     <li><a href="/admin/dashboard">Dashboard</a></li>
                     <li><a href="/admin/challenges">Challenges</a></li>
+                    {% if user and 'ADMIN' in user.roles %}
+                        <li><a href="/admin/db">Manage Database</a></li>
+                    {% endif %}
                 </ul>
             </nav>
         </aside>
