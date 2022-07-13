@@ -10,6 +10,7 @@ from fastapi import HTTPException, Query, Depends
 from fastapi.responses import RedirectResponse
 
 from soc.auth_helpers import session_cookie
+from soc.config.models.site import SiteSettings
 from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication, AuthenticationSettings
 from soc.database import Database
@@ -91,6 +92,7 @@ async def _manage_db_redirect(
 async def discord_login(
     auth: Authentication = inject(Authentication),
     settings: AuthenticationSettings = inject(AuthenticationSettings),
+    site_settings: SiteSettings = inject(SiteSettings),
 ):
     state = _create_state()
     session_id, session = await auth.create_guest_session(state=state)
@@ -102,10 +104,14 @@ async def discord_login(
         f"scope=identify%20email&"
         f"state={state}&"
         f"redirect_uri={redirect_uri}&"
-        f"prompt=consent"
+        "prompt=consent"
     )
     response.set_cookie(
-        "sessionid", session_id, secure=True, expires=7 * 24 * 60 * 60, httponly=True
+        "sessionid",
+        session_id,
+        secure=not site_settings.dev,
+        expires=7 * 24 * 60 * 60,
+        httponly=True,
     )
     return response
 
