@@ -31,6 +31,7 @@ COPY alembic.ini alembic.ini
 COPY production.config.yaml production.config.yaml
 COPY migrations migrations
 COPY templates templates
+COPY static static
 COPY soc soc
 
 USER app
