@@ -1,4 +1,7 @@
+from collections import defaultdict
+
 from bevy import Context
+from fastapi import Depends
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -6,9 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from soc.apps.admin_app import admin_app
 from soc.apps.api import api_app
 from soc.apps.auth import auth_app
+from soc.auth_helpers import session_cookie
 from soc.config.models.site import SiteSettings
 from soc.context import create_app, create_context, inject
 from soc.database import Database
+from soc.entities.sessions import Session
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
@@ -32,9 +37,20 @@ async def on_start():
 
 
 @site.get("/", response_class=TemplateResponse)
-async def index(db: Database = inject(Database)):
+async def index(
+    db: Database = inject(Database), session: Session = Depends(session_cookie)
+):
     challenge = await db.challenges.get_active()
-    return "index.html", {"challenge": await challenge.to_dict() if challenge else None}
+    scope = {"challenge": None}
+    if challenge:
+        scope["challenge"] = await challenge.to_dict()
+        scope["user_votes"] = defaultdict(set)
+        for submission in scope["challenge"]["submissions"]:
+            for emoji, voters in submission["votes"].items():
+                if session.user_id in voters:
+                    scope["user_votes"][submission["id"]].add(emoji)
+
+    return "index.html", scope
 
 
 @site.get("/challenges", response_class=TemplateResponse)
