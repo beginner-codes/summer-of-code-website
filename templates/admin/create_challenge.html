@@ -1,19 +1,16 @@
-{% include 'header.html' %}
-<body>
-    <main class="container">
-        <h1>Create Challenge</h1>
-        <form id = "create-challenge-form">
-            <label for = "title">Title</label>
-            <input id = "title" type = "text" name = "title" placeholder="Title">
-            <label for = "description">Description</label>
-            <textarea id = "description" type = "text" name = "description" placeholder="Description"></textarea>
-            <label for = "start">Start Time</label>
-            <input id = "start" type = "datetime-local" name = "start" placeholder="Start Time">
-            <label for = "end">End Time</label>
-            <input id = "end" type = "datetime-local" name = "end" placeholder="End Time">
-            <button>Create</button>
-        </form>
-    </main>
+{% include 'admin/header.html' %}
+    <h1>Create Challenge</h1>
+    <form id = "create-challenge-form">
+        <label for = "title">Title</label>
+        <input id = "title" type = "text" name = "title" placeholder="Title">
+        <label for = "description">Description</label>
+        <textarea id = "description" type = "text" name = "description" placeholder="Description"></textarea>
+        <label for = "start">Start Time</label>
+        <input id = "start" type = "datetime-local" name = "start" placeholder="Start Time">
+        <label for = "end">End Time</label>
+        <input id = "end" type = "datetime-local" name = "end" placeholder="End Time">
+        <button>Create</button>
+    </form>
     <script>
         const create_challenge_form = document.getElementById("create-challenge-form");
         const start_date = document.getElementById("start-date");
@@ -27,5 +24,4 @@
             apiRequest("POST", "/admin/api/v1/challenges/create", json_data);
         })
     </script>
-</body>
-</html>
+{% include 'admin/footer.html' %}

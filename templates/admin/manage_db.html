@@ -1,11 +1,8 @@
-{% include 'header.html' %}
-<body>
-    <main class="container">
-        <h1>Manage Database</h1>
-        <p>Logged in as: {{username}}{% if email %} ({{email}}){% endif %}</p>
-        <button id="migrate-db-btn" type="button">Run DB Migrations</button>
-        <pre id="migration-output"></pre>
-    </main>
+{% include 'admin/header.html' %}
+    <h1>Manage Database</h1>
+    <p>Logged in as: {{username}}{% if email %} ({{email}}){% endif %}</p>
+    <button id="migrate-db-btn" type="button">Run DB Migrations</button>
+    <pre id="migration-output"></pre>
     <script>
         let btn = document.getElementById("migrate-db-btn")
 
@@ -26,5 +23,4 @@
             }
         )
     </script>
-</body>
-</html>
+{% include 'admin/footer.html' %}
