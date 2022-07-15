@@ -36,7 +36,7 @@ jobs:
       run: docker build -t zzmmrmn/summer-of-code:$(echo $GITHUB_SHA | head -c7) .
 
     - name: Push image to Docker Hub
-      run: docker push zzmmrmn/beginner-py-bot:$(echo $GITHUB_SHA | head -c7)
+      run: docker push zzmmrmn/summer-of-code:$(echo $GITHUB_SHA | head -c7)
 
     - name: Deploy to DigitalOcean Kubernetes
       run: kubectl apply -f $GITHUB_WORKSPACE/k8s/deploy.yaml
