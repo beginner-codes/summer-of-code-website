@@ -8,7 +8,7 @@ class DatabaseSettings(BaseSettingsModel):
 
     port: int = Field(default=0, env="SOC_DB_PORT")
     host: str = Field(default="", env="SOC_DB_HOST")
-    name: str = Field(default="", env="SOC_DB_NAME")
+    database: str = Field(default="", env="SOC_DB_DATABASE")
     username: str = Field(default="", env="SOC_DB_USERNAME")
     password: str = Field(default="", env="SOC_DB_PASSWORD")
     driver: str = Field(default="postgres+asyncpg", env="SOC_DB_DRIVER")
@@ -28,7 +28,7 @@ class DatabaseSettings(BaseSettingsModel):
             if self.port:
                 uri.append(f":{self.port}")
 
-        if self.name:
-            uri.append(f"/{self.name}")
+        if self.database:
+            uri.append(f"/{self.database}")
 
         return "".join(uri)
