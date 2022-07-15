@@ -61,6 +61,21 @@ spec:
                         configMapKeyRef:
                             name: soc-postgres-config
                             key: soc.db.driver
+                    - name: SOC_JWT_PRIVATE_KEY
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-auth-config
+                            key: soc.auth.private-key
+                    - name: SOC_DISCORD_CLIENT_ID
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-auth-config
+                            key: soc.auth.client-id
+                    - name: SOC_AUTH_ADMIN_EMAIL
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-auth-config
+                            key: soc.auth.admin-email
                     - name: SOC_DISCORD_CLIENT_SECRET
                       valueFrom:
                         secretKeyRef:
