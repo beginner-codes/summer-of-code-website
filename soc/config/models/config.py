@@ -6,8 +6,8 @@ from soc.config import BaseSettingsModel
 class DatabaseSettings(BaseSettingsModel):
     __config_key__ = "database"
 
-    port: int = Field(default=0, env="SOC_DB_PORT")
     host: str = Field(default="", env="SOC_DB_HOST")
+    port: int = Field(default=0, env="SOC_DB_PORT")
     database: str = Field(default="", env="SOC_DB_DATABASE")
     username: str = Field(default="", env="SOC_DB_USERNAME")
     password: str = Field(default="", env="SOC_DB_PASSWORD")
