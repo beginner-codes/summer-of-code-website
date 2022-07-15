@@ -46,7 +46,7 @@ async def discord_code_auth(
     user_data = await discord.get_user_data(access_token)
     try:
         user = await _log_user_in(user_data, db)
-    except sqlalchemy.exc.OperationalError:
+    except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.ProgrammingError):
         return await _manage_db_redirect(user_data, access_token, auth)
     else:
         return await _home_redirect(user, session)
