@@ -11,7 +11,7 @@ class DatabaseSettings(BaseSettingsModel):
     name: str = Field(default="", env="SOC_DB_NAME")
     username: str = Field(default="", env="SOC_DB_USERNAME")
     password: str = Field(default="", env="SOC_DB_PASSWORD")
-    driver: str = Field(default="postgres+asyncpg", env="SOC_DB_PASSWORD")
+    driver: str = Field(default="postgres+asyncpg", env="SOC_DB_DRIVER")
 
     @property
     def uri(self) -> str:
