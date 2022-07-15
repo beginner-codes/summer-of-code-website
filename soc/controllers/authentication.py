@@ -81,19 +81,22 @@ class Authentication(Bevy):
     @bevy_method
     def _create_session_id(self, site_settings: SiteSettings = Inject) -> int:
         """Creates a bigint that encodes the timestamp, process ID, and a local counter."""
+        num_bytes = 8
         sections = [
             self._int_to_bytes(int(time()), 4),
             self._int_to_bytes(os.getpid(), 2),
             self._int_to_bytes(self._get_next_counter_value(), 2),
         ]
         if site_settings.dev:
+            num_bytes = 4
             sections = sections[:1]
 
         id_bytes = bytearray()
         for section in sections:
             id_bytes.extend(section)
 
-        return int.from_bytes(id_bytes, "big")
+        session_id = int.from_bytes(id_bytes, "big")
+        return self._convert_to_signed_int(session_id, num_bytes)
 
     def _get_next_counter_value(self) -> int:
         """Gets the next value from the local counter. This method is thread safe."""
@@ -104,3 +107,13 @@ class Authentication(Bevy):
         """Takes an integer and masks it to a set number of bytes before converting it to a bytes type."""
         limit = 2 ** (num_bytes * 8)
         return (value % limit).to_bytes(num_bytes, "little")
+
+    def _convert_to_signed_int(self, value: int, num_bytes: int) -> int:
+        signed_bit_index = num_bytes * 8 - 1
+        signed_bit_mask = 2**signed_bit_index  # 1 at the top bit
+        negative_number_mask = 2**signed_bit_index - 1  # All but the top bit is 1's
+        if value & signed_bit_mask:
+            negative_number = value & negative_number_mask
+            return -negative_number
+
+        return value
