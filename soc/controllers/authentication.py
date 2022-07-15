@@ -62,7 +62,7 @@ class Authentication(Bevy):
         session_id = self._create_session_id()
         try:
             session = await db.sessions.create(session_id, -1, **values)
-        except sqlalchemy.exc.OperationalError:
+        except (sqlalchemy.exc.OperationalError, sqlalchemy.exc.ProgrammingError):
             token = self.create_token(type="dbless", **values)
             session = None
         else:
