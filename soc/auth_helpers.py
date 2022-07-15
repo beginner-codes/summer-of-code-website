@@ -1,6 +1,7 @@
 from typing import Any
 
 import jwt
+import sqlalchemy.exc
 from fastapi import Depends, HTTPException, Cookie
 from fastapi.security import OAuth2PasswordBearer
 
@@ -64,7 +65,10 @@ async def validate_session(session: Session | None, settings, db):
 
 
 async def get_session_data(session_info: dict[str, Any], db: Database) -> Session:
-    return await db.sessions.get(session_info.get("session_id", -1))
+    try:
+        return await db.sessions.get(session_info.get("session_id", -1))
+    except sqlalchemy.exc.ProgrammingError:
+        return Session(-1, -1, False, None, session_info)
 
 
 async def session_cookie(
