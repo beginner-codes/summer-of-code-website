@@ -31,6 +31,36 @@ spec:
                     requests:
                         cpu: 100m
                 env:
+                    - name: SOC_DB_HOST
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-postgres-config
+                            key: soc.db.host
+                    - name: SOC_DB_PORT
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-postgres-config
+                            key: soc.db.port
+                    - name: SOC_DB_DATABASE
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-postgres-config
+                            key: soc.db.database
+                    - name: SOC_DB_USERNAME
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-postgres-config
+                            key: soc.db.username
+                    - name: SOC_DB_PASSWORD
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-postgres-config
+                            key: soc.db.password
+                    - name: SOC_DB_DRIVER
+                      valueFrom:
+                        configMapKeyRef:
+                            name: soc-postgres-config
+                            key: soc.db.driver
                     - name: SOC_DISCORD_CLIENT_SECRET
                       valueFrom:
                         secretKeyRef:
