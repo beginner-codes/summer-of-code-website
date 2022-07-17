@@ -158,8 +158,8 @@ class Submission(Bevy):
             )
             self._status_state.changed = False
 
-    async def to_dict(self) -> dict[str, Any]:
-        return {
+    async def to_dict(self, expand_user: bool = False) -> dict[str, Any]:
+        data = {
             "id": self.id,
             "type": self.type,
             "description": self.description,
@@ -167,8 +167,10 @@ class Submission(Bevy):
             "user_id": self._user_id,
             "challenge_id": self._challenge_id,
             "status": await self.status.to_dict(),
-            "votes": await self.votes
+            "votes": await self.votes,
+            "created_by": await (await self.created_by).to_dict() if expand_user else None
         }
+        return data
 
     @classmethod
     def from_db_model(

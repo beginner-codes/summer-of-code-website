@@ -114,7 +114,7 @@ class Challenge(Bevy):
 
         await db.challenges.update(**changes)
 
-    async def to_dict(self) -> dict[str, Any]:
+    async def to_dict(self, expand_submissions: bool = False) -> dict[str, Any]:
         return {
             "id": self.id,
             "title": self.title,
@@ -125,7 +125,8 @@ class Challenge(Bevy):
             "user": await (await self.created_by).to_dict(),
             "active": self.active,
             "submissions": [
-                await submission.to_dict() for submission in await self.submissions
+                await submission.to_dict(expand_user=expand_submissions)
+                for submission in await self.submissions
             ],
         }
 
