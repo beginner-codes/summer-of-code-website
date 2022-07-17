@@ -40,7 +40,7 @@ class CreateChallengePayload(BaseModel):
 
 @admin_api.post(
     "/challenges/create",
-    deprecated=[Depends(validate_bearer_token), Depends(require_roles("ADMIN"))],
+    dependencies=[Depends(validate_bearer_token), Depends(require_roles("ADMIN"))],
 )
 async def create_challenge(
     challenge_data: CreateChallengePayload,
