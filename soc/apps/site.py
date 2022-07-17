@@ -43,7 +43,7 @@ async def index(
     challenge = await db.challenges.get_active()
     scope = {"challenge": None}
     if challenge:
-        scope["challenge"] = await challenge.to_dict()
+        scope["challenge"] = await challenge.to_dict(expand_submissions=True)
         scope["challenge"]["formatted_start"] = challenge.start.format("dddd, MMMM Do ")
         scope["challenge"]["formatted_end"] = challenge.end.format("dddd, MMMM Do ")
         scope["user_votes"] = defaultdict(set)
