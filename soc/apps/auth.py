@@ -57,11 +57,12 @@ async def _log_user_in(user_data: dict[str, Any], db: Database) -> User:
     if user:
         return user
 
-    avatar = (
-        f"https://cdn.discordapp.com/avatars/{user_data['id']}/{user_data['avatar']}.png"
-        if user_data.get("avatar")
-        else f"https://cdn.discordapp.com/embed/avatars/{int(user_data['discriminator']) % 5}.png"
-    )
+    if user_data.get("avatar"):
+        file_type = "gif" if user_data["avatar"].startswith("a_") else "png"
+        avatar = f"https://cdn.discordapp.com/avatars/{user_data['id']}/{user_data['avatar']}.{file_type}"
+    else:
+        avatar = f"https://cdn.discordapp.com/embed/avatars/{int(user_data['discriminator']) % 5}.png"
+
     return await db.users.create(user_data["username"], "", user_data["email"], avatar)
 
 
