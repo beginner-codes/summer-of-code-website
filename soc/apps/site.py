@@ -47,8 +47,12 @@ async def index(
         scope["challenge"]["formatted_start"] = challenge.start.format("dddd, MMMM Do ")
         scope["challenge"]["formatted_end"] = challenge.end.format("dddd, MMMM Do ")
         scope["user_votes"] = defaultdict(set)
-        if session:
-            for submission in scope["challenge"]["submissions"]:
+        for submission in scope["challenge"]["submissions"]:
+            submission["formatted_created"] = submission["created"].format(
+                "dddd, MMMM Do - h:mmA"
+            )
+
+            if session:
                 for emoji, voters in submission["votes"].items():
                     if session.user_id in voters:
                         scope["user_votes"][submission["id"]].add(emoji)
