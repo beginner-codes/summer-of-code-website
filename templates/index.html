@@ -22,10 +22,12 @@
 <section id="submissions">
     <h4>Submissions</h4>
     {% for submission in challenge.submissions %}
-    {{submission}}
-    <a class="vote-button" href="#" role="button" data-emoji="😍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😍</a>
-    <a class="vote-button" href="#" role="button" data-emoji="👍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">👍</a>
-    <a class="vote-button" href="#" role="button" data-emoji="😀" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😀</a>
+        <div id="submission-{{submission.id}}">
+            {{submission}}
+            <a class="vote-button" href="#" role="button" data-emoji="😍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😍</a>
+            <a class="vote-button" href="#" role="button" data-emoji="👍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">👍</a>
+            <a class="vote-button" href="#" role="button" data-emoji="😀" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😀</a>
+        </div>
     {% endfor %}
 </section>
 
