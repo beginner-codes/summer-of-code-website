@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Awaitable
 
+import pendulum
 from bevy import Bevy, bevy_method, Inject
 
 import soc.database
@@ -107,6 +108,12 @@ class Submission(Bevy):
 
     @property
     @bevy_method
+    async def created(self, db: soc.database.Database = Inject) -> pendulum.DateTime:
+        status = await db.challenges.get_submission_created_status(self.id)
+        return pendulum.instance(status.updated)
+
+    @property
+    @bevy_method
     def created_by(self, db: soc.database.Database = Inject) -> Awaitable[User]:
         return db.users.get_by_id(self._user_id)
 
@@ -162,6 +169,7 @@ class Submission(Bevy):
         data = {
             "id": self.id,
             "type": self.type,
+            "created": await self.created,
             "description": self.description,
             "link": self._link,
             "user_id": self._user_id,
