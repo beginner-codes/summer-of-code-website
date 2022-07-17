@@ -1,0 +1,72 @@
+{% include 'admin/header.html' %}
+    <section>
+        <h1>{{challenge.title}}</h1>
+    </section>
+    <section>
+        <table role="grid">
+            <thead>
+            <tr>
+                <th style="min-width: 320px;" scope="col">Description</th>
+                <th scope="col">Link</th>
+                <th scope="col">Created</th>
+                <th scope="col">Status</th>
+                <th scope="col">User</th>
+                <th scope="col">Type</th>
+                <th scope="col">Update Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{challenge}}
+                {% for submission in challenge.submissions %}
+                    <tr id="submission-{{submission.id}}" class="submission">
+                        <td>
+                            <p class="submission-description">{{submission.description}}</p>
+                        </td>
+                        <td>
+                            <a href="{{submission.link}}" target="_blank">{{submission.link}}</a>
+                        </td>
+                        <td>
+                            {{submission.created}}
+                        </td>
+                        <td>
+                            <ul>
+                                <li>{{submission.status.updated}}</li>
+                                <li>{{submission.status.user_id}}</li>
+                                <li>{{submission.status.status}}</li>
+                            </ul>
+                        </td>
+                        <td>
+                            {{submission.created_by.username}}
+                        </td>
+                        <td>{{submission.type}}</td>
+                        <td>
+                            <form class="update-submission-status" data-submission-id="{{submission.id}}">
+                                <label for="change-submission-status-{{submission.id}}">New Status</label>
+                                <select name="status" id="change-submission-status-{{submission.id}}">
+                                    <option disabled>Select One</option>
+                                    <option value="APPROVED">Approve</option>
+                                    <option value="DISAPPROVED">Disapprove</option>
+                                </select>
+                                <button>Apply</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+    <script>
+        document.querySelectorAll(".update-submission-status").forEach(frm => {
+            frm.addEventListener("submit", event => {
+                event.preventDefault()
+                const submissionID = frm.getAttribute("data-submission-id")
+                const status = frm.status.value;
+                apiRequest(
+                    "POST",
+                    `/admin/api/v1/challenges/{{challenge.id}}/submissions/${submissionID}/status`,
+                    {status: status}
+                )
+            })
+        });
+    </script>
+{% include 'admin/footer.html' %}

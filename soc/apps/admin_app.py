@@ -18,7 +18,6 @@ from soc.database.models.base import BaseModel
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
-
 admin_app = create_app()
 admin_app.mount("/api/v1", admin_api)
 
@@ -73,6 +72,22 @@ async def challenges(db: Database = inject(Database)):
         "challenges": [
             await challenge.to_dict() for challenge in await db.challenges.get_all()
         ]
+    }
+
+
+@admin_app.get(
+    "/challenges/{challenge_id}",
+    response_class=TemplateResponse,
+    dependencies=[
+        Depends(validate_session_cookie),
+        Depends(require_roles("ADMIN", "MOD")),
+    ],
+)
+async def show_challenge(challenge_id: int, db: Database = inject(Database)):
+    return "admin/challenge.html", {
+        "challenge": await (await db.challenges.get(challenge_id)).to_dict(
+            expand_submissions=True
+        )
     }
 
 

@@ -18,7 +18,9 @@
                 {% for challenge in challenges %}
                     <tr id="challenge-{{challenge.id}}" class="challenge">
                         <td>
-                            <strong class="challenge-title">{{challenge.title}}</strong>
+                            <strong class="challenge-title">
+                                <a href="/admin/challenges/{{challenge.id}}">{{challenge.title}}</a>
+                            </strong>
                             <p class="challenge-description">{{challenge.description}}</p>
                         </td>
                         <td>
