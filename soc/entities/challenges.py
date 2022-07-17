@@ -4,6 +4,7 @@ import datetime
 from datetime import datetime, timedelta
 from typing import Any, Awaitable
 
+import pendulum
 from bevy import Bevy, bevy_method, Inject
 
 import soc.database
@@ -32,9 +33,9 @@ class Challenge(Bevy):
         self._id = id
         self._title = title
         self._description = description
-        self._created = created
-        self._start = start
-        self._end = end
+        self._created = pendulum.instance(created)
+        self._start = pendulum.instance(start)
+        self._end = pendulum.instance(end)
         self._user_id = user_id
 
     def __hash__(self):
@@ -54,7 +55,7 @@ class Challenge(Bevy):
 
     @property
     def active(self) -> bool:
-        return self.start <= datetime.utcnow() < self.end + timedelta(days=1)
+        return self.start <= pendulum.now() < self.end + timedelta(days=1)
 
     @property
     def changed(self) -> bool:
