@@ -13,7 +13,7 @@ RUN apt-get update && \
 COPY pyproject.toml .
 COPY poetry.lock .
 
-RUN poetry export -f requirements.txt --output requirements.txt && \
+RUN poetry export --without-hashes -f requirements.txt --output requirements.txt && \
     pip wheel --no-cache-dir --no-deps --wheel-dir /app/wheels -r requirements.txt
 
 FROM python:3.10-slim
