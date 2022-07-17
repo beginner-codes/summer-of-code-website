@@ -22,11 +22,23 @@
 <section id="submissions">
     <h4>Submissions</h4>
     {% for submission in challenge.submissions %}
-        <div id="submission-{{submission.id}}">
-            {{submission}}
-            <a class="vote-button" href="#" role="button" data-emoji="😍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😍</a>
-            <a class="vote-button" href="#" role="button" data-emoji="👍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">👍</a>
-            <a class="vote-button" href="#" role="button" data-emoji="😀" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😀</a>
+        <div id="submission-{{submission.id}}" class="submission">
+            <hgroup>
+                <img class="submission-avatar" src="{{submission.created_by.avatar}}" />
+                <h4>{{submission.created_by.username}}</h4>
+                <h5>{{submission.status.updated}}</h5>
+            </hgroup>
+            <div id="submission-{{submission.id}}-votes">
+                <span>Votes</span>
+                {% for emoji, votes in submission.votes.items() %}
+                    <span>{{emoji}}<span>{{votes|length}}x</span></span>
+                {% endfor %}
+                <a class="vote-button" href="#" role="button" data-emoji="😍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😍</a>
+                <a class="vote-button" href="#" role="button" data-emoji="👍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">👍</a>
+                <a class="vote-button" href="#" role="button" data-emoji="😀" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😀</a>
+            </div>
+            <p>{{submission.description}}</p>
+            <a href="{{submission.link}}" role="button">Check It Out</a>
         </div>
     {% endfor %}
 </section>
