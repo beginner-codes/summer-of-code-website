@@ -21,7 +21,7 @@
             const data = new FormData(e.target);
             const json_data = Object.fromEntries(data.entries());
             apiRequest("POST", "/v1/challenges/{{challenge.id}}/submissions/create", json_data).then(
-                data => {console.log(data)}
+                data => location.href = `/#submission-${data.id}`
             )
         })
     </script>
