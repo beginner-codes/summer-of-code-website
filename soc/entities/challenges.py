@@ -118,9 +118,9 @@ class Challenge(Bevy):
             "id": self.id,
             "title": self.title,
             "description": self.description,
-            "created": self.created,
-            "start": self.start,
-            "end": self.end,
+            "created": self.created.date(),
+            "start": self.start.date(),
+            "end": self.end.date(),
             "user": await (await self.created_by).to_dict(),
             "active": self.active,
             "submissions": [
