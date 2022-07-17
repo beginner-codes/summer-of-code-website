@@ -44,6 +44,8 @@ async def index(
     scope = {"challenge": None}
     if challenge:
         scope["challenge"] = await challenge.to_dict()
+        scope["challenge"]["formatted_start"] = challenge.start.format("dddd, MMMM Do ")
+        scope["challenge"]["formatted_end"] = challenge.end.format("dddd, MMMM Do ")
         scope["user_votes"] = defaultdict(set)
         if session:
             for submission in scope["challenge"]["submissions"]:
