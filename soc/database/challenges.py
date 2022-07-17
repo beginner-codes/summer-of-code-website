@@ -108,14 +108,14 @@ class Challenges(Bevy):
     @bevy_method
     async def set_submission_status(
         self,
-        submission: Submission | SubmissionModel,
+        submission: Submission | SubmissionModel | int,
         status: Status,
         user: User | int,
         db_session: AsyncSession = Inject,
     ) -> SubmissionStatus:
         model = SubmissionStatusModel(
             status=status,
-            submission_id=submission.id,
+            submission_id=submission.id if hasattr(submission, "id") else submission,
             user_id=user if isinstance(user, int) else user.id,
         )
         async with db_session.begin():
