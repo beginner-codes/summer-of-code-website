@@ -176,11 +176,8 @@ class Challenges(Bevy):
             for row in result
         ]
 
-    @bevy_method
-    async def get_submission_status(
-        self, submission_id: int, db_session: AsyncSession = Inject
-    ) -> SubmissionStatus | None:
-        query = select(SubmissionStatusModel).order_by(
+    async def get_submission_status(self, submission_id: int) -> SubmissionStatus | None:
+        query = select(SubmissionStatusModel).filter_by(submission_id=submission_id).order_by(
             SubmissionStatusModel.updated.desc()
         )
         model = await self._get_first_query_result(query)
