@@ -10,7 +10,7 @@ from soc.context import create_app, inject
 from soc.database import Database
 from soc.discord import Discord
 from soc.entities.sessions import Session
-
+from soc.entities.submissions import Status
 
 admin_api = create_app()
 
@@ -52,6 +52,28 @@ async def create_challenge(
     data["end"] = data["end"]
     challenge = await db.challenges.create(**data)
     return await challenge.to_dict()
+
+
+class SubmissionStatusUpdatePayload(BaseModel):
+    status: Status
+
+
+@admin_api.post(
+    "/challenges/{challenge_id}/submissions/{submission_id}/status",
+    dependencies=[Depends(require_roles("ADMIN", "MOD"))],
+)
+async def update_submission_status(
+    submission_id: int,
+    payload: SubmissionStatusUpdatePayload,
+    session: Session = Depends(bearer_token),
+    db: Database = inject(Database),
+):
+    await db.challenges.set_submission_status(
+        submission_id, payload.status, session.user_id
+    )
+    return await (await db.challenges.get_submission(submission_id)).to_dict(
+        expand_user=False
+    )
 
 
 def _run_alembic() -> (str, bool):
