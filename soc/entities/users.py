@@ -19,6 +19,13 @@ class User(pydantic.BaseModel, Bevy):
     joined: datetime.datetime
     banned: bool
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.avatar = (
+            self.avatar
+            or "/static/res/account_circle_FILL0_wght400_GRAD0_opsz48-white.png"
+        )
+
     def __hash__(self):
         return id(self.id)
 
