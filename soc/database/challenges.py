@@ -183,6 +183,11 @@ class Challenges(Bevy):
         model = await self._get_first_query_result(query)
         return self._submission_status_type.from_db_model(model)
 
+    async def get_submission_created_status(self, submission_id: int) -> SubmissionStatus | None:
+        query = select(SubmissionStatusModel).filter_by(submission_id=submission_id, status=Status.CREATED)
+        model = await self._get_first_query_result(query)
+        return self._submission_status_type.from_db_model(model)
+
     @bevy_method
     async def update_submission(
         self, submission_id: int, description: str, db_session: AsyncSession = Inject
