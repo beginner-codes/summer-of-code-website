@@ -24,7 +24,7 @@
     {% for submission in challenge.submissions %}
         <div id="submission-{{submission.id}}" class="submission">
             <hgroup>
-                <img class="submission-avatar" src="{{submission.created_by.avatar}}" />
+                <img class="submission-avatar" src="{{submission.created_by.avatar}}" alt="{{submission.created_by.username}}' Avatar" />
                 <h4>{{submission.created_by.username}}</h4>
                 <h5>{{submission.formatted_created}}</h5>
             </hgroup>
