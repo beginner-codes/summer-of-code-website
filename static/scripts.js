@@ -9,7 +9,7 @@ async function apiRequest(method, endpoint, payload){
                 }
             ),
             method: method,
-            body: JSON.stringify(payload)
+            body: JSON.stringify(payload ?? {})
         }
     )
     return await fetched.json()
