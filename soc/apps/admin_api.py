@@ -2,7 +2,7 @@ import subprocess
 from datetime import datetime
 from typing import Any
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from soc.auth_helpers import bearer_token, require_roles, validate_bearer_token
@@ -120,4 +120,46 @@ async def ban_users(bans: BanRequest, db: Database = inject(Database)):
 )
 async def unban_users(ban: BanRequest, db: Database = inject(Database)):
     await db.users.unban(*ban.ids)
+    return {"success": True}
+
+
+class RolesPayload(BaseModel):
+    roles: set[str]
+
+
+@admin_api.post(
+    "/users/{user_id}/roles",
+    dependencies=[
+        Depends(validate_bearer_token),
+        Depends(require_roles("ADMIN")),
+    ],
+)
+async def add_roles(
+    user_id: int, payload: RolesPayload, db: Database = inject(Database)
+):
+    user = await db.users.get_by_id(user_id)
+    if not user:
+        raise HTTPException(400, "User does not exist")
+
+    current_roles = set(await user.get_roles())
+    await user.set_roles(current_roles | payload.roles)
+    return {"success": True}
+
+
+@admin_api.delete(
+    "/users/{user_id}/roles",
+    dependencies=[
+        Depends(validate_bearer_token),
+        Depends(require_roles("ADMIN")),
+    ],
+)
+async def remove_roles(
+    user_id: int, payload: RolesPayload, db: Database = inject(Database)
+):
+    user = await db.users.get_by_id(user_id)
+    if not user:
+        raise HTTPException(400, "User does not exist")
+
+    current_roles = set(await user.get_roles())
+    await user.set_roles(current_roles - payload.roles)
     return {"success": True}
