@@ -2,7 +2,7 @@ from typing import Iterable, Type
 
 from bevy import Bevy, Inject
 from bevy.providers.function_provider import bevy_method
-from sqlalchemy import update
+from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
@@ -102,6 +102,16 @@ class Users(Bevy):
         roles: Iterable[str],
         session: AsyncSession = Inject,
     ):
+        current_roles = set(await self.get_roles(user_id))
+        roles = set(roles)
         async with session.begin():
-            for role in roles:
+            add_roles = roles - current_roles
+            for role in add_roles:
                 session.add(RoleModel(type=role, user_id=user_id))
+
+            remove_roles = current_roles - roles
+            await session.execute(
+                delete(RoleModel).filter(
+                    RoleModel.type.in_(remove_roles), RoleModel.user_id == user_id
+                )
+            )
