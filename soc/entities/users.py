@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from typing import Any
+from typing import Any, Iterable
 
 import pydantic
 from bevy import Bevy, bevy_method, Inject
@@ -37,7 +37,7 @@ class User(pydantic.BaseModel, Bevy):
         return await db.users.get_roles(self.id)
 
     @bevy_method
-    async def set_roles(self, roles: list[str], db: soc.database.Database = Inject):
+    async def set_roles(self, roles: Iterable[str], db: soc.database.Database = Inject):
         await db.users.set_roles(self.id, roles)
 
     @bevy_method

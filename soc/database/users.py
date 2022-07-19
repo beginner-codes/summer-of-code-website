@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Iterable, Type
 
 from bevy import Bevy, Inject
 from bevy.providers.function_provider import bevy_method
@@ -99,7 +99,7 @@ class Users(Bevy):
     async def set_roles(
         self,
         user_id: int,
-        roles: list[str],
+        roles: Iterable[str],
         session: AsyncSession = Inject,
     ):
         async with session.begin():
