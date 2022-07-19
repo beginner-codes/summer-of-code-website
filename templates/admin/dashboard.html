@@ -5,6 +5,7 @@
                 <th>Username</th>
                 <th>Banned</th>
                 <th>Roles</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -17,8 +18,26 @@
                             {{role|title}}{{"" if loop.last else ", "}}
                         {% endfor %}
                     </td>
+                    <td>
+                        <button class="ban-user" onclick="{{"un" if user.banned else ""}}banUser({{user.id}})">{{"Unban" if user.banned else "Ban"}}</button>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    <script>
+        const banUser = async userID => manageBan(userID, "ban")
+        const unbanUser = async userID => manageBan(userID, "unban")
+        const manageBan = async (userID, action) => {
+            if(action != "ban" && action != "unban")
+                return
+
+            await apiRequest(
+                "POST",
+                `/admin/api/v1/users/${action}`,
+                {ids: [userID]}
+            )
+            location.reload()
+        }
+    </script>
 {% include 'admin/footer.html' %}
