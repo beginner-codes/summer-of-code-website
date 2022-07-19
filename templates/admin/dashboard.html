@@ -9,17 +9,33 @@
             </tr>
         </thead>
         <tbody>
-            {% for user in users %}
+        {{user}}
+            {% for u in users %}
                 <tr>
-                    <td>{{user.username}}</td>
-                    <td>{{"Yes" if user.banned else "No"}}</td>
+                    <td>{{u.username}}</td>
+                    <td>{{"Yes" if u.banned else "No"}}</td>
                     <td>
-                        {% for role in user.roles %}
+                        {% for role in u.roles %}
                             {{role|title}}{{"" if loop.last else ", "}}
                         {% endfor %}
                     </td>
                     <td>
-                        <button class="ban-user" onclick="{{"un" if user.banned else ""}}banUser({{user.id}})">{{"Unban" if user.banned else "Ban"}}</button>
+                        {% if "ADMIN" in u.roles %}
+                            <i>ADMIN</i>
+                        {% else %}
+                            {% if "ADMIN" in user.roles or "MOD" not in u.roles %}
+                                <button class="ban-user" onclick='{{"un" if u.banned else ""}}banUser({{u.id}})'>
+                                    {{"Unban" if u.banned else "Ban"}}
+                                </button>
+                            {% else %}
+                                <i>MOD</i>
+                            {% endif %}
+                            {% if "ADMIN" in user.roles %}
+                                <button onclick='{{"remove" if "MOD" in u.roles else "add"}}ModRole({{u.id}})'>
+                                    {{"Remove" if "MOD" in u.roles else "Make"}} Mod
+                                </button>
+                            {% endif %}
+                        {% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -36,6 +52,21 @@
                 "POST",
                 `/admin/api/v1/users/${action}`,
                 {ids: [userID]}
+            )
+            location.reload()
+        }
+
+
+        const addModRole = async userID => manageModRole(userID, "POST")
+        const removeModRole = async userID => manageModRole(userID, "DELETE")
+        const manageModRole = async (userID, action) => {
+            if(action !== "POST" && action !== "DELETE")
+                return
+
+            await apiRequest(
+                action,
+                `/admin/api/v1/users/${userID}/roles`,
+                {roles: ["MOD"]}
             )
             location.reload()
         }
