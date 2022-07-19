@@ -29,7 +29,7 @@
         const banUser = async userID => manageBan(userID, "ban")
         const unbanUser = async userID => manageBan(userID, "unban")
         const manageBan = async (userID, action) => {
-            if(action != "ban" && action != "unban")
+            if(action !== "ban" && action !== "unban")
                 return
 
             await apiRequest(
