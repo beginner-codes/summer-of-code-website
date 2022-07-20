@@ -12,6 +12,7 @@ from soc.config.settings_provider import SettingsProvider
 from soc.database import Database
 from soc.database.provider import DatabaseProvider
 from soc.entities.sessions import Session
+from soc.request_tracking import RequestTracking
 from soc.templates.scope import Scope
 
 T = TypeVar("T")
@@ -22,6 +23,9 @@ P = ParamSpec("P")
 global_context = Context.factory()
 global_context.add_provider(SettingsProvider)
 global_context.add_provider(DatabaseProvider)
+global_context.create(RequestTracking, cache=True)
+
+
 class DependencyOverridesProvider:
     def __init__(self, app, overrides):
         self.overrides = overrides
