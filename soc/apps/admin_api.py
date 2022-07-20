@@ -11,8 +11,10 @@ from soc.database import Database
 from soc.discord import Discord
 from soc.entities.sessions import Session
 from soc.entities.submissions import Status
+from soc.rate_limiting import RateLimitMiddleware
 
 admin_api = create_app()
+admin_api.middleware("http")(RateLimitMiddleware(admin_api))
 
 
 @admin_api.get(
