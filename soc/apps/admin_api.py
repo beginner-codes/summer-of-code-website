@@ -56,6 +56,19 @@ async def create_challenge(
     return await challenge.to_dict()
 
 
+@admin_api.delete(
+    "/challenges/{challenge_id}",
+    dependencies=[Depends(validate_bearer_token), Depends(require_roles("ADMIN"))],
+)
+async def delete_challenge(
+    challenge_id: int,
+    db: Database = inject(Database),
+):
+    challenge = await db.challenges.get(challenge_id)
+    await challenge.delete()
+    return {"success": True}
+
+
 class SubmissionStatusUpdatePayload(BaseModel):
     status: Status
 

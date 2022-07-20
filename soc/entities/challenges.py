@@ -91,6 +91,10 @@ class Challenge(Bevy):
         return db.challenges.get_submissions(self.id)
 
     @bevy_method
+    async def delete(self, db: soc.database.Database = Inject):
+        await db.challenges.delete_challenge(self)
+
+    @bevy_method
     async def sync(self, db: soc.database.Database = Inject):
         if not self.changed:
             return

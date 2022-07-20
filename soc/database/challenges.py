@@ -156,6 +156,16 @@ class Challenges(Bevy):
         async with db_session.begin():
             await db_session.execute(query)
 
+    @bevy_method
+    async def delete_challenge(self, challenge: int | Challenge, db_session: AsyncSession = Inject):
+        challenge_id = challenge if isinstance(challenge, int) else challenge.id
+        async with db_session.begin():
+            await db_session.execute(
+                delete(ChallengeModel).filter_by(
+                    id=challenge_id
+                )
+            )
+
     async def get_submission_votes(self, submission: int | Submission) -> list[VoteModel]:
         query = select(VoteModel).filter_by(submission=self.get_id(submission))
         result = await self._get_query_result(query, [])
