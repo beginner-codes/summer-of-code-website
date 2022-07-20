@@ -32,7 +32,7 @@ class TemplateResponse(HTMLResponse, Bevy):
         response_scope: Scope = Inject
     ) -> dict[str, Any]:
         scope = {}
-        if session:
+        if session and not session.revoked:
             scope["user"] = {
                 "username": session.get("username"),
                 "roles": session.get("roles", []),
