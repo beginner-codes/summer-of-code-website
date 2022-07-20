@@ -63,6 +63,17 @@ class Sessions(Bevy):
             await db_session.commit()
 
     @bevy_method
+    async def revoke(self, session_id: int, db_session: AsyncSession = Inject):
+        async with db_session.begin():
+            statement = (
+                update(SessionModel)
+                .where(SessionModel.id == session_id)
+                .values(revoked=True)
+            )
+            await db_session.execute(statement)
+            await db_session.commit()
+
+    @bevy_method
     async def update(
         self, session_id: int, db_session: AsyncSession = Inject, **values
     ):
