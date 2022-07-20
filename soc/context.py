@@ -35,9 +35,10 @@ class BevyRoute(routing.APIRoute):
             overrides_provider = self.dependency_overrides_provider
             overrides = overrides_provider.dependency_overrides
             context: Context = overrides.get(create_context, create_context)().branch()
-            context.add(await self._load_session(request, context), use_as=Session)
+            session = await self._load_session(request, context)
+            context.add(session, use_as=Session)
             context.add(request, use_as=Request)
-            if "sessionid" in request.cookies:
+            if "sessionid" in request.cookies and session and not session.revoked:
                 scope = context.get(Scope)
                 scope["session_token"] = request.cookies["sessionid"]
 
