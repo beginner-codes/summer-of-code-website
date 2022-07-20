@@ -7,8 +7,10 @@ from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
 from soc.database import Database
 from soc.entities.sessions import Session
+from soc.rate_limiting import RateLimitMiddleware
 
 api_app = create_app()
+api_app.middleware("http")(RateLimitMiddleware(api_app))
 
 
 @api_app.post("/register")
