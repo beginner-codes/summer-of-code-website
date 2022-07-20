@@ -10,6 +10,7 @@ from soc.context import inject
 from soc.controllers.authentication import AuthenticationSettings
 from soc.database import Database
 from soc.entities.sessions import Session
+from soc.request_tracking import RequestTracking
 
 auth_scheme = OAuth2PasswordBearer(tokenUrl="authenticate")
 
@@ -112,7 +113,14 @@ async def validate_bearer_token(
     session: Session = Depends(bearer_token),
     settings: AuthenticationSettings = inject(AuthenticationSettings),
     db: Database = inject(Database),
+    tracking: RequestTracking = inject(RequestTracking),
 ):
+    tracking.add_request(session.id)
+    if tracking.should_rate_limit(session.id):
+        session.revoked = True
+        await session.sync()
+        raise HTTPException(429)
+
     try:
         await validate_session(session, settings, db)
     except HTTPException as http_exc:
