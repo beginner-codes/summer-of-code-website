@@ -19,6 +19,9 @@ R = TypeVar("R")
 P = ParamSpec("P")
 
 
+global_context = Context.factory()
+global_context.add_provider(SettingsProvider)
+global_context.add_provider(DatabaseProvider)
 class DependencyOverridesProvider:
     def __init__(self, app, overrides):
         self.overrides = overrides
@@ -78,10 +81,7 @@ def create_app(*args, **kwargs) -> FastAPI:
 
 
 def create_context() -> Context:
-    ctx = Context.factory()
-    ctx.add_provider(DatabaseProvider)
-    ctx.add_provider(SettingsProvider)
-    return ctx
+    return global_context
 
 
 @overload
