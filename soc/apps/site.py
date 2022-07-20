@@ -55,7 +55,16 @@ async def index(
 
 @site.get("/challenges", response_class=TemplateResponse)
 async def challenges(db: Database = inject(Database)):
-    return "challenges.html", {"challenges": await db.challenges.get_all()}
+    return "challenges.html", {
+        "challenges": [
+            (await challenge.to_dict())
+            | {
+                "formatted_start": challenge.start.format("dddd, MMMM Do "),
+                "formatted_end": challenge.end.format("dddd, MMMM Do "),
+            }
+            for challenge in await db.challenges.get_all()
+        ]
+    }
 
 
 @site.get(
