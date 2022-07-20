@@ -2,7 +2,7 @@ from typing import Any
 
 import jwt
 import sqlalchemy.exc
-from fastapi import Depends, HTTPException, Cookie
+from fastapi import Depends, HTTPException, Cookie, Header
 from fastapi.security import OAuth2PasswordBearer
 
 from soc.config.models.site import SiteSettings
@@ -23,11 +23,17 @@ def require_roles(*roles):
     roles = set(roles)
 
     async def roles_check(
-        session: dict[str, Any] = Depends(session_cookie),
+        authorization: str = Header(None, alias="Authorization"),
+        cookie_session: dict[str, Any] | None = Depends(session_cookie),
         db: Database = inject(Database),
         settings: AuthenticationSettings = inject(AuthenticationSettings),
     ):
-        if "email" in session:
+        session = (
+            await bearer_token(authorization.split(" ", maxsplit=1)[1], settings, db)
+            if authorization
+            else cookie_session
+        )
+        if session and "email" in session:
             roles_match = session["email"] == settings.admin_email
 
         else:
