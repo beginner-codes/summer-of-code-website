@@ -59,6 +59,9 @@ async def validate_session(session: Session | None, settings, db):
     if not session or session.empty:
         raise HTTPException(401, "No session")
 
+    if session.revoked:
+        raise HTTPException(403, "Session revoked")
+
     if session.user_id == -1 and "email" not in session:
         print(session)
         raise HTTPException(403, "Invalid session")
