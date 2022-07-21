@@ -1,5 +1,4 @@
 from collections import defaultdict
-import logging
 
 from bevy import Context
 from fastapi import Depends
