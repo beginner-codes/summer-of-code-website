@@ -22,7 +22,6 @@
 </section>
 
 <section id="submissions" class = "container">
-    <p>{{challenge}}</p>
     <h4>Submissions</h4>
     {% for submission in challenge.submissions %}
         {% if submission.status.status != "DISAPPROVED" %}
