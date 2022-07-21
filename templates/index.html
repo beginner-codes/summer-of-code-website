@@ -5,7 +5,7 @@
             <p>Active Challenge</p>
             <h2>{{ challenge.title }}</h2>
             <p>{{ challenge.description }}</p>
-            <button>Post Your Submission</button>
+            <a href="/challenges/{{ challenge.id }}/create-submission"><button>Post Your Submission</button></a>
         </div>
         <div id = "time-info">
             <h1 id = "days-left"></h1>
