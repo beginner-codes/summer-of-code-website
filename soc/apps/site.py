@@ -1,4 +1,5 @@
 from collections import defaultdict
+import logging
 
 from bevy import Context
 from fastapi import Depends
@@ -12,6 +13,7 @@ from soc.apps.auth import auth_app
 from soc.auth_helpers import session_cookie
 from soc.context import create_app, create_context, inject
 from soc.database import Database
+from soc.entities.challenges import Challenge
 from soc.entities.sessions import Session
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
@@ -67,6 +69,20 @@ async def challenges(db: Database = inject(Database)):
     }
 
 
+@site.get("/challenges/{challenge_id}", response_class=TemplateResponse)
+async def challenges(challenge_id: int, db: Database = inject(Database)):
+    challenge = await db.challenges.get(challenge_id)
+    submissions = challenge.submissions
+    if not challenge:
+        return "error.html", {
+            "reason": f"The challenge you are looking for does not exist",
+            "title": f"Challenge does not exist",
+        }
+    return "challenge.html", {
+        "challenge": await challenge.to_dict(expand_submissions=True)
+    }
+
+
 @site.get(
     "/challenges/{challenge_id}/create-submission", response_class=TemplateResponse
 )
@@ -77,7 +93,6 @@ async def challenges(challenge_id: int, db: Database = inject(Database)):
             "reason": f"{challenge.title} is no longer open for new submissions.",
             "title": "Submissions Are Closed",
         }
-
     return "create_submission.html", {"challenge": await challenge.to_dict()}
 
 

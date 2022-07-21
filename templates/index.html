@@ -1,25 +1,28 @@
 {% include 'header.html' %}
-<section id="challenge-info">
-    <div>
-        <p>Active Challenge</p>
-        <h2>{{ challenge.title }}</h2>
-        <p>{{ challenge.description }}</p>
-        <a href="/challenges/{{challenge.id}}/create-submission" role="button">Post Your Submission</a>
-    </div>
-    <div id = "time-info">
-        <h1 id = "days-left"></h1>
-        <h3>Days Left</h3>
-        <div id = "progress-bar-info">
-            <progress id="progress-bar" data-start="{{ challenge.start }}" data-end="{{ challenge.end }}"></progress>
-            <div>
-                <p id = "start-date">{{ challenge and challenge.formatted_start or ""}}</p>
-                <p id = "end-date">{{ challenge and challenge.formatted_end or ""}}</p>
+<body>
+    <div id="challenge-info" class = "container">
+        <div>
+            <p>Active Challenge</p>
+            <h2>{{ challenge.title }}</h2>
+            <p>{{ challenge.description }}</p>
+            <button>Post Your Submission</button>
+        </div>
+        <div id = "time-info">
+            <h1 id = "days-left"></h1>
+            <h3>Days Left</h3>
+            <div id = "progress-bar-info">
+                <progress id = "progress-bar" data-start = {{ challenge.start }} data-end = {{ challenge.end }}></progress>
+                <div>
+                    <p id = "start-date"></p>
+                    <p id = "end-date"></p>
+                </div>
             </div>
         </div>
     </div>
 </section>
 
-<section id="submissions">
+<section id="submissions" class = "container">
+    <p>{{challenge}}</p>
     <h4>Submissions</h4>
     {% for submission in challenge.submissions %}
         {% if submission.status.status != "DISAPPROVED" %}
