@@ -71,7 +71,6 @@ async def challenges(db: Database = inject(Database)):
 @site.get("/challenges/{challenge_id}", response_class=TemplateResponse)
 async def challenges(challenge_id: int, db: Database = inject(Database)):
     challenge = await db.challenges.get(challenge_id)
-    submissions = challenge.submissions
     if not challenge:
         return "error.html", {
             "reason": f"The challenge you are looking for does not exist",
@@ -79,6 +78,10 @@ async def challenges(challenge_id: int, db: Database = inject(Database)):
         }
     return "challenge.html", {
         "challenge": await challenge.to_dict(expand_submissions=True)
+        | {
+            "formatted_start": challenge.start.format("MMMM Do, YYYY"),
+            "formatted_end": challenge.end.format("MMMM Do, YYYY"),
+        }
     }
 
 

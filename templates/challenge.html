@@ -6,19 +6,8 @@
     <button>Post Your Submission</button>
   </div>
   <div id="time-info">
-    <h1 id="days-left"></h1>
-    <h3>Days Left</h3>
-    <div id="progress-bar-info">
-      <progress
-        id="progress-bar"
-        data-start={{ challenge.start }}
-        data-end={{ challenge.end }}
-      ></progress>
-      <div>
-        <p id="start-date"></p>
-        <p id="end-date"></p>
-      </div>
-    </div>
+    <h6>Start Date: <br>{{ challenge.formatted_start }}</h6>
+    <h6>End Date: <br>{{challenge.formatted_end}}</h6>
   </div>
 </div>
 <section id="submissions" class = "container">
