@@ -38,12 +38,14 @@
                             <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
                         </a>
                     {% endfor %}
-                    {% for name, description in emoji.items() %}
-                        {% if name not in user_votes[submission.id] %}
-                            <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
-                                <i class="emoji {{name}}" title="{{description}}"></i>
-                            </a>
-                        {% endif %}
+                    {% for category, _emoji in emoji.items() %}
+                        {% for name, description in _emoji.items() %}
+                            {% if name not in user_votes[submission.id] %}
+                                <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                                    <i class="emoji {{name}}" title="{{description}}"></i>
+                                </a>
+                            {% endif %}
+                        {% endfor %}
                     {% endfor %}
                 </div>
                 <p>{{submission.description}}</p>
