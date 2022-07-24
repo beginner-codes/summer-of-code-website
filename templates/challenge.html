@@ -1,0 +1,60 @@
+{% include 'header.html' %}
+<div id="challenge-info" class="container">
+  <div>
+    <h2>{{ challenge.title }}</h2>
+    <p>{{ challenge.description }}</p>
+    <button>Post Your Submission</button>
+  </div>
+  <div id="time-info">
+    <h6>Start Date: <br>{{ challenge.formatted_start }}</h6>
+    <h6>End Date: <br>{{challenge.formatted_end}}</h6>
+  </div>
+</div>
+<section id="submissions" class = "container">
+  <p>{{submissions}}</p>
+  <h4>Submissions</h4>
+  {% for submission in challenge.submissions %}
+      {% if submission.status.status != "DISAPPROVED" %}
+          <div id="submission-{{submission.id}}" class="submission">
+              <hgroup>
+                  <img class="submission-avatar" src="{{submission.created_by.avatar}}" alt="{{submission.created_by.username}}' Avatar" />
+                  <h4>{{submission.created_by.username}}</h4>
+                  <h5>{{submission.formatted_created}}</h5>
+              </hgroup>
+              <div id="submission-{{submission.id}}-votes">
+                  <span>Votes</span>
+                  {% for emoji, votes in submission.votes.items() %}
+                      <span>{{emoji}}<span>{{votes|length}}x</span></span>
+                  {% endfor %}
+                  <a class="vote-button" href="#" role="button" data-emoji="😍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😍</a>
+                  <a class="vote-button" href="#" role="button" data-emoji="👍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">👍</a>
+                  <a class="vote-button" href="#" role="button" data-emoji="😀" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😀</a>
+              </div>
+              <p>{{submission.description}}</p>
+              <a href="{{submission.link}}" role="button">Check It Out</a>
+          </div>
+      {% endif %}
+  {% endfor %}
+</section>
+<script>
+  const userVotes = [];
+  {% if user_votes %}
+      {% for submission_id, emoji in user_votes.items() %}
+      userVotes[{{submission_id}}] = {{emoji|safe}};
+      {% endfor %}
+  {% endif %}
+
+  const days_left_heading = document.getElementById("days-left");
+  const progress_bar = document.getElementById("progress-bar");
+  const start_date = new Date(progress_bar.getAttribute("data-start"));
+  const end_date = new Date(progress_bar.getAttribute("data-end"));
+
+  const total_days = Math.ceil((end_date - start_date)/86400000) + 1;
+  const days_elapsed = Math.floor((Date.now() - start_date)/86400000);
+  const days_left = total_days - days_elapsed;
+
+  progress_bar.value = days_elapsed.toString();
+  progress_bar.max = total_days.toString();
+  days_left_heading.textContent = days_left.toString();
+</script>
+{%include 'footer.html' %}
