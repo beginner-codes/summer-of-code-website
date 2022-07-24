@@ -82,6 +82,9 @@ async def add_vote(
     if not submission:
         raise HTTPException(400, f"No such submission")
 
+    if session.user_id == submission.user_id:
+        raise HTTPException(400, "You cannot vote for your own submissions.")
+
     await submission.add_vote(session.user_id, vote.emoji)
 
 
