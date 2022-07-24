@@ -33,12 +33,18 @@
                 </hgroup>
                 <div id="submission-{{submission.id}}-votes">
                     <span>Votes</span>
-                    {% for emoji, votes in submission.votes.items() %}
-                        <span>{{emoji}}<span>{{votes|length}}x</span></span>
+                    {% for name, votes in submission.votes.items() %}
+                        <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                            <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
+                        </a>
                     {% endfor %}
-                    <a class="vote-button" href="#" role="button" data-emoji="😍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😍</a>
-                    <a class="vote-button" href="#" role="button" data-emoji="👍" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">👍</a>
-                    <a class="vote-button" href="#" role="button" data-emoji="😀" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">😀</a>
+                    {% for name, description in emoji.items() %}
+                        {% if name not in user_votes[submission.id] %}
+                            <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                                <i class="emoji {{name}}" title="{{description}}"></i>
+                            </a>
+                        {% endif %}
+                    {% endfor %}
                 </div>
                 <p>{{submission.description}}</p>
                 <a href="{{submission.link}}" role="button">Check It Out</a>

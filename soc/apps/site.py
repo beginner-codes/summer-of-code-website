@@ -12,6 +12,7 @@ from soc.apps.auth import auth_app
 from soc.auth_helpers import session_cookie
 from soc.context import create_app, create_context, inject
 from soc.database import Database
+from soc.emoji import Emoji
 from soc.entities.sessions import Session
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
@@ -31,10 +32,12 @@ async def on_start():
 
 @site.get("/", response_class=TemplateResponse)
 async def index(
-    db: Database = inject(Database), session: Session = Depends(session_cookie)
+    emoji: Emoji = inject(Emoji),
+    db: Database = inject(Database),
+    session: Session = Depends(session_cookie),
 ):
     challenge = await db.challenges.get_active()
-    scope = {"challenge": None}
+    scope = {"challenge": None, "emoji": emoji}
     if challenge:
         scope["challenge"] = await challenge.to_dict(expand_submissions=True)
         scope["challenge"]["formatted_start"] = challenge.start.format("dddd, MMMM Do ")

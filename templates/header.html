@@ -9,12 +9,18 @@
       rel="stylesheet"
       href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css"
     />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/alohe/emojicloud/emojicloud.css">
     {% if session_token %}
     <script>
       const sessionToken = "{{session_token}}";
     </script>
     {% endif %}
     <script src="/static/scripts.js"></script>
+    <style>
+      i.emoji {
+        font-size: 32px;
+      }
+    </style>
   </head>
   <body>
     <header class="container">
