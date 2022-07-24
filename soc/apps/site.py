@@ -12,7 +12,6 @@ from soc.apps.auth import auth_app
 from soc.auth_helpers import session_cookie
 from soc.context import create_app, create_context, inject
 from soc.database import Database
-from soc.entities.challenges import Challenge
 from soc.entities.sessions import Session
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
@@ -69,7 +68,7 @@ async def challenges(db: Database = inject(Database)):
 
 
 @site.get("/challenges/{challenge_id}", response_class=TemplateResponse)
-async def challenges(challenge_id: int, db: Database = inject(Database)):
+async def show_challenge(challenge_id: int, db: Database = inject(Database)):
     challenge = await db.challenges.get(challenge_id)
     if not challenge:
         return "error.html", {
