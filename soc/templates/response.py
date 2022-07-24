@@ -36,7 +36,7 @@ class TemplateResponse(HTMLResponse, Bevy):
             scope["user"] = {
                 "username": session.get("username"),
                 "roles": session.get("roles", []),
-                "id": session.get("user_id", -1)
+                "id": session.user_id
             }
 
         if site_settings.dev:
