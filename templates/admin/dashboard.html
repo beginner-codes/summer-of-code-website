@@ -2,6 +2,7 @@
     <table id="users">
         <thead>
             <tr>
+                <th>ID</th>
                 <th>Username</th>
                 <th>Banned</th>
                 <th>Roles</th>
@@ -11,6 +12,7 @@
         <tbody>
             {% for u in users %}
                 <tr>
+                    <td>{{u.id}}</td>
                     <td>{{u.username}}</td>
                     <td>{{"Yes" if u.banned else "No"}}</td>
                     <td>
