@@ -38,15 +38,17 @@
                             <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
                         </a>
                     {% endfor %}
-                    {% for category, _emoji in emoji.items() %}
-                        {% for name, description in _emoji.items() %}
-                            {% if name not in user_votes[submission.id] %}
-                                <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
-                                    <i class="emoji {{name}}" title="{{description}}"></i>
-                                </a>
-                            {% endif %}
+                    {% if user.id != submission.created_by.id %}
+                        {% for category, _emoji in emoji.items() %}
+                            {% for name, description in _emoji.items() %}
+                                {% if name not in user_votes[submission.id] %}
+                                    <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                                        <i class="emoji {{name}}" title="{{description}}"></i>
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
                         {% endfor %}
-                    {% endfor %}
+                    {% endif %}
                 </div>
                 <p>{{submission.description}}</p>
                 <a href="{{submission.link}}" role="button">Check It Out</a>
