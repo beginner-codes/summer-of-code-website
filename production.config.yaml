@@ -6,46 +6,51 @@ templates:
   directory: templates
 
 emoji:
-  emoji-face-with-open-mouth: Mouth wide open
-  emoji-face-with-tears-of-joy: Tears of joy
-  emoji-astonished-face: Astonished
-  emoji-drooling-face: Drooling
-  emoji-grinning-face-1: Grinning
-  emoji-partying-face: Partying
-  emoji-smiling-face-with-heart-eyes: Heart eyes
-  emoji-smiling-face-with-hearts: Hearts
-  emoji-smiling-face-with-sunglasses: Sunglasses
-  emoji-upside-down-face: Upside down smiling
-  emoji-zany-face: Zany
-  emoji-exploding-head: Mind blown
-  emoji-cat: Cat
-  emoji-beach: Beach
-  emoji-airplane: Airplane
-  emoji-bubbles: Bubbles
-  emoji-bicycle: Bicycle
-  emoji-cool: Cool
-  emoji-dog: Dog
-  emoji-fire: Fire
-  emoji-gaspar: Crown
-  emoji-gemstone: Diamond
-  emoji-red-apple: Apple
-  emoji-hamburger: Hamburger
-  emoji-heart: Heart
-  emoji-high-voltage: Lightning
-  emoji-house: House
-  emoji-left-facing-fist: Fist bump
-  emoji-lion: Lion
-  emoji-mailbox: Mailbox
-  emoji-palm: Palm
-  emoji-panda: Panda
-  emoji-party-popper: Party popper
-  emoji-pencil: Pencil
-  emoji-pizza: Pizza
-  emoji-rainbow: Rainbow
-  emoji-recycling-symbol: Recycle
-  emoji-robot: Robot
-  emoji-rocket: Rocket
-  emoji-sparkles: Sparkles
-  emoji-star: Star
-  emoji-thumbs-up: Thumbs up
-  emoji-unicorn: Unicorn
+  People:
+    emoji-face-with-open-mouth: Mouth wide open
+    emoji-face-with-tears-of-joy: Tears of joy
+    emoji-astonished-face: Astonished
+    emoji-drooling-face: Drooling
+    emoji-grinning-face-1: Grinning
+    emoji-partying-face: Partying
+    emoji-smiling-face-with-heart-eyes: Heart eyes
+    emoji-smiling-face-with-hearts: Hearts
+    emoji-smiling-face-with-sunglasses: Sunglasses
+    emoji-upside-down-face: Upside down smiling
+    emoji-zany-face: Zany
+    emoji-exploding-head: Mind blown
+    emoji-thumbs-up: Thumbs up
+    emoji-left-facing-fist: Fist bump
+    emoji-heart: Heart
+  Animals:
+    emoji-cat: Cat
+    emoji-dog: Dog
+    emoji-lion: Lion
+    emoji-panda: Panda
+    emoji-unicorn: Unicorn
+  Food:
+    emoji-red-apple: Apple
+    emoji-hamburger: Hamburger
+    emoji-pizza: Pizza
+  # Things
+  Things:
+    emoji-cool: Cool
+    emoji-party-popper: Party popper
+    emoji-high-voltage: Lightning
+    emoji-fire: Fire
+    emoji-gaspar: Crown
+    emoji-gemstone: Diamond
+    emoji-rocket: Rocket
+    emoji-recycling-symbol: Recycle
+    emoji-mailbox: Mailbox
+    emoji-pencil: Pencil
+    emoji-rainbow: Rainbow
+    emoji-robot: Robot
+    emoji-sparkles: Sparkles
+    emoji-star: Star
+    emoji-bubbles: Bubbles
+    emoji-bicycle: Bicycle
+    emoji-airplane: Airplane
+    emoji-palm: Palm
+    emoji-beach: Beach
+    emoji-house: House
