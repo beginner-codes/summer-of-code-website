@@ -34,9 +34,13 @@
                 <div id="submission-{{submission.id}}-votes">
                     <span>Votes</span>
                     {% for name, votes in submission.votes.items() %}
+                        {% if user.id != submission.created_by.id %}
                         <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                        {% endif %}
                             <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
+                        {% if user.id != submission.created_by.id %}
                         </a>
+                        {% endif %}
                     {% endfor %}
                     {% if user.id != submission.created_by.id %}
                         {% for category, _emoji in emoji.items() %}
