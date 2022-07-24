@@ -9,7 +9,6 @@ from soc.config.config import Config
 class Emoji(Bevy, Mapping):
     @bevy_method
     def __init__(self, settings: Config = Inject):
-        print("GOT EMOJI")
         self.emoji = settings.get(dict, "emoji")
 
     def __getitem__(self, item):
