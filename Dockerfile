@@ -24,8 +24,7 @@ RUN addgroup --gid 1001 --system app && \
 WORKDIR /app
 COPY --from=builder /app/wheels /wheels
 RUN pip install --no-cache --upgrade pip && \
-    pip install --no-cache /wheels/* && \
-    pip install bevy --upgrade
+    pip install --no-cache /wheels/*
 
 RUN chmod ugo+rw /app
 COPY alembic.ini alembic.ini
