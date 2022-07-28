@@ -25,6 +25,7 @@ class Settings(Bevy):
     ):
         async with db_session.begin():
             await db_session.merge(SettingsModel(name=name, value=value))
+            await db_session.commit()
 
     @bevy_method
     async def sync(self, db_session: AsyncSession = Inject):
