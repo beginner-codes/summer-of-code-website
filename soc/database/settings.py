@@ -8,7 +8,7 @@ from sqlalchemy.future import select
 from soc.database.models.settings import SettingsModel
 
 
-class Sessions(Bevy):
+class Settings(Bevy):
     def __init__(self):
         self._unsynced = {}
 
