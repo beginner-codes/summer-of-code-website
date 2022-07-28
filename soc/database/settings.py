@@ -4,6 +4,7 @@ import sqlalchemy.exc
 from bevy import Bevy, bevy_method, Inject
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.sql import update
 
 from soc.database.models.settings import SettingsModel
 
@@ -24,15 +25,35 @@ class Settings(Bevy):
         db_session: AsyncSession = Inject,
     ):
         async with db_session.begin():
-            await db_session.merge(SettingsModel(name=name, value=value))
+            await self._add_update_to_session(name, value, db_session)
             await db_session.commit()
 
     @bevy_method
     async def sync(self, db_session: AsyncSession = Inject):
         async with db_session:
             for name, value in list(self._unsynced.items()):
-                await db_session.merge(SettingsModel(name=name, value=value))
+                await self._add_update_to_session(name, value, db_session)
                 del self._unsynced[name]
+
+            await db_session.commit()
+
+    async def _add_update_to_session(
+        self, name: str, value: Any, db_session: AsyncSession
+    ):
+        NOTSET = object()
+        existing_value = await self.get(name, NOTSET, use_unsynced_cache=False)
+        if existing_value is NOTSET:
+            db_session.add(SettingsModel(name=name, value=value))
+
+        else:
+            if isinstance(existing_value, dict):
+                value = existing_value | value
+
+            await db_session.execute(
+                update(SettingsModel)
+                .where(SettingsModel.name == name)
+                .values(value=value)
+            )
 
     @bevy_method
     async def get(
