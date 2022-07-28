@@ -10,6 +10,7 @@
         {% for entry in leaderboard.entries %}
             <div class="leaderboard-entry">
                 <span>{{entry.username}}</span>
+                <span class="vote-count">{{entry.votes}}</span>
                 <progress value="{{entry.votes}}" max="{{leaderboard.max}}" title="{{entry.username}} has {{entry.votes}} votes">{{entry.votes}}</progress>
             </div>
         {% endfor %}
@@ -34,8 +35,7 @@
             <div id="submission-{{submission.id}}" class="submission">
                 <hgroup>
                     <img class="submission-avatar" src="{{submission.created_by.avatar}}" alt="{{submission.created_by.username}}' Avatar" />
-                    <h4>{{submission.created_by.username}}</h4>
-                    <h5>{{submission.formatted_created}}</h5>
+                    <h4>{{submission.created_by.username}}</h4>                    <h5>{{submission.formatted_created}}</h5>
                 </hgroup>
                 <div id="submission-{{submission.id}}-votes">
                     <span>Votes</span>
