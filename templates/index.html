@@ -1,21 +1,27 @@
 {% include 'header.html' %}
 <section id="active-challenge">
-    <div id="challenge-info" class = "container">
-        <div>
-            <p>Active Challenge</p>
-            <h2>{{ challenge.title }}</h2>
-            <p>{{ challenge.description }}</p>
-            <a href="/challenges/{{ challenge.id }}/create-submission"><button>Post Your Submission</button></a>
-        </div>
-        <div id = "time-info">
-            <h1 id = "days-left"></h1>
-            <h3>Days Left</h3>
-            <div id = "progress-bar-info">
-                <progress id = "progress-bar" data-start = {{ challenge.start }} data-end = {{ challenge.end }}></progress>
-                <div>
-                    <p id = "start-date"></p>
-                    <p id = "end-date"></p>
-                </div>
+    <h4>Active Challenge</h4>
+    <div id="challenge-info" class="container">
+        <h2>{{ challenge.title }}</h2>
+        <p>{{ challenge.description }}</p>
+        <a href="/challenges/{{ challenge.id }}/create-submission"><button>Post Your Submission</button></a>
+    </div>
+    <div id="challenge-leaderboard">
+        {% for entry in leaderboard.entries %}
+            <div class="leaderboard-entry">
+                <span>{{entry.username}}</span>
+                <progress value="{{entry.votes}}" max="{{leaderboard.max}}" title="{{entry.username}} has {{entry.votes}} votes">{{entry.votes}}</progress>
+            </div>
+        {% endfor %}
+    </div>
+    <div id = "time-info">
+        <h1 id = "days-left"></h1>
+        <h3>Days Left</h3>
+        <div id = "progress-bar-info">
+            <progress id="progress-bar" data-start="{{ challenge.start }}" data-end="{{ challenge.end }}"></progress>
+            <div>
+                <p id="start-date"></p>
+                <p id="end-date"></p>
             </div>
         </div>
     </div>
