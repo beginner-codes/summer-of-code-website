@@ -234,21 +234,19 @@ class Challenges(Bevy):
             await db_session.commit()
 
     @bevy_method
-    async def get_leaderboard(self, challenge_id: int, db_session: AsyncSession = Inject):
-        query = (
-            select(UserModel.username, func.count("*").label("votes"))
-            .join(SubmissionModel)
-            .join(VoteModel)
-            .filter(SubmissionModel.challenge_id == challenge_id)
-            .group_by(SubmissionModel.user_id)
-        )
+    async def get_leaderboard(
+        self,
+        challenge_id: int,
+        db_session: AsyncSession = Inject
+    ) -> sqlalchemy.engine.result.ChunkedIteratorResult:
         async with db_session:
-            result = await db_session.execute(query)
-
-        return [
-            row
-            for row in result
-        ]
+            return await db_session.execute(
+                select(UserModel.username, func.count("*").label("votes"))
+                .join(SubmissionModel)
+                .join(VoteModel)
+                .where(SubmissionModel.challenge_id == challenge_id)
+                .group_by(SubmissionModel.user_id)
+            )
 
     @bevy_method
     async def _get_query_result(
