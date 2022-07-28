@@ -241,7 +241,7 @@ class Challenges(Bevy):
     ) -> sqlalchemy.engine.result.ChunkedIteratorResult:
         async with db_session:
             return await db_session.execute(
-                select(UserModel.username, func.count("*").label("votes"))
+                select(UserModel.username, func.count(UserModel.username).label("votes"))
                 .join(SubmissionModel)
                 .join(VoteModel)
                 .where(SubmissionModel.challenge_id == challenge_id)
