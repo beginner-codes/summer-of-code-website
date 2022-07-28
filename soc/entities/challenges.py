@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import datetime
 from datetime import datetime, timedelta
 from typing import Any, Awaitable
@@ -12,6 +13,12 @@ from soc.database.models.challenges import ChallengeModel
 from soc.entities.submissions import Submission
 from soc.entities.users import User
 from soc.state_property import state_property
+
+
+@dataclasses.dataclass
+class LeaderboardEntry:
+    username: str
+    votes: int
 
 
 class Challenge(Bevy):
@@ -93,6 +100,15 @@ class Challenge(Bevy):
     @bevy_method
     async def delete(self, db: soc.database.Database = Inject):
         await db.challenges.delete_challenge(self)
+
+    @bevy_method
+    async def get_leaderboard(
+        self, db: soc.database.Database = Inject
+    ) -> list[LeaderboardEntry]:
+        return [
+            LeaderboardEntry(entry.username, entry.votes)
+            for entry in await db.challenges.get_leaderboard(self.id)
+        ]
 
     @bevy_method
     async def sync(self, db: soc.database.Database = Inject):
