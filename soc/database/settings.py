@@ -36,9 +36,14 @@ class Settings(Bevy):
 
     @bevy_method
     async def get(
-        self, name: str, default: Any = None, db_session: AsyncSession = Inject
+        self,
+        name: str,
+        default: Any = None,
+        *,
+        use_unsynced_cache: bool = True,
+        db_session: AsyncSession = Inject,
     ) -> list[Any] | dict[str, Any] | None:
-        if name in self._unsynced:
+        if use_unsynced_cache and name in self._unsynced:
             return self._unsynced[name]
 
         return await self._get_from_db(name, default)
