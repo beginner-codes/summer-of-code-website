@@ -55,12 +55,13 @@ class Settings(Bevy):
         async with db_session:
             try:
                 cursor = await db_session.execute(
-                    select(SettingsModel.value).where(SettingsModel.name == name)
+                    select(SettingsModel).where(SettingsModel.name == name)
                 )
             except sqlalchemy.exc.OperationalError:
                 return default
             else:
-                return cursor.scalars().first()
+                row = cursor.scalars().first()
+                return row.value if row else default
 
     def __getitem__(self, name: str) -> Awaitable[list[Any] | dict[str, Any] | None]:
         return self.get(name)
