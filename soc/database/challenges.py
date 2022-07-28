@@ -8,10 +8,12 @@ from fast_protocol import protocol
 from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from sqlalchemy.sql import func
 
 from soc.database.models.challenges import ChallengeModel
 from soc.database.models.submission_status import SubmissionStatusModel
 from soc.database.models.submissions import SubmissionModel
+from soc.database.models.users import UserModel
 from soc.database.models.votes import VoteModel
 from soc.entities.challenges import Challenge
 from soc.entities.submissions import Submission, Status, SubmissionStatus
@@ -230,6 +232,23 @@ class Challenges(Bevy):
             )
             await db_session.execute(statement)
             await db_session.commit()
+
+    @bevy_method
+    async def get_leaderboard(self, challenge_id: int, db_session: AsyncSession = Inject):
+        query = (
+            select(UserModel.username, func.count("*").label("votes"))
+            .join(SubmissionModel)
+            .join(VoteModel)
+            .filter(SubmissionModel.challenge_id == challenge_id)
+            .group_by(SubmissionModel.user_id)
+        )
+        async with db_session:
+            result = await db_session.execute(query)
+
+        return [
+            row
+            for row in result
+        ]
 
     @bevy_method
     async def _get_query_result(
