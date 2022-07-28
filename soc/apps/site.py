@@ -53,6 +53,16 @@ async def index(
                     if session.user_id in voters:
                         scope["user_votes"][submission["id"]].add(emoji)
 
+        leaderboard = await challenge.get_leaderboard()
+        max_votes = max(leaderboard, key=lambda entry: entry.votes).votes
+        scope["leaderboard"] = {
+            "max": max(int(max_votes * 1.2), max_votes + 1),
+            "entries": [
+                {"username": entry.username, "votes": entry.votes}
+                for entry in leaderboard
+            ],
+        }
+
     return "index.html", scope
 
 
