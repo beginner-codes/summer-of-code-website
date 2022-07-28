@@ -15,6 +15,7 @@ from soc.context import create_app, inject
 from soc.controllers.authentication import Authentication
 from soc.database import Database
 from soc.database.models.base import BaseModel
+from soc.database.settings import Settings
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
@@ -128,3 +129,17 @@ async def login(
         "sessionid", token, secure=True, httponly=True, expires=7 * 24 * 60 * 60
     )
     return response
+
+
+@admin_app.get(
+    "/settings",
+    response_class=TemplateResponse,
+    dependencies=[
+        Depends(validate_session_cookie),
+        Depends(require_roles("ADMIN")),
+    ],
+)
+async def settings_page(settings: Settings = inject(Settings)):
+    return "admin/settings.html", {
+        "announcement_webhooks": await settings.get("announcement_webhooks", {})
+    }

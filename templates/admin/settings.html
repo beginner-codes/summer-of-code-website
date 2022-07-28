@@ -1,0 +1,90 @@
+{% include 'admin/header.html' %}
+    <form id="settings-form">
+        <h3>Announcement Webhooks</h3>
+        <table id="users">
+            <tbody>
+                <tr>
+                    <td>
+                        <label for="new-challenge-announcement">New challenge</label>
+                    </td>
+                    <td>
+                        <input
+                            id="new-challenge-announcement"
+                            data-name="announcement_webhooks"
+                            data-key="new_challenge"
+                            value="{{announcement_webhooks.new_challenge}}"
+                            type="url"
+                        />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label for="submission-approved-announcement">Submission approved</label>
+                    </td>
+                    <td>
+                        <input
+                            id="submission-approved-announcement"
+                            data-name="announcement_webhooks"
+                            data-key="submission_approved"
+                            value="{{announcement_webhooks.submission_approved}}"
+                            type="url"
+                        />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button id="save-settings" disabled>Save</button>
+    </form>
+    <script>
+        const getValues = () => {
+            const values = {}
+            document.querySelectorAll("input").forEach(input => values[input.id] = input.value)
+            return values
+        }
+        let originalValues = getValues()
+        const equal = (valuesA, valuesB) => {
+            for(let name in valuesA){
+                if(valuesA[name] !== valuesB[name])
+                    return false
+            }
+            return true
+        }
+        const changed = () => {
+            const saveButton = document.getElementById("save-settings")
+            if(equal(originalValues, getValues()))
+                saveButton.setAttribute("disabled", "true")
+            else
+                saveButton.removeAttribute("disabled")
+        }
+        const saveSettings = async (event) => {
+            event.preventDefault()
+
+            const payload = {}
+            document.querySelectorAll("input").forEach(
+                input => {
+                    if(originalValues[input.id] === input.value)
+                        return
+
+                    const name = input.getAttribute("data-name")
+                    const key = input.getAttribute("data-key")
+                    if(key){
+                         if(payload[name] === undefined)
+                             payload[name] = {}
+                         payload[name][key] = input.value
+                    } else {
+                        payload[name] = input.value
+                    }
+                }
+            )
+            await apiRequest(
+                "POST",
+                "/admin/api/v1/settings",
+                payload
+            )
+            originalValues = getValues()
+            changed()
+        }
+        document.querySelectorAll("input").forEach(input => input.addEventListener("input", changed))
+        document.getElementById("settings-form").addEventListener("submit", saveSettings)
+    </script>
+{% include 'admin/footer.html' %}
