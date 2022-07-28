@@ -2,12 +2,13 @@ import subprocess
 from datetime import datetime
 from typing import Any
 
-from fastapi import Depends, HTTPException
+from fastapi import Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from soc.auth_helpers import bearer_token, require_roles, validate_bearer_token
 from soc.context import create_app, inject
 from soc.database import Database
+from soc.database.settings import Settings
 from soc.discord import Discord
 from soc.entities.sessions import Session
 from soc.entities.submissions import Status
@@ -178,3 +179,16 @@ async def remove_roles(
     current_roles = set(await user.get_roles())
     await user.set_roles(current_roles - payload.roles)
     return {"success": True}
+
+
+@admin_api.post(
+    "/settings",
+    dependencies=[Depends(validate_bearer_token), Depends(require_roles("ADMIN"))],
+)
+async def update_settings(request: Request, settings: Settings = inject(Settings)):
+    updated_settings: dict[str, Any] = await request.json()
+    for name, value in updated_settings.items():
+        settings[name] = value
+
+    await settings.sync()
+    return {"status": "success"}
