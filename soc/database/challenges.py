@@ -245,7 +245,7 @@ class Challenges(Bevy):
                 .join(SubmissionModel)
                 .join(VoteModel)
                 .where(SubmissionModel.challenge_id == challenge_id)
-                .group_by(SubmissionModel.user_id)
+                .group_by(SubmissionModel.user_id, UserModel.username)
             )
 
     @bevy_method
