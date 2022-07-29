@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncEngine
 
+from soc.announcements import Announcements
 from soc.apps.admin_app import admin_app
 from soc.apps.api import api_app
 from soc.apps.auth import auth_app
@@ -29,6 +30,7 @@ site.mount("/static", StaticFiles(directory="static"), name="static")
 @site.on_event("startup")
 async def on_start():
     context: Context = site.dependency_overrides.get(create_context, create_context)()
+    context.create(Announcements, cache=True)
     context.create(AsyncEngine, cache=True)
     context.create(Events, cache=True)
 
