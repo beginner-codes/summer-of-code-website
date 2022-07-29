@@ -29,6 +29,7 @@ API = "https://discord.com/api/v10"
 def _verify_state(
     state: str = Query(), cookie: dict[str, Any] = Depends(session_cookie)
 ):
+    print(cookie, state)
     if cookie["state"] != state:
         raise HTTPException(403, "Invalid state")
 
