@@ -9,8 +9,8 @@ import pendulum
 from bevy import Bevy, bevy_method, Inject
 
 import soc.database
+import soc.entities.submissions as submissions
 from soc.database.models.challenges import ChallengeModel
-from soc.entities.submissions import Submission
 from soc.entities.users import User
 from soc.state_property import state_property
 
@@ -94,7 +94,7 @@ class Challenge(Bevy):
     @bevy_method
     def submissions(
         self, db: soc.database.Database = Inject
-    ) -> Awaitable[list[Submission]]:
+    ) -> Awaitable[list[submissions.Submission]]:
         return db.challenges.get_submissions(self.id)
 
     @bevy_method
