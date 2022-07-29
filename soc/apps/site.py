@@ -14,8 +14,10 @@ from soc.context import create_app, create_context, inject
 from soc.database import Database
 from soc.emoji import Emoji
 from soc.entities.sessions import Session
+from soc.events import Events
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
+
 
 site = create_app()
 site.mount("/v1/", api_app)
@@ -28,6 +30,7 @@ site.mount("/static", StaticFiles(directory="static"), name="static")
 async def on_start():
     context: Context = site.dependency_overrides.get(create_context, create_context)()
     context.create(AsyncEngine, cache=True)
+    context.create(Events, cache=True)
 
 
 @site.get("/", response_class=TemplateResponse)
