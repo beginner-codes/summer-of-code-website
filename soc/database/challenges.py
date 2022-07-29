@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from typing import Type
 
@@ -10,14 +12,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.sql import func
 
+import soc.entities.submissions as submissions
 from soc.database.models.challenges import ChallengeModel
 from soc.database.models.submission_status import SubmissionStatusModel
 from soc.database.models.submissions import SubmissionModel
 from soc.database.models.users import UserModel
 from soc.database.models.votes import VoteModel
 from soc.entities.challenges import Challenge
-from soc.entities.submissions import Submission, Status, SubmissionStatus
 from soc.entities.users import User
+from soc.events import Events
+
 
 IDable = protocol("id")
 
@@ -25,10 +29,12 @@ IDable = protocol("id")
 class Challenges(Bevy):
     def __init__(self):
         self._challenge_type: Type[Challenge] = self.bevy.bind(Challenge)
-        self._submission_type: Type[Submission] = self.bevy.bind(Submission)
-        self._submission_status_type: Type[SubmissionStatus] = self.bevy.bind(
-            SubmissionStatus
+        self._submission_type: Type[submissions.Submission] = self.bevy.bind(
+            submissions.Submission
         )
+        self._submission_status_type: Type[
+            submissions.SubmissionStatus
+        ] = self.bevy.bind(submissions.SubmissionStatus)
 
     @bevy_method
     async def create(
@@ -88,7 +94,7 @@ class Challenges(Bevy):
         challenge: int | Challenge,
         user: int | User,
         db_session: AsyncSession = Inject,
-    ) -> Submission:
+    ) -> submissions.Submission:
         user_id = user if isinstance(user, int) else user.id
         model = SubmissionModel(
             type=type,
@@ -101,8 +107,10 @@ class Challenges(Bevy):
             db_session.add(model)
 
         submission = self._submission_type.from_db_model(model)
-        submission.status = SubmissionStatus(
-            status=Status.CREATED, user_id=user_id, submission_id=submission.id
+        submission.status = submissions.SubmissionStatus(
+            status=submission.Status.CREATED,
+            user_id=user_id,
+            submission_id=submission.id,
         )
         await submission.sync()
         return submission
@@ -110,11 +118,12 @@ class Challenges(Bevy):
     @bevy_method
     async def set_submission_status(
         self,
-        submission: Submission | SubmissionModel | int,
-        status: Status,
+        submission: submissions.Submission | SubmissionModel | int,
+        status: submissions.Status,
         user: User | int,
         db_session: AsyncSession = Inject,
-    ) -> SubmissionStatus:
+        events: Events = Inject,
+    ) -> submissions.SubmissionStatus:
         model = SubmissionStatusModel(
             status=status,
             submission_id=submission.id if hasattr(submission, "id") else submission,
@@ -123,17 +132,26 @@ class Challenges(Bevy):
         async with db_session.begin():
             db_session.add(model)
 
-        return SubmissionStatus.from_db_model(model)
+        updated_status = submissions.SubmissionStatus.from_db_model(model)
+        await events.dispatch(
+            "submission.status.changed",
+            await self.get_submission(submission, updated_status)
+            if isinstance(submission, int)
+            else submission,
+        )
+        return updated_status
 
     @bevy_method
     async def add_vote_to_submission(
         self,
-        submission: int | Submission,
+        submission: int | submissions.Submission,
         user: int | User,
         emoji: str,
         db_session: AsyncSession = Inject,
     ) -> VoteModel:
-        model = VoteModel(emoji=emoji, user_id=self.get_id(user), submission=self.get_id(submission))
+        model = VoteModel(
+            emoji=emoji, user_id=self.get_id(user), submission=self.get_id(submission)
+        )
         async with db_session.begin():
             db_session.add(model)
 
@@ -142,43 +160,40 @@ class Challenges(Bevy):
     @bevy_method
     async def remove_vote_from_submission(
         self,
-        submission: int | Submission,
+        submission: int | submissions.Submission,
         user: int | User,
         emoji: str,
         db_session: AsyncSession = Inject,
     ):
-        query = (
-            delete(VoteModel)
-            .filter_by(
-                submission=self.get_id(submission),
-                user_id=self.get_id(user),
-                emoji=emoji
-            )
+        query = delete(VoteModel).filter_by(
+            submission=self.get_id(submission), user_id=self.get_id(user), emoji=emoji
         )
         async with db_session.begin():
             await db_session.execute(query)
 
     @bevy_method
-    async def delete_challenge(self, challenge: int | Challenge, db_session: AsyncSession = Inject):
+    async def delete_challenge(
+        self, challenge: int | Challenge, db_session: AsyncSession = Inject
+    ):
         challenge_id = challenge if isinstance(challenge, int) else challenge.id
         async with db_session.begin():
-            await db_session.execute(
-                delete(ChallengeModel).filter_by(
-                    id=challenge_id
-                )
-            )
+            await db_session.execute(delete(ChallengeModel).filter_by(id=challenge_id))
 
-    async def get_submission_votes(self, submission: int | Submission) -> list[VoteModel]:
+    async def get_submission_votes(
+        self, submission: int | submissions.Submission
+    ) -> list[VoteModel]:
         query = select(VoteModel).filter_by(submission=self.get_id(submission))
         result = await self._get_query_result(query, [])
         return list(result)
 
-    async def get_submission(self, submission_id: int) -> Submission | None:
+    async def get_submission(
+        self, submission_id: int, status: SubmissionStatusModel | None = None
+    ) -> submissions.Submission | None:
         query = select(SubmissionModel).filter_by(id=submission_id)
         model = await self._get_first_query_result(query)
-        return self._submission_type.from_db_model(model) if model else None
+        return self._submission_type.from_db_model(model, status) if model else None
 
-    async def get_submissions(self, challenge_id: int) -> list[Submission]:
+    async def get_submissions(self, challenge_id: int) -> list[submissions.Submission]:
         query = select(SubmissionModel).filter_by(challenge_id=challenge_id)
         result = await self._get_query_result(query, [])
         return [
@@ -188,15 +203,23 @@ class Challenges(Bevy):
             for row in result
         ]
 
-    async def get_submission_status(self, submission_id: int) -> SubmissionStatus | None:
-        query = select(SubmissionStatusModel).filter_by(submission_id=submission_id).order_by(
-            SubmissionStatusModel.updated.desc()
+    async def get_submission_status(
+        self, submission_id: int
+    ) -> submissions.SubmissionStatus | None:
+        query = (
+            select(SubmissionStatusModel)
+            .filter_by(submission_id=submission_id)
+            .order_by(SubmissionStatusModel.updated.desc())
         )
         model = await self._get_first_query_result(query)
         return self._submission_status_type.from_db_model(model)
 
-    async def get_submission_created_status(self, submission_id: int) -> SubmissionStatus | None:
-        query = select(SubmissionStatusModel).filter_by(submission_id=submission_id, status=Status.CREATED)
+    async def get_submission_created_status(
+        self, submission_id: int
+    ) -> submissions.SubmissionStatus | None:
+        query = select(SubmissionStatusModel).filter_by(
+            submission_id=submission_id, status=submissions.Status.CREATED
+        )
         model = await self._get_first_query_result(query)
         return self._submission_status_type.from_db_model(model)
 
@@ -285,4 +308,3 @@ class Challenges(Bevy):
 
             case _:
                 raise ValueError(f"Expected an int or an IDable, got {obj!r}")
-
