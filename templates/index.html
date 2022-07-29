@@ -1,28 +1,29 @@
 {% include 'header.html' %}
-<section id="active-challenge">
-    <h4>Active Challenge</h4>
-    <div id="challenge-info" class="container">
-        <h2>{{ challenge.title }}</h2>
-        <p>{{ challenge.description }}</p>
-        <a href="/challenges/{{ challenge.id }}/create-submission"><button>Post Your Submission</button></a>
+<body>
+    <p>Active Challenge</p>
+    <div id="challenge-info" class = "container">
+        <div>
+            <h2>{{ challenge.title }}</h2>
+            <p>{{ challenge.description }}</p>
+        </div>
+        <div>
+            {% for entry in leaderboard.entries %}
+                <h6>{{entry.username}}</h6>
+                <progress max = {{ leaderboard.max }} value = {{ entry.votes }} data-votes = {{ entry.votes }}></progress>
+            {%endfor%}
+            <button>Post Your Submission</button>
+        </div>
     </div>
-    <div id="challenge-leaderboard">
-        {% for entry in leaderboard.entries %}
-            <div class="leaderboard-entry">
-                <span>{{entry.username}}</span>
-                <span class="vote-count">{{entry.votes}}</span>
-                <progress value="{{entry.votes}}" max="{{leaderboard.max}}" title="{{entry.username}} has {{entry.votes}} votes">{{entry.votes}}</progress>
-            </div>
-        {% endfor %}
-    </div>
-    <div id="time-info">
-        <h1 id="days-left"></h1>
-        <h3>Days Left</h3>
-        <div id="progress-bar-info">
-            <progress id="progress-bar" data-start="{{ challenge.start }}" data-end="{{ challenge.end }}"></progress>
+    <div id = "time-info">
+        <div>
+            <h1 id = "days-left"></h1>
+            <h3>Days Left</h3>
+        </div>
+        <div id = "progress-bar-info">
+            <progress id = "progress-bar" data-start = {{ challenge.start }} data-end = {{ challenge.end }}></progress>
             <div>
-                <p id="start-date"></p>
-                <p id="end-date"></p>
+                <p id = "start-date"></p>
+                <p id = "end-date"></p>
             </div>
         </div>
     </div>
@@ -32,37 +33,44 @@
     <h4>Submissions</h4>
     {% for submission in challenge.submissions %}
         {% if submission.status.status != "DISAPPROVED" %}
-            <div id="submission-{{submission.id}}" class="submission">
-                <hgroup>
+            <div id="submission-{{submission.id}}" class="submission">  
+                <div class = "left-submission">
                     <img class="submission-avatar" src="{{submission.created_by.avatar}}" alt="{{submission.created_by.username}}' Avatar" />
-                    <h4>{{submission.created_by.username}}</h4>
-                    <h5>{{submission.formatted_created}}</h5>
-                </hgroup>
-                <div id="submission-{{submission.id}}-votes">
-                    <span>Votes</span>
-                    {% for name, votes in submission.votes.items() %}
-                        {% if user.id != submission.created_by.id %}
-                        <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
-                        {% endif %}
-                            <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
-                        {% if user.id != submission.created_by.id %}
-                        </a>
-                        {% endif %}
-                    {% endfor %}
-                    {% if user.id != submission.created_by.id %}
-                        {% for category, _emoji in emoji.items() %}
-                            {% for name, description in _emoji.items() %}
-                                {% if name not in user_votes[submission.id] %}
-                                    <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
-                                        <i class="emoji {{name}}" title="{{description}}"></i>
-                                    </a>
-                                {% endif %}
-                            {% endfor %}
-                        {% endfor %}
-                    {% endif %}
                 </div>
-                <p>{{submission.description}}</p>
-                <a href="{{submission.link}}" role="button">Check It Out</a>
+                <div class = "right-submission">
+                    <div class = "submission-top">
+                        <div >
+                            <h4>{{submission.created_by.username}}</h4>
+                            <p>{{submission.formatted_created}}</p>
+                        </div>
+                        <div id="submission-{{submission.id}}-votes">
+                        <span>Votes</span>
+                        {% for name, votes in submission.votes.items() %}
+                            {% if user and user.id != submission.created_by.id %}
+                            <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                            {% endif %}
+                                <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
+                            {% if user and user.id != submission.created_by.id %}
+                            </a>
+                            {% endif %}
+                        {% endfor %}
+                        {% if user and user.id != submission.created_by.id %}
+                            {% for category, _emoji in emoji.items() %}
+                                {% for name, description in _emoji.items() %}
+                                    {% if name not in user_votes[submission.id] %}
+                                        <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                                            <i class="emoji {{name}}" title="{{description}}"></i>
+                                        </a>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        {% endif %}
+                        </div>
+                    </div>
+                    <p>{{submission.description}}</p>
+                    <a href="{{submission.link}}" role="button">Check It Out</a>
+                    </div>
+                </div>
             </div>
         {% endif %}
     {% endfor %}

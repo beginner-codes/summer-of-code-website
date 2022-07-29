@@ -3,30 +3,61 @@
   justify-content: space-between;
   gap: 50px;
 }
+#challenge-info > div {
+  width: 100px;
+  flex: 1;
+}
 
 #time-info {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  width: 300px;
+  text-align: center;
+  justify-content: space-around;
+  margin: 50px 0;
 }
-#time-info > h1 {
+#time-info > div > h1 {
   font-size: 4em;
+  margin: 0;
 }
 
 #progress-bar-info {
-  width: inherit;
+  width: 50%;
 }
-#progress-bar-info > div {
+
+.submission {
+  display: flex;
+  margin-top: 50px;
+  gap: 20px;
+}
+.submission > hgroup {
+  display: flex;
+}
+
+.left-submission > img {
+  width: 70px;
+}
+
+.right-submission {
+  flex: 1;
+}
+
+.submission-top {
+  width: 100%;
   display: flex;
   justify-content: space-between;
 }
-#progress-bar-info > div > p {
-  font-size: 0.6em;
+.submission-top > div {
+  flex: 1;
 }
 
-#post-submission-btn {
-  width: 250px;
+.vote-button:hover {
+  text-decoration: none;
+}
+.vote-button > i {
+  transition: transform 200ms cubic-bezier(0.55, 0.22, 0.61, 1.87);
+}
+.vote-button > i:hover {
+  transform: scale(1.2);
 }
 
 * {
