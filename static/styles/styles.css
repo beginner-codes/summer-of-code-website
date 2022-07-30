@@ -14,14 +14,34 @@
   text-align: center;
   justify-content: space-around;
   margin: 50px 0;
+  background-color: rgba(0, 0, 0, 0.25);
+  border-radius: 16px;
+  padding: 25px 0;
 }
-#time-info > div > h1 {
+#time-info div > h1 {
   font-size: 4em;
   margin: 0;
 }
 
 #progress-bar-info {
   width: 50%;
+}
+#progress-bar-info > div {
+  display: flex;
+  justify-content: space-between;
+}
+
+.leaderboard-progress-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 25px;
+}
+.leaderboard-progress-bar:after {
+  content: attr(value);
+  position: absolute;
+  color: white;
+  left: var(--left);
 }
 
 .submission {
@@ -35,6 +55,7 @@
 
 .left-submission > img {
   width: 70px;
+  border-radius: 50%;
 }
 
 .right-submission {

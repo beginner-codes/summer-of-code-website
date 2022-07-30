@@ -10,7 +10,7 @@
             <div>
                 {% for entry in leaderboard.entries %}
                     <h6>{{entry.username}}</h6>
-                    <progress max = {{ leaderboard.max }} value = {{ entry.votes }} data-votes = {{ entry.votes }}></progress>
+                    <progress max = {{ leaderboard.max }} value = {{ entry.votes }} data-votes = {{ entry.votes }} class = "leaderboard-progress-bar"></progress>
                 {%endfor%}
                 <button>Post Your Submission</button>
             </div>
@@ -23,8 +23,8 @@
             <div id = "progress-bar-info">
                 <progress id = "progress-bar" data-start = {{ challenge.start }} data-end = {{ challenge.end }}></progress>
                 <div>
-                    <p id = "start-date"></p>
-                    <p id = "end-date"></p>
+                    <p id = "start-date">{{ challenge.formatted_start }}</p>
+                    <p id = "end-date"> {{challenge.formatted_end }}</p>
                 </div>
             </div>
         </div>
@@ -84,7 +84,6 @@
             userVotes[{{submission_id}}]={{emoji|safe}};
             {% endfor %}
         {% endif %}
-
         async function vote(e){
             e.preventDefault()
 
@@ -108,15 +107,22 @@
         document.querySelectorAll(".vote-button").forEach((btn) => {
             btn.addEventListener("click", vote.bind(btn))
         });
-
         const days_left_heading=document.getElementById("days-left");
         const progress_bar=document.getElementById("progress-bar");
         const start_date=new Date(progress_bar.getAttribute("data-start"));
         const end_date=new Date(progress_bar.getAttribute("data-end"));
-
         const total_days=Math.ceil((end_date - start_date)/86400000) + 1;
         const days_elapsed=Math.floor((Date.now() - start_date)/86400000);
         const days_left=total_days - days_elapsed;
+
+        document.querySelectorAll(".leaderboard-progress-bar")
+        .forEach(progress_bar => {
+            const current_value = parseInt(progress_bar.getAttribute("value"));
+            const max_value = parseInt(progress_bar.getAttribute("max"));
+            const left_value = Math.round((current_value / max_value)*100) + 1;
+            progress_bar.style.setProperty("--left", `${left_value}%`);
+            }
+        )
 
         progress_bar.value=days_elapsed.toString();
         progress_bar.max=total_days.toString();
