@@ -45,7 +45,9 @@ class SubmissionStatus:
         }
 
     @classmethod
-    def from_db_model(cls, model: SubmissionStatusModel | SubmissionStatus | None) -> SubmissionStatus:
+    def from_db_model(
+        cls, model: SubmissionStatusModel | SubmissionStatus | None
+    ) -> SubmissionStatus:
         match model:
             case SubmissionStatusModel():
                 return SubmissionStatus(
@@ -134,7 +136,9 @@ class Submission(Bevy):
         return self._build_votes_dict()
 
     @bevy_method
-    async def _build_votes_dict(self, db: soc.database.Database = Inject) -> dict[str, set[int]]:
+    async def _build_votes_dict(
+        self, db: soc.database.Database = Inject
+    ) -> dict[str, set[int]]:
         user_votes = await db.challenges.get_submission_votes(self)
         votes = defaultdict(set)
         for vote in user_votes:
@@ -143,11 +147,15 @@ class Submission(Bevy):
         return votes
 
     @bevy_method
-    async def add_vote(self, user: int | User, emoji: str, db: soc.database.Database = Inject):
+    async def add_vote(
+        self, user: int | User, emoji: str, db: soc.database.Database = Inject
+    ):
         await db.challenges.add_vote_to_submission(self.id, user, emoji)
 
     @bevy_method
-    async def remove_vote(self, user: int | User, emoji: str, db: soc.database.Database = Inject):
+    async def remove_vote(
+        self, user: int | User, emoji: str, db: soc.database.Database = Inject
+    ):
         await db.challenges.remove_vote_from_submission(self.id, user, emoji)
 
     @bevy_method
@@ -176,7 +184,9 @@ class Submission(Bevy):
             "challenge_id": self._challenge_id,
             "status": await self.status.to_dict(),
             "votes": await self.votes,
-            "created_by": await (await self.created_by).to_dict() if expand_user else None
+            "created_by": await (await self.created_by).to_dict()
+            if expand_user
+            else None,
         }
         return data
 

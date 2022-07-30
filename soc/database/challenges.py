@@ -258,13 +258,13 @@ class Challenges(Bevy):
 
     @bevy_method
     async def get_leaderboard(
-        self,
-        challenge_id: int,
-        db_session: AsyncSession = Inject
+        self, challenge_id: int, db_session: AsyncSession = Inject
     ) -> sqlalchemy.engine.result.ChunkedIteratorResult:
         async with db_session:
             return await db_session.execute(
-                select(UserModel.username, func.count(UserModel.username).label("votes"))
+                select(
+                    UserModel.username, func.count(UserModel.username).label("votes")
+                )
                 .join(SubmissionModel)
                 .join(VoteModel)
                 .where(SubmissionModel.challenge_id == challenge_id)

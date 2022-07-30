@@ -21,7 +21,9 @@ class TemplateResponse(HTMLResponse, Bevy):
         render_template: Jinja2 = Inject,
     ):
         template_name, template_scope = self._process_data(data)
-        content = render_template(template_name, **self._populate_scope(), **template_scope)
+        content = render_template(
+            template_name, **self._populate_scope(), **template_scope
+        )
         super().__init__(content, status_code, headers, media_type, background)
 
     @bevy_method
@@ -29,14 +31,14 @@ class TemplateResponse(HTMLResponse, Bevy):
         self,
         site_settings: SiteSettings = Inject,
         session: Session = Inject,
-        response_scope: Scope = Inject
+        response_scope: Scope = Inject,
     ) -> dict[str, Any]:
         scope = {}
         if session and not session.revoked:
             scope["user"] = {
                 "username": session.get("username"),
                 "roles": session.get("roles", []),
-                "id": session.user_id
+                "id": session.user_id,
             }
 
         if site_settings.dev:
