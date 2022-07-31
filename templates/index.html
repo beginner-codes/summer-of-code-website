@@ -145,5 +145,50 @@
         progress_bar.max=total_days.toString();
         days_left_heading.textContent=days_left.toString();
     </script>
+{% elif upcoming_challenge %}
+    <hgroup>
+        <h1>Next Challenge</h1>
+        <h2>{{upcoming_challenge.title}}</h2>
+    </hgroup>
+    <p>Begins in <strong id="countdown"></strong>!!!</p>
+    <script>
+        const start = {{upcoming_challenge.start_timestamp}};
+        function doUpdate(){
+            const countdown = document.getElementById("countdown");
+            const now = new Date().getTime();
+            const remaining = start - now / 1000;
+            const days = Math.floor(remaining / (3600 * 24));
+            const hours = Math.floor(remaining / 3600);
+            const minutes = Math.floor(remaining / 60);
+            let message = `${remaining} seconds`
+            let next = 60;
+            if(days === 1){
+                message = "1 day";
+            } else if(days > 1){
+                message = `${days} days`;
+            } else if(hours === 1){
+                message = "1 hour";
+                const mins = minutes - 60;
+                if(mins > 0){
+                    message += ` & ${mins} minutes`
+                }
+            } else if(hours > 1){
+                message = `${hours} hours`;
+            } else if(minutes > 1){
+                message = `${minutes} minutes`;
+            } else if(remaining === 1){
+                message = "1 second";
+            } else if(remaining === 0){
+                location.reload();
+            } else if(remaining > 1){
+                message = `${remaining} seconds`;
+                next = 1;
+            }
+
+            countdown.innerHTML = message;
+            setTimeout(doUpdate, next * 1000);
+        }
+        doUpdate();
+    </script>
 {% endif %}
 {% include 'footer.html' %}

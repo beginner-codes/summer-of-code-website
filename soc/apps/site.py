@@ -69,6 +69,19 @@ async def index(
             ],
         }
 
+    upcoming_challenges = await db.challenges.get_upcoming_challenges(2)
+    upcoming = None
+    if challenge and len(upcoming_challenges) > 1:
+        upcoming = upcoming_challenges[1]
+    elif not challenge and upcoming_challenges:
+        upcoming = upcoming_challenges[0]
+
+    if upcoming:
+        scope["upcoming_challenge"] = {
+            "title": upcoming.title,
+            "start_timestamp": upcoming.start.timestamp(),
+        }
+
     return "index.html", scope
 
 
