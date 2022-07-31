@@ -22,7 +22,6 @@ from soc.entities.challenges import Challenge
 from soc.entities.users import User
 from soc.events import Events
 
-
 IDable = protocol("id")
 
 
@@ -108,7 +107,7 @@ class Challenges(Bevy):
 
         submission = self._submission_type.from_db_model(model)
         submission.status = submissions.SubmissionStatus(
-            status=submission.Status.CREATED,
+            status=submissions.Status.CREATED,
             user_id=user_id,
             submission_id=submission.id,
         )
