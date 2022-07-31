@@ -92,3 +92,39 @@
         transform: scale(1.2);
     }
 }
+
+.add-vote-button {
+
+    display: inline-block;
+    text-align: center;
+    margin: 10px 10px;
+    cursor: pointer;
+    color: #464646;
+    background-color: rgba(0, 0, 0, 0.25);
+    font-size: 1.3rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+
+}
+
+.add-vote-conatiner {
+    position: relative;
+}
+
+.hidden-vote-box {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+    background-color: #24333E;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.hidden-vote-box.active {
+    display: none;
+}
