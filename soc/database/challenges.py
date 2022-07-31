@@ -7,6 +7,7 @@ import sqlalchemy.exc
 import sqlalchemy.orm
 from bevy import Bevy, bevy_method, Inject
 from fast_protocol import protocol
+from fastapi import Request
 from sqlalchemy import delete, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
@@ -21,7 +22,6 @@ from soc.database.models.votes import VoteModel
 from soc.entities.challenges import Challenge
 from soc.entities.users import User
 from soc.events import Events
-
 
 IDable = protocol("id")
 
@@ -78,6 +78,17 @@ class Challenges(Bevy):
 
         return self._challenge_type.from_db_model(model)
 
+    async def get_upcoming_challenges(self, limit: int = 10) -> list[Challenge]:
+        now = datetime.utcnow()
+        query = (
+            select(ChallengeModel)
+            .where(ChallengeModel.end >= now.date())
+            .order_by(ChallengeModel.start.asc())
+            .limit(limit)
+        )
+        challenges = await self._get_query_result(query)
+        return [self._challenge_type.from_db_model(model) for model in challenges]
+
     async def get_all(self) -> list[Challenge]:
         query = select(ChallengeModel).order_by(
             ChallengeModel.start, ChallengeModel.end
@@ -123,6 +134,7 @@ class Challenges(Bevy):
         user: User | int,
         db_session: AsyncSession = Inject,
         events: Events = Inject,
+        request: Request = Inject
     ) -> submissions.SubmissionStatus:
         model = SubmissionStatusModel(
             status=status,
@@ -138,6 +150,7 @@ class Challenges(Bevy):
             await self.get_submission(submission, updated_status)
             if isinstance(submission, int)
             else submission,
+            request
         )
         return updated_status
 

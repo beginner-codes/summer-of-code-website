@@ -12,7 +12,7 @@
                     <h6>{{entry.username}}</h6>
                     <progress max = {{ leaderboard.max }} value = {{ entry.votes }} data-votes = {{ entry.votes }} class = "leaderboard-progress-bar"></progress>
                 {%endfor%}
-                <a href = "challenges/{{ challenge.id }}/create-submission"><button>Post Your Submission</button></a>
+                <a href="/challenges/{{challenge.id}}/create-submission" role="button">Post Your Submission</a>
             </div>
         </div>
         <div id = "time-info">
