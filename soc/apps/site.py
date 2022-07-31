@@ -19,7 +19,6 @@ from soc.events import Events
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
-
 site = create_app()
 site.mount("/v1/", api_app)
 site.mount("/admin/", admin_app)
@@ -105,7 +104,7 @@ async def show_challenge(challenge_id: int, db: Database = inject(Database)):
 @site.get(
     "/challenges/{challenge_id}/create-submission", response_class=TemplateResponse
 )
-async def challenges(challenge_id: int, db: Database = inject(Database)):
+async def create_submission(challenge_id: int, db: Database = inject(Database)):
     challenge = await db.challenges.get(challenge_id)
     if not challenge.active:
         return "error.html", {
