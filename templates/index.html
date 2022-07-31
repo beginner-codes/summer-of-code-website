@@ -12,7 +12,7 @@
                     <h6>{{entry.username}}</h6>
                     <progress max = {{ leaderboard.max }} value = {{ entry.votes }} data-votes = {{ entry.votes }} class = "leaderboard-progress-bar"></progress>
                 {%endfor%}
-                <button>Post Your Submission</button>
+                <a href = "challenges/{{ challenge.id }}/create-submission"><button>Post Your Submission</button></a>
             </div>
         </div>
         <div id = "time-info">
@@ -44,28 +44,37 @@
                                 <h4>{{submission.created_by.username}}</h4>
                                 <p>{{submission.formatted_created}}</p>
                             </div>
-                            <div id="submission-{{submission.id}}-votes">
-                            <span>Votes</span>
-                            {% for name, votes in submission.votes.items() %}
-                                {% if user and user.id != submission.created_by.id %}
-                                <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
-                                {% endif %}
-                                    <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
-                                {% if user and user.id != submission.created_by.id %}
-                                </a>
-                                {% endif %}
-                            {% endfor %}
-                            {% if user and user.id != submission.created_by.id %}
-                                {% for category, _emoji in emoji.items() %}
-                                    {% for name, description in _emoji.items() %}
-                                        {% if name not in user_votes[submission.id] %}
-                                            <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
-                                                <i class="emoji {{name}}" title="{{description}}"></i>
-                                            </a>
-                                        {% endif %}
-                                    {% endfor %}
+                            <div id="submission-{{submission.id}}-votes" style = "position: relative;">
+                                <span>Votes</span>
+                                <span class = "vote-box" data-submission-id="{{ submission.id }}">
+                                {% for name, votes in submission.votes.items() %}
+                                    {% if user and user.id != submission.created_by.id %}
+                                    <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                                    {% endif %}
+                                        <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
+                                    {% if user and user.id != submission.created_by.id %}
+                                    </a>
+                                    {% endif %}
                                 {% endfor %}
-                            {% endif %}
+                                </span>
+                                <span class = "add-vote-conatiner">
+                                    {% if user and user.id != submission.created_by.id %}
+                                    <h1 class = "add-vote-button" data-submission-id="{{ submission.id }}">+</h1>
+                                    {% endif %}
+                                    <div class="hidden-vote-box active" data-submission-id="{{ submission.id }}">
+                                    {% if user and user.id != submission.created_by.id %}
+                                        {% for category, _emoji in emoji.items() %}
+                                            {% for name, description in _emoji.items() %}
+                                                {% if name not in user_votes[submission.id] %}
+                                                    <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
+                                                        <i class="emoji {{name}}" title="{{description}}"></i>
+                                                    </a>
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    {% endif %}
+                                    </div>
+                                </span>
                             </div>
                         </div>
                         <p>{{submission.description}}</p>
@@ -86,11 +95,9 @@
         {% endif %}
         async function vote(e){
             e.preventDefault()
-
             const submissionID=parseInt(this.getAttribute("data-submission-id"))
             const challengeID=parseInt(this.getAttribute("data-challenge-id"))
             const emoji=this.getAttribute("data-emoji")
-
             let method="POST"
             if(userVotes[submissionID] === undefined)
                 userVotes[submissionID]=[]
@@ -100,10 +107,10 @@
                 userVotes[submissionID].splice(userVotes[submissionID].indexOf(emoji))
             } else
                 userVotes[submissionID].push(emoji)
-
-            await apiRequest(method, `/v1/challenges/${challengeID}/submissions/${submissionID}/vote`, {emoji: emoji})
             location.reload()
+            await apiRequest(method, `/v1/challenges/${challengeID}/submissions/${submissionID}/vote`, {emoji: emoji})
         }
+
         document.querySelectorAll(".vote-button").forEach((btn) => {
             btn.addEventListener("click", vote.bind(btn))
         });
@@ -113,6 +120,8 @@
         const end_date=new Date(progress_bar.getAttribute("data-end"));
         const total_days=Math.ceil((end_date - start_date)/86400000) + 1;
         const days_elapsed=Math.floor((Date.now() - start_date)/86400000);
+        const add_vote_button = document.querySelectorAll(".add-vote-button")
+        const hidden_vote_boxes = document.querySelectorAll(".hidden-vote-box");
         const days_left=total_days - days_elapsed;
 
         document.querySelectorAll(".leaderboard-progress-bar")
@@ -123,6 +132,14 @@
             progress_bar.style.setProperty("--left", `${left_value}%`);
             }
         )
+
+        add_vote_button.forEach((vote_button) => {
+            vote_button.addEventListener("click", () => {
+                const submission_id = vote_button.getAttribute("data-submission-id");
+                const hidden_vote_box = document.querySelector(`.hidden-vote-box[data-submission-id='${submission_id}']`);
+                hidden_vote_box.classList.toggle("active")
+            });
+        })
 
         progress_bar.value=days_elapsed.toString();
         progress_bar.max=total_days.toString();
