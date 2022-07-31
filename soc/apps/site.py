@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from bevy import Context
-from fastapi import Depends
+from fastapi import Depends, FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -19,7 +19,6 @@ from soc.events import Events
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
-
 site = create_app()
 site.mount("/v1/", api_app)
 site.mount("/admin/", admin_app)
@@ -33,6 +32,7 @@ async def on_start():
     context.create(Announcements, cache=True)
     context.create(AsyncEngine, cache=True)
     context.create(Events, cache=True)
+    context.add(site, use_as=FastAPI)
 
 
 @site.get("/", response_class=TemplateResponse)
@@ -59,7 +59,8 @@ async def index(
                         scope["user_votes"][submission["id"]].add(emoji)
 
         leaderboard = await challenge.get_leaderboard()
-        max_votes = max(leaderboard, key=lambda e: e.votes).votes if leaderboard else 2
+        leaderboard = sorted(leaderboard, key=lambda e: e.votes, reverse=True)
+        max_votes = leaderboard[0].votes if leaderboard else 2
         scope["leaderboard"] = {
             "max": max(int(max_votes * 1.2), max_votes + 1),
             "entries": [
@@ -85,7 +86,9 @@ async def challenges(db: Database = inject(Database)):
     }
 
 
-@site.get("/challenges/{challenge_id}", response_class=TemplateResponse)
+@site.get(
+    "/challenges/{challenge_id}", response_class=TemplateResponse, name="show-challenge"
+)
 async def show_challenge(challenge_id: int, db: Database = inject(Database)):
     challenge = await db.challenges.get(challenge_id)
     if not challenge:
@@ -105,7 +108,7 @@ async def show_challenge(challenge_id: int, db: Database = inject(Database)):
 @site.get(
     "/challenges/{challenge_id}/create-submission", response_class=TemplateResponse
 )
-async def challenges(challenge_id: int, db: Database = inject(Database)):
+async def create_submission(challenge_id: int, db: Database = inject(Database)):
     challenge = await db.challenges.get(challenge_id)
     if not challenge.active:
         return "error.html", {
