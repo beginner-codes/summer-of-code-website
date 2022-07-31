@@ -65,4 +65,15 @@
         {% endif %}
     {% endfor %}
 </section>
+<script>
+    const add_vote_button = document.querySelectorAll(".add-vote-button")
+    add_vote_button.forEach((vote_button) => {
+            vote_button.addEventListener("click", () => {
+                const submission_id = vote_button.getAttribute("data-submission-id");
+                const hidden_vote_box = document.querySelector(`.hidden-vote-box[data-submission-id='${submission_id}']`);
+                hidden_vote_box.classList.toggle("active")
+            });
+        }
+    )
+</script>
 {%include 'footer.html' %}
