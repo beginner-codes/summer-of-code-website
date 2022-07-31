@@ -6,7 +6,7 @@ import re
 import pendulum
 from bevy import Bevy, Inject
 from bevy.providers.function_provider import bevy_method
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from httpx import AsyncClient
 
 import soc.entities.submissions as submissions
@@ -84,7 +84,7 @@ class Announcements(Bevy):
     async def on_submission_status_changed(
         self,
         submission: submissions.Submission,
-        request: Request,
+        app: FastAPI = Inject,
         settings: Settings = Inject,
     ):
         webhooks = await settings.get("announcement_webhooks")
@@ -92,7 +92,7 @@ class Announcements(Bevy):
             async with AsyncClient() as session:
                 user = await submission.created_by
                 description = submission.description.strip()
-                url = f"{request.url_for('index')}#submission-{submission.id}"
+                url = f"https://soc.beginner.codes{app.url_path_for('index')}#submission-{submission.id}"
                 short_url = self._create_short_link(submission.link)
                 if len(description) > 250:
                     description = f"{description[:247].rstrip(' !?.:,;)([]{}+-_')}..."
