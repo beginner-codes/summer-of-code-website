@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from bevy import Context
-from fastapi import Depends
+from fastapi import Depends, FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.ext.asyncio import AsyncEngine
@@ -32,6 +32,7 @@ async def on_start():
     context.create(Announcements, cache=True)
     context.create(AsyncEngine, cache=True)
     context.create(Events, cache=True)
+    context.add(site, use_as=FastAPI)
 
 
 @site.get("/", response_class=TemplateResponse)
