@@ -5,6 +5,7 @@ import datetime
 from datetime import datetime, timedelta
 from typing import Any, Awaitable
 
+import markdown
 import pendulum
 from bevy import Bevy, bevy_method, Inject
 
@@ -87,6 +88,10 @@ class Challenge(Bevy):
         return self._id
 
     @property
+    def markdown(self) -> str:
+        return markdown.markdown(self.description)
+
+    @property
     def user_id(self) -> int:
         return self._user_id
 
@@ -139,6 +144,7 @@ class Challenge(Bevy):
             "id": self.id,
             "title": self.title,
             "description": self.description,
+            "markdown": self.markdown,
             "created": self.created.date(),
             "start": self.start.date(),
             "end": self.end.date(),

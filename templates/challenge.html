@@ -2,7 +2,7 @@
 <div id="challenge-info" class="container">
   <div>
     <h2>{{ challenge.title }}</h2>
-    <p>{{ challenge.description }}</p>
+    <p>{{ challenge.markdown|safe }}</p>
     <button>Post Your Submission</button>
   </div>
   <div id="time-info">

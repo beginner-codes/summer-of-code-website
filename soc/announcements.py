@@ -52,7 +52,9 @@ class Announcements(Bevy):
         await self._send_announcement(challenge)
 
     @bevy_method
-    async def _send_announcement(self, challenge, settings: Settings = Inject, app: FastAPI = Inject):
+    async def _send_announcement(
+        self, challenge, settings: Settings = Inject, app: FastAPI = Inject
+    ):
         webhooks = await settings.get("announcement_webhooks")
         if webhooks:
             async with AsyncClient() as session:
@@ -70,15 +72,13 @@ class Announcements(Bevy):
                                 "color": 0x4AFF8F,
                                 "description": f"{description}\n\nEnds <t:{end.timestamp():.0f}:R>",
                                 "title": challenge.title,
-                                "url": url
+                                "url": url,
                             }
                         ]
                     },
                 )
 
-                print(
-                    f"Announce new challenge {resp.content=} {resp.status_code=}"
-                )
+                print(f"Announce new challenge {resp.content=} {resp.status_code=}")
 
     @bevy_method
     async def on_submission_status_changed(

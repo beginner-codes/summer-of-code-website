@@ -5,7 +5,7 @@
         <div id="challenge-info" class = "container">
             <div>
                 <h2>{{ challenge.title }}</h2>
-                <p>{{ challenge.description }}</p>
+                <p>{{ challenge.markdown|safe }}</p>
             </div>
             <div>
                 {% for entry in leaderboard.entries %}
