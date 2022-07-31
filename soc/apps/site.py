@@ -47,16 +47,7 @@ async def index(
         scope["challenge"] = await challenge.to_dict(expand_submissions=True)
         scope["challenge"]["formatted_start"] = challenge.start.format("dddd, MMMM Do ")
         scope["challenge"]["formatted_end"] = challenge.end.format("dddd, MMMM Do ")
-        scope["user_votes"] = defaultdict(set)
-        for submission in scope["challenge"]["submissions"]:
-            submission["formatted_created"] = submission["created"].format(
-                "dddd, MMMM Do - h:mmA"
-            )
-
-            if session:
-                for emoji, voters in submission["votes"].items():
-                    if session.user_id in voters:
-                        scope["user_votes"][submission["id"]].add(emoji)
+        _build_submissions(scope, session)
 
         leaderboard = await challenge.get_leaderboard()
         leaderboard = sorted(leaderboard, key=lambda e: e.votes, reverse=True)
@@ -103,7 +94,10 @@ async def challenges(db: Database = inject(Database)):
     "/challenges/{challenge_id}", response_class=TemplateResponse, name="show-challenge"
 )
 async def show_challenge(
-    challenge_id: int, db: Database = inject(Database), emoji: Emoji = inject(Emoji)
+    challenge_id: int,
+    db: Database = inject(Database),
+    emoji: Emoji = inject(Emoji),
+    session: Session = Depends(session_cookie),
 ):
     challenge = await db.challenges.get(challenge_id)
     if not challenge:
@@ -111,13 +105,28 @@ async def show_challenge(
             "reason": f"The challenge you are looking for does not exist",
             "title": f"Challenge does not exist",
         }
-    return "challenge.html", {
+
+    scope = {
         "challenge": await challenge.to_dict(expand_submissions=True),
         "emoji": emoji,
-    } | {
         "formatted_start": challenge.start.format("MMMM Do, YYYY"),
         "formatted_end": challenge.end.format("MMMM Do, YYYY"),
     }
+    _build_submissions(scope, session)
+    return "challenge.html", scope
+
+
+def _build_submissions(scope, session):
+    scope["user_votes"] = defaultdict(set)
+    for submission in scope["challenge"]["submissions"]:
+        submission["formatted_created"] = submission["created"].format(
+            "dddd, MMMM Do - h:mmA"
+        )
+
+        if session:
+            for emoji, voters in submission["votes"].items():
+                if session.user_id in voters:
+                    scope["user_votes"][submission["id"]].add(emoji)
 
 
 @site.get(
