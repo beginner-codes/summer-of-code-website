@@ -124,6 +124,10 @@ class Submission(Bevy):
         return self._id
 
     @property
+    def link(self) -> str:
+        return self._link
+
+    @property
     def type(self) -> str:
         return self._type
 
