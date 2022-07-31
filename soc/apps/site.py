@@ -58,7 +58,8 @@ async def index(
                         scope["user_votes"][submission["id"]].add(emoji)
 
         leaderboard = await challenge.get_leaderboard()
-        max_votes = max(leaderboard, key=lambda e: e.votes).votes if leaderboard else 2
+        leaderboard = sorted(leaderboard, key=lambda e: e.votes, reverse=True)
+        max_votes = leaderboard[0].votes if leaderboard else 2
         scope["leaderboard"] = {
             "max": max(int(max_votes * 1.2), max_votes + 1),
             "entries": [
