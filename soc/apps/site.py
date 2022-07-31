@@ -102,7 +102,7 @@ async def challenges(db: Database = inject(Database)):
 @site.get(
     "/challenges/{challenge_id}", response_class=TemplateResponse, name="show-challenge"
 )
-async def show_challenge(challenge_id: int, db: Database = inject(Database)):
+async def show_challenge(challenge_id: int, db: Database = inject(Database), emoji: Emoji = inject(Emoji)):
     challenge = await db.challenges.get(challenge_id)
     if not challenge:
         return "error.html", {
@@ -111,6 +111,7 @@ async def show_challenge(challenge_id: int, db: Database = inject(Database)):
         }
     return "challenge.html", {
         "challenge": await challenge.to_dict(expand_submissions=True)
+        "emoji": emoji,
         | {
             "formatted_start": challenge.start.format("MMMM Do, YYYY"),
             "formatted_end": challenge.end.format("MMMM Do, YYYY"),
