@@ -78,6 +78,17 @@ class Challenges(Bevy):
 
         return self._challenge_type.from_db_model(model)
 
+    async def get_upcoming_challenges(self, limit: int = 10) -> list[Challenge]:
+        now = datetime.utcnow()
+        query = (
+            select(ChallengeModel)
+            .where(ChallengeModel.end >= now.date())
+            .order_by(ChallengeModel.start.asc())
+            .limit(limit)
+        )
+        challenges = await self._get_query_result(query)
+        return [self._challenge_type.from_db_model(model) for model in challenges]
+
     async def get_all(self) -> list[Challenge]:
         query = select(ChallengeModel).order_by(
             ChallengeModel.start, ChallengeModel.end
