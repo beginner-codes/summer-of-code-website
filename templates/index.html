@@ -182,7 +182,7 @@
             } else if(remaining === 0){
                 location.reload();
             } else if(remaining > 1){
-                message = `${remaining} seconds`;
+                message = `${Math.floor(remaining)} seconds`;
                 next = 1;
             }
 
