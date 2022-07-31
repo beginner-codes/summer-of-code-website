@@ -86,7 +86,9 @@ async def challenges(db: Database = inject(Database)):
     }
 
 
-@site.get("/challenges/{challenge_id}", response_class=TemplateResponse)
+@site.get(
+    "/challenges/{challenge_id}", response_class=TemplateResponse, name="show-challenge"
+)
 async def show_challenge(challenge_id: int, db: Database = inject(Database)):
     challenge = await db.challenges.get(challenge_id)
     if not challenge:
