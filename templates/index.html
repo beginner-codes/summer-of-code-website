@@ -161,7 +161,7 @@
             const hours = Math.floor(remaining / 3600);
             const minutes = Math.floor(remaining / 60);
             let message = `${remaining} seconds`
-            let next = 60 - remaining % 60;
+            let next = remaining % 60;
             if(days === 1){
                 message = "1 day";
             } else if(days > 1){
