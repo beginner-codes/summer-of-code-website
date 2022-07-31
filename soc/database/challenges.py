@@ -3,7 +3,6 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import Type
 
-import pendulum
 import sqlalchemy.exc
 import sqlalchemy.orm
 from bevy import Bevy, bevy_method, Inject
@@ -96,7 +95,7 @@ class Challenges(Bevy):
             ChallengeModel.start, ChallengeModel.end
         )
         if ignore_future:
-            query.where(ChallengeModel.start <= pendulum.now("UTC"))
+            query = query.where(ChallengeModel.start <= datetime.utcnow())
 
         result = await self._get_query_result(query, [])
         return [self._challenge_type.from_db_model(row) for row in result]
