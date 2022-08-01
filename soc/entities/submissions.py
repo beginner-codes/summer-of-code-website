@@ -125,6 +125,10 @@ class Submission(Bevy):
         return self._id
 
     @property
+    def challenge_id(self) -> int:
+        return self._challenge_id
+
+    @property
     def link(self) -> str:
         return self._link
 

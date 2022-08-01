@@ -57,64 +57,105 @@ class Announcements(Bevy):
     ):
         webhooks = await settings.get("announcement_webhooks")
         if webhooks:
-            async with AsyncClient() as session:
-                description = challenge.description.strip()
-                if len(description) > 250:
-                    description = f"{description[:247].rstrip(' !?.:,;)([]{}+-_')}..."
+            description = challenge.description.strip()
+            if len(description) > 250:
+                description = f"{description[:247].rstrip(' !?.:,;)([]{}+-_')}..."
 
-                url = f"https://soc.beginner.codes{app.url_path_for('show-challenge', challenge_id=challenge.id)}"
-                end = challenge.end + pendulum.duration(days=1)
-                resp = await session.post(
-                    webhooks["new_challenge"],
-                    json={
-                        "embeds": [
-                            {
-                                "color": 0x4AFF8F,
-                                "description": f"{description}\n\nEnds <t:{end.timestamp():.0f}:R>",
-                                "title": challenge.title,
-                                "url": url,
-                            }
-                        ]
-                    },
-                )
-
-                print(f"Announce new challenge {resp.content=} {resp.status_code=}")
+            url = f"https://soc.beginner.codes{app.url_path_for('show-challenge', challenge_id=challenge.id)}"
+            end = challenge.end + pendulum.duration(days=1)
+            await self._send_to_webhook(
+                webhooks["new_challenge"],
+                {
+                    "embeds": [
+                        {
+                            "color": 0x4AFF8F,
+                            "description": f"{description}\n\nEnds <t:{end.timestamp():.0f}:R>",
+                            "title": challenge.title,
+                            "url": url,
+                        }
+                    ]
+                },
+            )
 
     @bevy_method
     async def on_submission_status_changed(
         self,
         submission: submissions.Submission,
-        app: FastAPI = Inject,
         settings: Settings = Inject,
     ):
         webhooks = await settings.get("announcement_webhooks")
-        if webhooks and submission.status.status == submissions.Status.APPROVED:
-            async with AsyncClient() as session:
-                user = await submission.created_by
-                description = submission.description.strip()
-                url = f"https://soc.beginner.codes{app.url_path_for('index')}#submission-{submission.id}"
-                short_url = self._create_short_link(submission.link)
-                if len(description) > 250:
-                    description = f"{description[:247].rstrip(' !?.:,;)([]{}+-_')}..."
-                resp = await session.post(
-                    webhooks["submission_approved"],
-                    json={
-                        "embeds": [
-                            {
-                                "author": {
-                                    "icon_url": user.avatar,
-                                    "name": user.username,
-                                },
-                                "color": 0xFFE44A,
-                                "description": f"{description}\n\nCheck it out [{short_url}]({url})",
-                            }
-                        ]
-                    },
-                )
+        if not webhooks:
+            return
 
-                print(
-                    f"Announce submission approval {resp.content=} {resp.status_code=}"
-                )
+        if submission.status.status == submissions.Status.APPROVED:
+            await self._send_submission_approved_announcement(
+                submission, webhooks["submission_approved"]
+            )
+
+        elif submission.status.status == submissions.Status.CREATED:
+            await self._send_submission_created_announcement(
+                submission, webhooks["new_submission"]
+            )
+
+    @bevy_method
+    async def _send_submission_approved_announcement(
+        self, submission, webhook, app: FastAPI = Inject
+    ):
+        user = await submission.created_by
+        description = submission.description.strip()
+        url = f"https://soc.beginner.codes{app.url_path_for('index')}#submission-{submission.id}"
+        short_url = self._create_short_link(submission.link)
+        if len(description) > 250:
+            description = f"{description[:247].rstrip(' !?.:,;)([]{}+-_')}..."
+
+        await self._send_to_webhook(
+            webhook,
+            {
+                "embeds": [
+                    {
+                        "author": {
+                            "icon_url": user.avatar,
+                            "name": user.username,
+                        },
+                        "color": 0xFFE44A,
+                        "description": f"{description}\n\nCheck it out [{short_url}]({url})",
+                    }
+                ]
+            },
+        )
+
+    @bevy_method
+    async def _send_submission_created_announcement(
+        self, submission, webhook, app: FastAPI = Inject
+    ):
+        url = (
+            f"https://soc.beginner.codes"
+            f"{app.url_path_for('admin-view-challenge', challenge_id=submission.challenge_id)}"
+            f"#submission-{submission.id}"
+        )
+        user = await submission.created_by
+        await self._send_to_webhook(
+            webhook,
+            {
+                "embeds": [
+                    {
+                        "author": {
+                            "icon_url": user.avatar,
+                            "name": user.username,
+                        },
+                        "color": 0xFF4A4A,
+                        "description": f"{submission.description}\n\n{submission.type=}\n{submission.link=}\n\n[Review]({url})",
+                    }
+                ]
+            },
+        )
+
+    async def _send_to_webhook(self, webhook, payload):
+        async with AsyncClient() as session:
+            resp = await session.post(webhook, json=payload)
+            print(
+                f"Ran webhook {webhook=} {resp.content=} {resp.status_code=} {payload=}"
+            )
 
     def _create_short_link(self, link: str) -> str:
         short = re.match("(?:https?://)?(.+)", link).group(1)
