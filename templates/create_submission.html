@@ -1,6 +1,8 @@
 {% include 'header.html' %}
-    <h1>Create Submission</h1>
-    <h2>{{challenge.title}}</h2>
+    <hgroup>
+        <h1>Create Submission</h1>
+        <h2>for {{challenge.title}}</h2>
+    </hgroup>
     <form id = "create-submission-form">
         <label for="submission-description">Description</label>
         <textarea id="submission-description" name="description" placeholder="Describe your submission!"></textarea>
