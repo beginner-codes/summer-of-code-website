@@ -16,6 +16,11 @@
             </tr>
             </thead>
             <tbody>
+                {% if not challenge.submissions %}
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 3em 0; color: #ffffff33;"><em>No Submissions Yet</em></td>
+                </tr>
+                {% endif %}
                 {% for submission in challenge.submissions %}
                     <tr id="submission-{{submission.id}}" class="submission">
                         <td>
