@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Awaitable
 
+import markdown
 import pendulum
 from bevy import Bevy, bevy_method, Inject
 
@@ -13,7 +14,7 @@ from soc.database.models.submission_status import SubmissionStatusModel
 from soc.database.models.submissions import SubmissionModel
 from soc.entities.users import User
 from soc.state_property import state_property
-from soc.strenum import StrEnum, auto
+from soc.strenum import auto, StrEnum
 
 
 class Status(StrEnum):
@@ -124,8 +125,16 @@ class Submission(Bevy):
         return self._id
 
     @property
+    def challenge_id(self) -> int:
+        return self._challenge_id
+
+    @property
     def link(self) -> str:
         return self._link
+
+    @property
+    def markdown(self) -> str:
+        return markdown.markdown(self.description)
 
     @property
     def type(self) -> str:
@@ -183,6 +192,7 @@ class Submission(Bevy):
             "type": self.type,
             "created": await self.created,
             "description": self.description,
+            "markdown": self.markdown,
             "link": self._link,
             "user_id": self._user_id,
             "challenge_id": self._challenge_id,

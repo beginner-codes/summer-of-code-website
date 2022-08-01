@@ -19,6 +19,7 @@ from soc.events import Events
 from soc.templates.jinja import Jinja2
 from soc.templates.response import TemplateResponse
 
+
 site = create_app()
 site.mount("/v1/", api_app)
 site.mount("/admin/", admin_app)
@@ -85,7 +86,7 @@ async def challenges(db: Database = inject(Database)):
                 "formatted_start": challenge.start.format("dddd, MMMM Do "),
                 "formatted_end": challenge.end.format("dddd, MMMM Do "),
             }
-            for challenge in await db.challenges.get_all()
+            for challenge in await db.challenges.get_all(ignore_future=True)
         ]
     }
 

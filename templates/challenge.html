@@ -2,78 +2,15 @@
 <div id="challenge-info" class="container">
   <div>
     <h2>{{ challenge.title }}</h2>
-    <p>{{ challenge.description }}</p>
-    <button>Post Your Submission</button>
+    <p>{{ challenge.markdown|safe }}</p>
+    <a href = "challenges/{{ challenge.id }}/create-submission" style = "margin-top:20px; width: 100%" role="button">Post Your Submission</a>
   </div>
   <div id="time-info">
     <h6>Start Date: <br>{{ challenge.formatted_start }}</h6>
     <h6>End Date: <br>{{challenge.formatted_end}}</h6>
   </div>
 </div>
- <section id="submissions" class="container">
-    <h4>Submissions</h4>
-    {% for submission in challenge.submissions %}
-        {% if submission.status.status != "DISAPPROVED" %}
-            <div id="submission-{{submission.id}}" class="submission">
-                <div class = "left-submission">
-                    <img class="submission-avatar" src="{{submission.created_by.avatar}}" alt="{{submission.created_by.username}}' Avatar" />
-                </div>
-                <div class = "right-submission">
-                    <div class = "submission-top">
-                        <div >
-                            <h4>{{submission.created_by.username}}</h4>
-                            <p>{{submission.formatted_created}}</p>
-                        </div>
-                        <div id="submission-{{submission.id}}-votes" style = "position: relative;">
-                            <span>Votes</span>
-                            <span class = "vote-box" data-submission-id="{{ submission.id }}">
-                            {% for name, votes in submission.votes.items() %}
-                                {% if user and user.id != submission.created_by.id %}
-                                <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
-                                {% endif %}
-                                    <span><i class="emoji {{name}}"></i><span>{{votes|length}}x</span></span>
-                                {% if user and user.id != submission.created_by.id %}
-                                </a>
-                                {% endif %}
-                            {% endfor %}
-                            </span>
-                            <span class = "add-vote-conatiner">
-                                {% if user and user.id != submission.created_by.id %}
-                                <h1 class = "add-vote-button" data-submission-id="{{ submission.id }}">+</h1>
-                                {% endif %}
-                                <div class="hidden-vote-box active" data-submission-id="{{ submission.id }}">
-                                {% if user and user.id != submission.created_by.id %}
-                                    {% for category, _emoji in emoji.items() %}
-                                        {% for name, description in _emoji.items() %}
-                                            {% if name not in user_votes[submission.id] %}
-                                                <a class="vote-button" href="#" data-emoji="{{name}}" data-submission-id="{{submission.id}}" data-challenge-id="{{challenge.id}}">
-                                                    <i class="emoji {{name}}" title="{{description}}"></i>
-                                                </a>
-                                            {% endif %}
-                                        {% endfor %}
-                                    {% endfor %}
-                                {% endif %}
-                                </div>
-                            </span>
-                        </div>
-                    </div>
-                    <p>{{submission.description}}</p>
-                    <a href="{{submission.link}}" role="button">Check It Out</a>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
-    {% endfor %}
-</section>
-<script>
-    const add_vote_button = document.querySelectorAll(".add-vote-button")
-    add_vote_button.forEach((vote_button) => {
-            vote_button.addEventListener("click", () => {
-                const submission_id = vote_button.getAttribute("data-submission-id");
-                const hidden_vote_box = document.querySelector(`.hidden-vote-box[data-submission-id='${submission_id}']`);
-                hidden_vote_box.classList.toggle("active")
-            });
-        }
-    )
-</script>
+
+{% include 'submissions-list.html' %}
+
 {%include 'footer.html' %}

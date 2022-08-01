@@ -1,11 +1,12 @@
 {% include 'header.html' %}
 <h1>Challenges</h1>
 {% for challenge in challenges %}
-<section id="challenge-{{challenge.id}}">
-  <hgroup>
-    <h3><a href="/challenges/{{challenge.id}}">{{challenge.title}}</a></h3>
-    <h4>{{challenge.formatted_start}} until {{challenge.formatted_end}}</h4>
-  </hgroup>
-  <p>{{challenge.description}}</p>
-</section>
-{% endfor %} {% include 'footer.html' %}
+  <section id="challenge-{{challenge.id}}">
+    <hgroup>
+      <h3><a href="/challenges/{{challenge.id}}">{{challenge.title}}</a></h3>
+      <h4>{{challenge.formatted_start}} until {{challenge.formatted_end}}</h4>
+    </hgroup>
+    <p>{{challenge.markdown|safe}}</p>
+  </section>
+{% endfor %}
+{% include 'footer.html' %}
