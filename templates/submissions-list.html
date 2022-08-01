@@ -47,7 +47,16 @@
                             </div>
                         </div>
                         <p>{{submission.markdown|safe}}</p>
-                        <a href="{{submission.link}}" role="button">Check It Out</a>
+                        <a href="{{submission.link}}" role="button">
+                            Check Out the
+                            {% if submission.type == "code" %}
+                                Code
+                            {% elif submission.type == "blog" %}
+                                Blog Post
+                            {% elif submission.type == "video" %}
+                                Video
+                            {% endif %}
+                        </a>
                         </div>
                     </div>
                 </div>
