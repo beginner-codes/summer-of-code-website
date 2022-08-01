@@ -8,21 +8,20 @@
         <input id="submission-link" type="url" name="link" placeholder="https://..." />
         <label for="submission-type">Type</label>
         <select id="submission-type" name="type">
+            <option value="code">Code</option>
             <option value="blog">Blog Post</option>
             <option value="video">Video</option>
-            <option value="code">Code</option>
         </select>
         <button>Create</button>
     </form>
     <script>
         const create_challenge_form = document.getElementById("create-submission-form");
-        create_challenge_form.addEventListener("submit", (e) => {
+        create_challenge_form.addEventListener("submit", async e => {
             e.preventDefault();
-            const data = new FormData(e.target);
-            const json_data = Object.fromEntries(data.entries());
-            apiRequest("POST", "/v1/challenges/{{challenge.id}}/submissions/create", json_data).then(
-                data => location.href = `/#submission-${data.id}`
-            )
+            const formData = new FormData(e.target);
+            const json_data = Object.fromEntries(formData.entries());
+            const data = await apiRequest("POST", "/v1/challenges/{{challenge.id}}/submissions/create", json_data)
+            location.href = `/#submission-${data.id}`
         })
     </script>
 {% include 'footer.html' %}
