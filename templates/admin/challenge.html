@@ -42,9 +42,9 @@
                             <form class="update-submission-status" data-submission-id="{{submission.id}}">
                                 <label for="change-submission-status-{{submission.id}}">New Status</label>
                                 <select name="status" id="change-submission-status-{{submission.id}}">
-                                    <option disabled>Select One</option>
-                                    <option value="APPROVED">Approve</option>
-                                    <option value="DISAPPROVED">Disapprove</option>
+                                    <option value disabled{% if submission.status.status == "CREATED" %} selected{% endif %}>-- Select One --</option>
+                                    <option value="APPROVED"{% if submission.status.status == "APPROVED" %} selected{% endif %}>Approved</option>
+                                    <option value="DISAPPROVED"{% if submission.status.status == "DISAPPROVED" %} selected{% endif %}>Disapproved</option>
                                 </select>
                                 <button>Apply</button>
                             </form>
