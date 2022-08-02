@@ -148,3 +148,13 @@ async def logout(template: Jinja2 = inject(Jinja2)):
     response = HTMLResponse(template("logout.html"))
     response.delete_cookie("sessionid")
     return response
+
+
+@site.get("/about", response_class=TemplateResponse)
+async def about_page():
+    return "about.html"
+
+
+@site.get("/rules", response_class=TemplateResponse)
+async def about_page():
+    return "rules.html"
