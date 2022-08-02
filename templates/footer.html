@@ -1,6 +1,28 @@
-    </main>
-    <footer class="container">
-      <p style="text-align: center;">&copy; Zech Zimmerman 2022</p>
-    </footer>
-  </body>
+        </main>
+        <footer class="container">
+            <nav>
+                <ul style="margin: auto;">
+                    <li>
+                        <a href="/rules">Rules</a>
+                    </li>
+                    <li>
+                        <a href="/about">About Us</a>
+                    </li>
+                    <li>
+                        {% if user %}
+                        <a href="/logout">Log Out</a>
+                        {% else %}
+                        <a href="/auth/discord/login">Log In</a>
+                        {% endif %}
+                    </li>
+                    {% if user and ("MOD" in user.roles or "ADMIN" in user.roles) %}
+                    <li>
+                        <a href="/admin/dashboard">Admin</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            <p style="text-align: center;">&copy; Zech Zimmerman 2022</p>
+        </footer>
+    </body>
 </html>
