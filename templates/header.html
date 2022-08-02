@@ -38,17 +38,13 @@
             <a href="/challenges">Challenges</a>
           </li>
           <li>
-            {% if user %}
-            <a href="/logout">Log out</a>
-            {% else %}
-            <a href="/auth/discord/login">Log in</a>
-            {% endif %}
+            <a href="/about">About Us</a>
           </li>
+          {% if not user %}
           <li>
-            {% if user and ("ADMIN" in user.roles or "MOD" in user.roles) %}
-            <a href="/admin/dashboard">Admin</a>
-            {% endif %}
+            <a href="/auth/discord/login">Log In</a>
           </li>
+          {% endif %}
         </ul>
       </nav>
     </header>
