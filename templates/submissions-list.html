@@ -97,6 +97,7 @@
                 vote_button.addEventListener("click", () => {
                     const submission_id = vote_button.getAttribute("data-submission-id");
                     const hidden_vote_box = document.querySelector(`.hidden-vote-box[data-submission-id='${submission_id}']`);
+                    vote_button.classList.toggle("clicked")
                     hidden_vote_box.classList.toggle("active")
                 });
             })
