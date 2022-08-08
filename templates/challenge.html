@@ -3,7 +3,7 @@
   <div>
     <h2>{{ challenge.title }}</h2>
     <p>{{ challenge.markdown|safe }}</p>
-    <a href = "challenges/{{ challenge.id }}/create-submission" style = "margin-top:20px; width: 100%" role="button">Post Your Submission</a>
+    <a href = "/challenges/{{ challenge.id }}/create-submission" style = "margin-top:20px; width: 100%" role="button">Post Your Submission</a>
   </div>
   <div id="time-info">
     <h6>Start Date: <br>{{ challenge.formatted_start }}</h6>
