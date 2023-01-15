@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 from datetime import datetime, timedelta
 from typing import Type
 
@@ -47,8 +48,8 @@ class Challenges(Bevy):
         db_session: AsyncSession = Inject,
     ) -> Challenge:
         model = ChallengeModel(
-            title=title,
-            description=description,
+            title=html.escape(title),
+            description=html.escape(description),
             start=start,
             end=end,
             user_id=user.id if isinstance(user, User) else user,
@@ -112,8 +113,8 @@ class Challenges(Bevy):
         user_id = user if isinstance(user, int) else user.id
         model = SubmissionModel(
             type=type,
-            link=link,
-            description=description,
+            link=html.escape(link),
+            description=html.escape(description),
             user_id=user_id,
             challenge_id=challenge if isinstance(challenge, int) else challenge.id,
         )
@@ -245,7 +246,7 @@ class Challenges(Bevy):
             statement = (
                 update(SubmissionModel)
                 .where(SubmissionModel.id == submission_id)
-                .values(description=description)
+                .values(description=html.escape(description))
             )
             await db_session.execute(statement)
             await db_session.commit()
@@ -260,6 +261,12 @@ class Challenges(Bevy):
             for field_name, field_value in fields.items()
             if field_name not in disallowed_fields
         }
+        
+        if "description" in changed_fields:
+            changed_fields["description"] = html.escape(changed_fields["description"])
+        
+        if "title" in changed_fields:
+            changed_fields["title"] = html.escape(changed_fields["title"])
 
         async with db_session.begin():
             statement = (
